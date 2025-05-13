@@ -1,0 +1,23 @@
+{
+    "app.name": "CSR",
+    "tab.newest_activities": "Newest",
+    "tab.all_activities": "All",
+    "tab.my_account": "My",
+    "title.newest_activities": "Newest Activities",
+    "title.all_activities": "All Activities",
+    "title.activity_detail": "Activity Detail",
+    "title.my_account": "My Account",
+    "title.login": "CSR - Login",
+    "activity.label.progress": "Progress: ",
+    "activity.label.time": "Time: ",
+    "activity.label.to": " to ",
+    "activity.label.introduction": "Introduction: ",
+    "activity.join": "Join",
+    "activity.joined": "Joined",
+    "acivity.introduction": "Introduction",
+    "acivity.progress": "Progress",
+    "acivity.participation": "Participation",
+    "login.user_name": "User Name",
+    "login.password": "Password",
+    "login.login": "Login"
+}
