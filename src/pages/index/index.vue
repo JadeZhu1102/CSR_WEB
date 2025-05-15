@@ -59,7 +59,7 @@ const onJoin = (id: number) => {
 }
 </script>
 
-<style>
+<style lang="less">
 #current-activity-list .activity-item {
   margin: 12px;
   background-color: #f8f8f8;

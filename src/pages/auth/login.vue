@@ -42,7 +42,7 @@ const onLogin = () => {
 
 </script>
 
-<style>
+<style lang="less">
 #login-form {
   max-width: 640px;
 }

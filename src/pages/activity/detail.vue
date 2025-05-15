@@ -78,7 +78,7 @@ onLoad(async (query) => {
 });
 </script>
 
-<style>
+<style lang="less">
 .activity-detail {
   .activity-title {
     display: block;
