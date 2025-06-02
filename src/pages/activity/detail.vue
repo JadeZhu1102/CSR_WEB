@@ -10,14 +10,14 @@
       <view v-if="tab === 1">
         <swiper class="activity-gallery">
           <swiper-item>
-            <image class="image" :src="activity.cover" />
+            <image class="image" :src="activity.coverImage" />
           </swiper-item>
         </swiper>
         <view class="activity-title">
-          <text>{{ activity.title }}</text>
+          <text>{{ activity.name }}</text>
         </view>
         <view class="activity-introduction">
-          <text>{{ activity.introduction }}</text>
+          <text>{{ activity.slogan }}</text>
         </view>
       </view>
     </view>
@@ -45,6 +45,9 @@
       </template>
 
     </view>
+    <view v-if="tab === 3">
+      <ActivityEnroll :joined="activity.joined" :activityId="currentActivityId" />
+    </view>
   </template>
 </template>
 
@@ -56,6 +59,26 @@ import uaTimeline from "@/components/ua-timeline/ua-timeline.vue";
 import uaTimelineItem from "@/components/ua-timeline-item/ua-timeline-item.vue";
 import type { IActivityDetail } from "@/models/activity";
 import fetchActivityDetailApi from "@/api/activity-detail.api";
+import ActivityEnroll from "@/components/activity/activity-enroll.vue";
+
+const tabList = ref([
+  {
+    index: 1,
+    name: "acivity.introduction",
+  },
+  {
+    index: 2,
+    name: "acivity.progress",
+  },
+  {
+    index: 3,
+    name: "acivity.participation",
+  },
+]);
+const currentActivityId = ref<number>(0);
+const tab = ref<number>(1);
+const activity = ref<IActivityDetail | null>(null);
+
 const publicEvent = ref<Array<Object>>([
   {
     title: "项目筛选",
@@ -81,33 +104,19 @@ const publicEvent = ref<Array<Object>>([
     size: 26
   },
 ]);
+
 const personalEvent = ref([]);
-const tabList = ref([
-  {
-    index: 1,
-    name: "acivity.introduction",
-  },
-  {
-    index: 2,
-    name: "acivity.progress",
-  },
-  {
-    index: 3,
-    name: "acivity.participation",
-  },
-]);
-const tab = ref<number>(1);
 const timelineList = computed(() => {
   return [...publicEvent.value, ...personalEvent.value].sort((a, b) => {
     return new Date(a.timestamp) - new Date(b.timestamp)
   })
 })
 
-const activity = ref<IActivityDetail | null>(null);
 
 const selecTab = (index: number) => {
   tab.value = index;
 };
+
 const addPersonalEvent = (): void => {
   const title = prompt("请输入标题");
   const content = prompt("请输入描述");
@@ -124,30 +133,43 @@ const addPersonalEvent = (): void => {
     });
   }
 };
+
 type DetailParam = {
   id: string;
 };
+
 const deleteItem = (item: number): void => {
   personalEvent.value = personalEvent.value.filter(i => i.id !== item);
 
 }
+
 onLoad(async (query) => {
   const activityId = (query as DetailParam).id;
-  console.log(activityId);
+  currentActivityId.value = Number(activityId);
 
-  uni.showLoading();
-  await new Promise((resolve) => {
-    setTimeout(() => resolve(true), 1000);
-  });
-  const detail: IActivityDetail = await fetchActivityDetailApi(activityId);
+  try {
+    uni.showLoading();
+    await new Promise(resolve => {
+      setTimeout(() => resolve(true), 1000);
+    });
+    const detail: IActivityDetail = await fetchActivityDetailApi(activityId);
+    activity.value = detail;
 
-  activity.value = detail;
+    uni.setNavigationBarTitle({ title: detail.name });
+  } catch (error) {
+    //
+  } finally {
+    uni.hideLoading();
+  }
 
-  uni.hideLoading();
 });
+
+const onEnroll = () => {
+  
+}
 </script>
 
-<style lang="less">
+<style lang="scss">
 .activity-detail {
   .activity-title {
     display: block;

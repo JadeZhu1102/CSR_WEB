@@ -15,15 +15,19 @@
 </template>
 
 <script setup lang="ts">
+import { loginAccount } from '@/util/auth';
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue'
 const userName = ref('')
 const password = ref('')
 
 onLoad(() => {
-  uni.navigateTo({
-    url: '/pages/auth/login',
-  });
+  const isLogined = false;
+  if (isLogined) {
+    uni.switchTab({
+      url: '/pages/index/index',
+    });
+  }
 });
 
 type ChangeEvent = {
@@ -36,13 +40,23 @@ const onUserPasswordChange = (event: ChangeEvent) => {
   password.value = event.detail.value;
 }
 
-const onLogin = () => {
-  console.log(userName.value, password.value);
+const onLogin = async () => {
+  try {
+    await loginAccount({
+      username: userName.value,
+      password:  password.value,
+    });
+    uni.switchTab({
+      url: '/pages/index/index',
+    })
+  } catch (error) {
+    
+  }
 }
 
 </script>
 
-<style lang="less">
+<style lang="scss">
 #login-form {
   max-width: 640px;
 }

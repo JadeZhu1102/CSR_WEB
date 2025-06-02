@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
-import checkIfLogined from "@/util/login-check";
+import { checkIfLogined } from "@/util/auth";
+import { initializeLocale } from "./config/locale";
 
 onLaunch(() => {
-  // 根据用户的具体情况设置语言
-  uni.setLocale("zh-Hans");
+  initializeLocale();
 
   checkIfLogined().then(isLogined => {
     if (isLogined !== true) {
@@ -22,4 +22,7 @@ onHide(() => {
   console.log("App Hide");
 });
 </script>
-<style></style>
+
+<style lang="scss">
+@import url("uni.scss");
+</style>

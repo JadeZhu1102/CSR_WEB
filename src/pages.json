@@ -1,6 +1,12 @@
 {
 	"pages": [
 		{
+			"path": "pages/account/index",
+			"style": {
+				"navigationBarTitleText": "%title.my_account%"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "%title.newest_activities%"
@@ -16,12 +22,6 @@
 			"path": "pages/activity/detail",
 			"style": {
 				"navigationBarTitleText": "%title.activity_detail%"
-			}
-		},
-		{
-			"path": "pages/account/index",
-			"style": {
-				"navigationBarTitleText": "%title.my_account%"
 			}
 		},
 		{
@@ -62,9 +62,9 @@
 		]
 	},
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "#30a908",
 		"backgroundColor": "#F8F8F8"
 	}
 }

@@ -1,17 +1,16 @@
 import type { IActivityItem } from "@/models/activity";
+import { request } from "./request";
+
+interface IActivityListApiResponse {
+    lang: string;
+    data: IActivityItem[];
+}
 
 export default async function fetchActivityListApi(): Promise<IActivityItem[]> {
-    const list: IActivityItem[] = [
-        {
-            id: 1,
-            title: '2025玉米行',
-            introduction: '崇明岛种玉米活动',
-            cover: 'https://img.redocn.com/sheji/20190222/jianyuechuangyilvseditanhuanbaoxuanchuanhaibao_10150195.jpg',
-            startDate: '2025-05-01',
-            endDate: '2025-10-01',
-            progress: 60,
-            hasJoined: false,
-        }
-    ];
-    return Promise.resolve(list);
+    return request<IActivityListApiResponse>({
+        url: '/api/activity/all?type=newest',
+    }).then(res => res.data.map(item => ({
+        ...item,
+        coverImage: typeof item.coverImage === 'string' ? '/media/' + item.coverImage : item.coverImage,
+    })));
 }
