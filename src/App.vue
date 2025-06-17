@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { checkIfLogined } from "@/util/auth";
-import { initializeLocale } from "./config/locale";
+import { initializeLocale } from "@/config/locale";
+import PageUrl from "@/config/page-url";
 
 onLaunch(() => {
   initializeLocale();
@@ -9,7 +10,7 @@ onLaunch(() => {
   checkIfLogined().then(isLogined => {
     if (isLogined !== true) {
       uni.navigateTo({
-        url: '/pages/auth/login',
+        url: PageUrl.auth.login,
       });
     }
   });

@@ -36,7 +36,8 @@ const datetimeFormats = {
 		weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: true
 	  }
 	}
-  }
+};
+
 const i18nConfig = {
 	locale: uni.getLocale(),
 	datetimeFormats,

@@ -54,12 +54,13 @@ import { ref } from 'vue'
 
 import type { IActivityItem } from '@/models/activity';
 import fetchActivityListApi from '@/api/activity-list';
+import PageUrl from '@/config/page-url';
 
 const activityList = ref<IActivityItem[]>([]);
 
 const onJoin = (id: number) => {
   uni.navigateTo({
-    url: '/pages/activity/detail?id=' + id,
+    url: PageUrl.activity.detail(id),
   });
 }
 

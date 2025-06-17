@@ -22,7 +22,7 @@
 <script lang="ts">
 import { ref } from "vue";
 import type { IActivityEvent } from "@/models/event";
-import enrollctivityListApi from "@/api/activity-enroll";
+import enrollActivityListApi from "@/api/activity-enroll";
 import fetchActivityEventsApi from "@/api/activity-events";
 
 export default {
@@ -46,7 +46,7 @@ export default {
         async onEnroll() {
             try {
                 uni.showLoading()
-                const res = await enrollctivityListApi(this.activityId);
+                const res = await enrollActivityListApi(this.activityId);
                 if (res) {
                     uni.showToast({
                         icon: 'success',
