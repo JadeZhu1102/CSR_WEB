@@ -25,6 +25,7 @@
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 import { logoutAccount } from '@/util/auth';
+import PageUrl from '@/config/page-url';
 
 const avatarUrl = ref('');
 const userName = ref('-');
@@ -32,7 +33,7 @@ const userName = ref('-');
 const onLogout = () => {
     logoutAccount();
     uni.navigateTo({
-        url: '/page/auth/login'
+        url: PageUrl.auth.login,
     });
 }
 

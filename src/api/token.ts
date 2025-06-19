@@ -1,3 +1,5 @@
+import PageUrl from "@/config/page-url";
+
 interface ITokenCache {
     token: string;
     refreshToken: string;
@@ -40,7 +42,8 @@ class TokenManager {
                 return tokenCache.token;
             }
         }
-        throw new Error('Token expired');
+        uni.navigateTo({ url: PageUrl.auth.login });
+        throw new Error('Token does not exist or is expired');
     }
 }
 

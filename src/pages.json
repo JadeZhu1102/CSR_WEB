@@ -1,12 +1,6 @@
 {
 	"pages": [
 		{
-			"path": "pages/account/index",
-			"style": {
-				"navigationBarTitleText": "%title.my_account%"
-			}
-		},
-		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "%title.newest_activities%"
@@ -22,6 +16,18 @@
 			"path": "pages/activity/detail",
 			"style": {
 				"navigationBarTitleText": "%title.activity_detail%"
+			}
+		},
+		{
+			"path": "pages/activity/auto-join",
+			"style": {
+				"navigationBarTitleText": "%title.join_activity%"
+			}
+		},
+		{
+			"path": "pages/account/index",
+			"style": {
+				"navigationBarTitleText": "%title.my_account%"
 			}
 		},
 		{
@@ -63,7 +69,7 @@
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "CSR",
 		"navigationBarBackgroundColor": "#30a908",
 		"backgroundColor": "#F8F8F8"
 	}

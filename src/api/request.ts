@@ -1,4 +1,5 @@
 import { getLocale } from "@/config/locale";
+import PageUrl from "@/config/page-url";
 import tokenManager from "./token";
 
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {
@@ -14,11 +15,12 @@ const defaultConfig: IRequestConfig = {
 }
 
 export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestConfig = defaultConfig) {
-    const { url, data, ...rest } = options;
-    const requestUrl = cfg.useI18n === false ? url : (url.indexOf('?') >= 0 ? url + '&' : url + '?') + 'lang=' + getLocale() ;
     const token = await tokenManager.getToken();
 
     return new Promise<T>((resolve, reject) => {
+        const { url, data, ...rest } = options;
+        const requestUrl = cfg.useI18n === false ? url : (url.indexOf('?') >= 0 ? url + '&' : url + '?') + 'lang=' + getLocale() ;
+
         uni.request({
             ...rest,
             url: requestUrl,
@@ -31,7 +33,7 @@ export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestCo
                     throw new Error('Not found');
                 }
                 if (isTokenExpired(res)) {
-                    uni.navigateTo({ url: '/pages/auth/login' });
+                    uni.navigateTo({ url: PageUrl.auth.login });
                 }
                 resolve(res.data as T);
             },
