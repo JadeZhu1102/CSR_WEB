@@ -7,6 +7,7 @@
             <view class="user-info-container">
                 <text class="user-name">{{ userName }}</text>
             </view>
+            <button class="ani-btn lang-btn" @click="showLangDialog = true">{{ $t('account.button.language') }}</button>
         </view>
         <view id="user-achievement">
             <text class="section-title">
@@ -18,23 +19,51 @@
                 {{ $t('account.button.logout') }}
             </button>
         </view>
+        <view v-if="showLangDialog" class="lang-dialog-mask" @click.self="showLangDialog = false">
+            <view class="lang-dialog ani-scale-pop">
+                <view class="lang-title">{{ $t('account.language.title') }}</view>
+                <view class="lang-options">
+                    <view class="lang-option" :class="{active: normalizeLang(currentLang) === 'zh-Hans'}" @click="switchLang('zh-Hans')">简体中文</view>
+                    <view class="lang-option" :class="{active: normalizeLang(currentLang) === 'en'}" @click="switchLang('en')">English</view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app';
-import { ref } from 'vue';
+import { ref, getCurrentInstance } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
 
+function normalizeLang(lang: string) {
+    if (lang.startsWith('zh')) return 'zh-Hans';
+    if (lang.startsWith('en')) return 'en';
+    return 'zh-Hans'; // 默认中文
+}
+
 const avatarUrl = ref('');
 const userName = ref('-');
+const showLangDialog = ref(false);
+const currentLang = ref(normalizeLang(uni.getLocale() || 'zh-Hans'));
 
 const onLogout = () => {
     logoutAccount();
     uni.navigateTo({
         url: PageUrl.auth.login,
     });
+}
+
+const switchLang = (lang: string) => {
+    const instance = getCurrentInstance();
+    if (instance && instance.appContext.config.globalProperties.$i18n) {
+        instance.appContext.config.globalProperties.$i18n.locale = lang;
+    }
+    uni.setLocale && uni.setLocale(lang);
+    currentLang.value = lang;
+    showLangDialog.value = false;
+    // 可选：刷新页面或emit事件通知全局
 }
 
 onLoad(() => {
@@ -124,5 +153,58 @@ onLoad(() => {
     box-shadow: 0 2px 8px rgba(255,77,79,0.10);
     border: none;
     margin-top: 8px;
+}
+.lang-btn {
+    margin-top: 12px;
+    background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
+    color: #fff;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 7px 18px;
+    min-width: 90px;
+    box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+    border: none;
+}
+.lang-dialog-mask {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lang-dialog {
+    background: #fff;
+    border-radius: 12px;
+    min-width: 220px;
+    padding: 24px 18px 18px 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.lang-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #222;
+}
+.lang-options {
+    display: flex;
+    gap: 18px;
+}
+.lang-option {
+    font-size: 15px;
+    color: #666;
+    padding: 7px 18px;
+    border-radius: 8px;
+    background: #f4f4f4;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    &.active, &:hover {
+        background: #30a908;
+        color: #fff;
+    }
 }
 </style>

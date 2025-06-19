@@ -26,5 +26,7 @@
     "login.password": "密码",
     "login.login": "登录",
     "account.title.my_contributions": "我的贡献",
-    "account.button.logout": "退出登录"
+    "account.button.logout": "退出登录",
+    "account.button.language": "语言切换",
+    "account.language.title": "选择语言"
 }

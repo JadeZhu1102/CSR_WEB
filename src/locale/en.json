@@ -26,5 +26,7 @@
     "login.password": "Password",
     "login.login": "Login",
     "account.title.my_contributions": "My Contributions",
-    "account.button.logout": "Logout"
+    "account.button.logout": "Logout",
+    "account.button.language": "Language",
+    "account.language.title": "Select Language"
 }
