@@ -1,17 +1,21 @@
 <template>
-  <form id="login-form">
-    <view class="form-item">
-      <input type="text" :placeholder="$t('login.user_name')" @value="userName" @input="onUserNameChange" />
+  <view class="login-bg ani-fade-in-up">
+    <view class="login-card">
+      <form id="login-form">
+        <view class="form-item">
+          <input class="ani-input" type="text" :placeholder="$t('login.user_name')" v-model="userName" />
+        </view>
+        <view class="form-item">
+          <input class="ani-input" type="password" :placeholder="$t('login.password')" v-model="password" />
+        </view>
+        <view class="form-action">
+          <button class="ani-btn login-btn" type="primary" form-type="submit" @click="onLogin">
+            {{ $t('login.login') }}
+          </button>
+        </view>
+      </form>
     </view>
-    <view class="form-item">
-      <input type="password" :placeholder="$t('login.password')" @value="password" @input="onUserPasswordChange" />
-    </view>
-    <view class="form-action">
-      <button type="primary" form-type="submit" @click="onLogin">
-        {{ $t('login.login') }}
-      </button>
-    </view>
-  </form>
+  </view>
 </template>
 
 <script setup lang="ts">
@@ -30,16 +34,6 @@ onLoad(() => {
   }
 });
 
-type ChangeEvent = {
-  detail: { value: string; }
-}
-const onUserNameChange = (event: ChangeEvent) => {
-  userName.value = event.detail.value;
-}
-const onUserPasswordChange = (event: ChangeEvent) => {
-  password.value = event.detail.value;
-}
-
 const onLogin = async () => {
   try {
     await loginAccount({
@@ -50,27 +44,65 @@ const onLogin = async () => {
       url: '/pages/index/index',
     })
   } catch (error) {
-    
+    // 错误处理
   }
 }
-
 </script>
 
 <style lang="scss">
+.login-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f8fafc 100%);
+}
+.login-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(48,169,8,0.10);
+  padding: 38px 32px 32px 32px;
+  min-width: 320px;
+  max-width: 90vw;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 #login-form {
-  max-width: 640px;
+  width: 100%;
 }
-
 #login-form .form-item {
-  border-bottom: 1px solid #c8c7cc;
+  margin-bottom: 22px;
 }
-
-#login-form .form-item input {
-  padding: 12px;
+#login-form .form-item input.ani-input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 15px;
+  background: #fafbfc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
 }
-
+#login-form .form-item input.ani-input:focus {
+  border-color: #30a908;
+  box-shadow: 0 0 0 2px rgba(48,169,8,0.08);
+}
 #login-form .form-action {
-  margin-top: 16px;
-  padding: 12px;
+  margin-top: 10px;
+  padding: 0;
+}
+.login-btn {
+  width: 100%;
+  padding: 13px 0;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+  border: none;
+  margin-top: 8px;
 }
 </style>
