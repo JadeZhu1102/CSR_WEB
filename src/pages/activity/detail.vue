@@ -2,7 +2,7 @@
   <template v-if="activity">
     <view class="activity-detail">
       <view class="tab-wrapper">
-        <view v-for="tabItem in tabList" @click="selecTab(tabItem.index)"
+        <view v-for="tabItem in tabList" :key="tabItem.index" @click="selecTab(tabItem.index)"
           :class="`tab-item ${tab === tabItem.index ? 'active' : 'inactive'}`">
           {{ $t(tabItem.name) }}
         </view>
@@ -27,26 +27,27 @@
           <ua-timeline-item v-for="(item, index) in timelineList" :key="index" :timestamp="item.timestamp"
             :type="item.type" :size="item.size" :icon="item.icon" :color="item.color" :lineColor="item.lineColor"
             :lineType="item.lineType" placement="top" class="timeline-item">
-            <view class="left">
-              <h4 style="margin-bottom: 2%;">{{ item.title }}</h4>
-              {{ item.content }}
-            </view>
-            <view class="right">
-              <!-- <view> View</view> -->
-              <view v-if="item.action" @click="deleteItem(item.id)">
-                delete
+            <view class="timeline-content-row">
+              <view class="left">
+                <h4 class="timeline-title">{{ item.title }}</h4>
+                <div class="timeline-desc">{{ item.content }}</div>
+              </view>
+              <view class="right">
+                <button v-if="item.action" class="delete-btn" @click="deleteItem(item.id)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
               </view>
             </view>
           </ua-timeline-item>
-
         </ua-timeline>
 
         <button @click="addPersonalEvent" class="timeline-add">+</button>
+        <PersonalEventDialog v-model:visible="showDialog" @confirm="handlePersonalEventConfirm" />
       </template>
 
     </view>
     <view v-if="tab === 3">
-      <ActivityEnroll :joined="activity.joined" :activityId="currentActivityId" />
+      <ActivityEnroll :activityId="currentActivityId" />
     </view>
   </template>
 </template>
@@ -60,6 +61,7 @@ import uaTimelineItem from "@/components/ua-timeline-item/ua-timeline-item.vue";
 import type { IActivityDetail } from "@/models/activity";
 import fetchActivityDetailApi from "@/api/activity-detail.api";
 import ActivityEnroll from "@/components/activity/activity-enroll.vue";
+import PersonalEventDialog from "@/components/activity/personal-event-dialog.vue";
 
 const tabList = ref([
   {
@@ -105,7 +107,9 @@ const publicEvent = ref<Array<Object>>([
   },
 ]);
 
-const personalEvent = ref([]);
+const showDialog = ref(false);
+
+const personalEvent = ref<any[]>([]);
 const timelineList = computed(() => {
   return [...publicEvent.value, ...personalEvent.value].sort((a, b) => {
     return new Date(a.timestamp) - new Date(b.timestamp)
@@ -118,20 +122,20 @@ const selecTab = (index: number) => {
 };
 
 const addPersonalEvent = (): void => {
-  const title = prompt("请输入标题");
-  const content = prompt("请输入描述");
-  const timestamp = new Date().toISOString().split("T")[0];
-  if (title && content) {
-    personalEvent.value.push({
-      id: uuidV4(),
-      title,
-      content,
-      timestamp,
-      side: "right",
-      action: true,
-      type: "danger"
-    });
-  }
+  showDialog.value = true;
+};
+
+const handlePersonalEventConfirm = (data: { type: string; content: string; date: string }) => {
+  personalEvent.value.push({
+    id: uuidV4(),
+    title: data.type,
+    content: data.content,
+    timestamp: data.date,
+    side: "right",
+    action: true,
+    type: data.type === "重要" ? "danger" : data.type === "提醒" ? "warning" : "info",
+    size: 26
+  });
 };
 
 type DetailParam = {
@@ -183,15 +187,63 @@ const onEnroll = () => {
   display: flex;
   flex-direction: column;
   margin: 5% !important;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px 0 24px 0;
 
-  .ve__timeline-item__content {
-    display: grid;
-    grid-template-columns: 1fr auto;
-
-    .right {
-      align-self: center;
-      cursor: pointer;
-      color: #FF4136;
+  .timeline-item {
+    margin-bottom: 18px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 12px 18px;
+    .timeline-content-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .left {
+        flex: 1;
+        min-width: 0;
+        .timeline-title {
+          margin-bottom: 6px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+        .timeline-desc {
+          color: #666;
+          font-size: 14px;
+          word-break: break-all;
+        }
+      }
+      .right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-left: 16px;
+        .delete-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #fff0f0;
+          border: none;
+          color: #ff4d4f;
+          cursor: pointer;
+          transition: background 0.2s;
+          box-shadow: 0 1px 4px rgba(255,77,79,0.08);
+          &:hover {
+            background: #ff4d4f;
+            color: #fff;
+          }
+          svg {
+            display: block;
+          }
+        }
+      }
     }
   }
 }
