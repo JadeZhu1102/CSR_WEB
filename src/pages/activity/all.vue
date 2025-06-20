@@ -68,9 +68,9 @@
             style="width: 100%; height: 8px; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 1;"
           />
           <image
-            v-if="activity['progressIcon']"
+            v-if="activity.progressIcon"
             class="progress-icon"
-            :src="activity['progressIcon']"
+            :src="activity.progressIcon"
             :style="getProgressIconStyle(activity.progress)"
           />
         </view>
@@ -83,9 +83,14 @@
 <script setup lang="ts">
 import { onPageShow } from "@dcloudio/uni-app";
 import { onMounted, ref } from "vue";
-import type { IActivityItem } from "@/models/activity";
+import type { IActivityItem as IActivityItemOrigin } from "@/models/activity";
 import fetchActivityListApi from "@/api/activity-list";
 import image from "@/static/logo.png";
+
+type IActivityItem = IActivityItemOrigin & {
+  progressIcon?: string;
+};
+
 const activityList = ref<IActivityItem[]>([]);
 
 const onJoin = (id: number) => {
@@ -177,7 +182,7 @@ onPageShow(async () => {
   .activity-detail {
     padding: 10px 16px 0 16px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     .lifecycle {
       font-size: 13px;
@@ -193,6 +198,9 @@ onPageShow(async () => {
       }
     }
     .activity-action {
+      display: flex;
+      align-items: center;
+      height: 100%;
       .join {
         min-width: 80px;
         height: 32px;
@@ -205,6 +213,11 @@ onPageShow(async () => {
         font-weight: 600;
         box-shadow: 0 2px 8px rgba(48,169,8,0.08);
         transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        white-space: nowrap;
         &.joined {
           background: #b7eb8f;
           color: #389e0d;

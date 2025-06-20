@@ -235,6 +235,11 @@ onPageShow(async () => {
         font-weight: 600;
         box-shadow: 0 2px 8px rgba(48,169,8,0.08);
         transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        white-space: nowrap;
         &.joined {
           background: #b7eb8f;
           color: #389e0d;

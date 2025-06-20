@@ -33,8 +33,13 @@
       </view>
       <view v-if="tab === 2">
         <!-- 现代化高科技感活动进度区块 -->
-        <view class="activity-progress-modern">
-          <view v-for="stage in stages" :key="stage.id" class="progress-stage-card">
+        <view class="activity-progress-modern" @click="handleProgressAreaClick">
+          <view
+            v-for="stage in stages"
+            :key="stage.id"
+            class="progress-stage-card"
+            @click.stop="toggleStageExpand(stage.id)"
+          >
             <view class="stage-thumb">
               <image :src="stage.thumbnail" mode="aspectFill" />
             </view>
@@ -50,12 +55,69 @@
                 </view>
                 <span class="progress-percent">{{ stage.progress }}%</span>
               </view>
+              <view v-if="expandedStageId === stage.id" class="stage-records">
+                <image
+                  v-for="(img, idx) in stage.records"
+                  :key="idx"
+                  :src="img"
+                  class="record-img"
+                  mode="aspectFill"
+                  @click.stop="showPreview(img)"
+                />
+              </view>
             </view>
+          </view>
+          <view class="progress-add-btn" @click.stop="showDialog = true">+</view>
+          <PersonalEventDialog
+            v-model:visible="showDialog"
+            :typeOptions="eventTypeOptions"
+            @confirm="handlePersonalEventConfirm"
+          />
+          <!-- 图片预览弹窗 -->
+          <view v-if="previewImg" class="img-preview-mask" @click="closePreview">
+            <image :src="previewImg" class="img-preview" mode="aspectFit" />
           </view>
         </view>
       </view>
       <view v-if="tab === 3">
-        <view class="enroll-card">
+        <view class="activity-progress-modern">
+          <view
+            v-for="stage in userStages"
+            :key="stage.id"
+            class="progress-stage-card"
+            @click.stop="toggleStageExpand(stage.id)"
+          >
+            <view class="stage-thumb">
+              <image :src="stage.thumbnail" mode="aspectFill" />
+            </view>
+            <view class="stage-info">
+              <view class="stage-title-row">
+                <span class="stage-title">{{ stage.name }}</span>
+                <span class="stage-time">{{ formatDate(stage.time) }}</span>
+              </view>
+              <view class="stage-desc">{{ stage.description }}</view>
+              <view class="stage-progress-bar">
+                <view class="progress-bar-bg">
+                  <view class="progress-bar-fg" :style="{ width: stage.progress + '%' }"></view>
+                </view>
+                <span class="progress-percent">{{ stage.progress }}%</span>
+              </view>
+              <view v-if="expandedStageId === stage.id" class="stage-records">
+                <image
+                  v-for="(img, idx) in stage.records"
+                  :key="idx"
+                  :src="img"
+                  class="record-img"
+                  mode="aspectFill"
+                  @click.stop="showPreview(img)"
+                />
+              </view>
+            </view>
+          </view>
+          <!-- 图片预览弹窗复用 -->
+          <view v-if="previewImg" class="img-preview-mask" @click="closePreview">
+            <image :src="previewImg" class="img-preview" mode="aspectFit" />
+          </view>
           <ActivityEnroll :activityId="currentActivityId" />
         </view>
       </view>
@@ -72,6 +134,9 @@ import ActivityEnroll from "@/components/activity/activity-enroll.vue";
 import iconAppstore from '@/static/icons/appstore.svg';
 import iconFireActive from '@/static/icons/fire_active.png';
 import iconTrophy from '@/static/icons/trophy.svg';
+import recordImg1 from '@/static/icons/appstore.svg';
+import recordImg2 from '@/static/icons/fire_active.png';
+import PersonalEventDialog from '@/components/activity/personal-event-dialog.vue';
 
 const tabList = ref([
   {
@@ -91,31 +156,62 @@ const currentActivityId = ref<number>(0);
 const tab = ref<number>(1);
 const activity = ref<IActivityDetail | null>(null);
 
+const expandedStageId = ref<number | null>(null);
+const previewImg = ref<string | null>(null);
+const showDialog = ref(false);
+const eventTypeOptions = ref(['种玉米', '收玉米']);
+
+function toggleStageExpand(id: number) {
+  expandedStageId.value = expandedStageId.value === id ? null : id;
+}
+
+function showPreview(img: string) {
+  previewImg.value = img;
+}
+
+function closePreview() {
+  previewImg.value = null;
+}
+
+function handleProgressAreaClick(e: Event) {
+  if (showDialog.value) return;
+  // 只在点击进度区块空白处时收起
+  if ((e.target as HTMLElement).classList.contains('activity-progress-modern')) {
+    expandedStageId.value = null;
+  }
+}
+
 // 活动阶段数据
 const stages = ref([
   {
     id: 1,
     name: "项目启动会",
-    time: "2025-04-10",
+    time: "2025-04-10T08:00:00",
     description: "参与项目启动会，了解整体流程和目标。",
     thumbnail: iconAppstore,
-    progress: 100
+    progress: 100,
+    records: [recordImg1, recordImg2],
+    isUserAdded: false
   },
   {
     id: 2,
     name: "种玉米活动",
-    time: "2025-04-20",
+    time: "2025-04-20T08:00:00",
     description: "参加种玉米活动，体验农业劳动。",
     thumbnail: iconFireActive,
-    progress: 60
+    progress: 60,
+    records: [recordImg2, recordImg1],
+    isUserAdded: false
   },
   {
     id: 3,
     name: "成果展示",
-    time: "2025-05-01",
+    time: "2025-05-01T08:00:00",
     description: "展示种植成果，分享收获与心得。",
     thumbnail: iconTrophy,
-    progress: 0
+    progress: 0,
+    records: [recordImg1, recordImg2],
+    isUserAdded: false
   }
 ]);
 
@@ -150,6 +246,24 @@ function formatDate(dateStr: string) {
   const pad = (n: number) => n < 10 ? '0' + n : n;
   return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+function handlePersonalEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
+  stages.value.push({
+    id: Date.now(),
+    name: data.type, // 事件名称
+    time: data.date,
+    description: data.content,
+    thumbnail: iconAppstore, // 可根据type选择不同icon
+    progress: 100,
+    records: data.images || [],
+    isUserAdded: true
+  });
+  // 按时间排序
+  stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+  showDialog.value = false;
+}
+
+const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
 </script>
 
 <style lang="scss">
@@ -437,11 +551,75 @@ function formatDate(dateStr: string) {
     text-shadow: 0 1px 4px #fff;
   }
 }
+.stage-records {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(48,169,8,0.08);
+  padding: 12px 0;
+  justify-content: flex-start;
+  .record-img {
+    width: 120px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f4f4f4;
+    box-shadow: 0 1px 6px rgba(48,169,8,0.06);
+    @media (max-width: 600px) {
+      width: 40vw;
+      height: 24vw;
+    }
+  }
+}
 .enroll-card {
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 5vw 4vw;
   margin-bottom: 2.5vw;
+}
+.img-preview-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-preview {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px #0006;
+  background: #fff;
+}
+.progress-add-btn {
+  position: fixed;
+  right: 5vw;
+  bottom: 7vw;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #30a908;
+  color: #fff;
+  font-size: 36px;
+  font-weight: bold;
+  box-shadow: 0 2px 12px rgba(48,169,8,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.18s cubic-bezier(.23,1.01,.32,1);
+  &:hover {
+    background: #389e0d;
+    transform: scale(1.08);
+  }
+  &:active {
+    transform: scale(1.12);
+  }
 }
 </style>

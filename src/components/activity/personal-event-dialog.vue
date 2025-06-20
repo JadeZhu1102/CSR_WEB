@@ -1,10 +1,11 @@
 <template>
-  <view v-if="visible" class="dialog-mask">
+  <view v-if="visible" class="dialog-mask" @click.stop>
     <view class="dialog-container">
       <view class="dialog-title">添加个人事件</view>
+      <view v-if="errorMsg" class="form-error">{{ errorMsg }}</view>
       <view class="dialog-form">
         <view class="form-item">
-          <text class="label">事件类型</text>
+          <text class="label">事件名称</text>
           <view class="input-select" @click="showTypeSelect = !showTypeSelect">
             <text>{{ typeOptionsComputed[form.typeIndex] }}</text>
             <view v-if="showTypeSelect" class="select-dropdown">
@@ -53,7 +54,10 @@ import { ref, watch, defineComponent, computed, getCurrentInstance } from 'vue';
 import uniCalendar from '@dcloudio/uni-ui/lib/uni-calendar/uni-calendar.vue';
 import uniFilePicker from '@dcloudio/uni-ui/lib/uni-file-picker/uni-file-picker.vue';
 
+const errorMsg = ref('');
+
 function showError(msg: string) {
+  errorMsg.value = msg;
   const instance = getCurrentInstance();
   const proxy = instance && (instance.proxy as any);
   if (proxy && proxy.$u && typeof proxy.$u.toast === 'function') {
@@ -63,7 +67,8 @@ function showError(msg: string) {
       title: msg,
       icon: 'none',
       duration: 2000,
-      position: 'center'
+      position: 'center',
+      mask: true
     });
   }
   console.error('表单校验失败:', msg);
@@ -104,6 +109,7 @@ export default defineComponent({
       if (val) {
         form.value = { typeIndex: 0, content: '', date: '', images: [] };
         showTypeSelect.value = false;
+        errorMsg.value = '';
       }
     });
     const selectType = (idx: number) => {
@@ -113,11 +119,11 @@ export default defineComponent({
     const onCancel = () => {
       emit('update:visible', false);
       emit('cancel');
+      errorMsg.value = '';
     };
     const onConfirm = () => {
-      console.log('onConfirm', form.value);
       if (!typeOptionsComputed.value[form.value.typeIndex]) {
-        showError('事件类型不能为空');
+        showError('事件名称不能为空');
         return;
       }
       if (!form.value.content) {
@@ -128,10 +134,6 @@ export default defineComponent({
         showError('日期不能为空');
         return;
       }
-      if (!form.value.images || form.value.images.length === 0) {
-        showError('请上传图片');
-        return;
-      }
       emit('confirm', {
         type: typeOptionsComputed.value[form.value.typeIndex],
         content: form.value.content,
@@ -139,6 +141,7 @@ export default defineComponent({
         images: form.value.images
       });
       emit('update:visible', false);
+      errorMsg.value = '';
     };
     return {
       typeOptionsComputed,
@@ -149,7 +152,8 @@ export default defineComponent({
       onUniCalendarConfirm,
       selectType,
       onCancel,
-      onConfirm
+      onConfirm,
+      errorMsg
     };
   }
 });
@@ -259,5 +263,11 @@ export default defineComponent({
       border: none;
     }
   }
+}
+.form-error {
+  color: #ff4d4f;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 </style> 
