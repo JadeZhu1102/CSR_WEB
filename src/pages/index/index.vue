@@ -71,6 +71,12 @@
         </view>
         <view class="progress-text">{{ activity.progress ?? 0 }}%</view>
       </view>
+      <view
+        v-if="activity.status !== 'Active'"
+        class="activity-mask"
+      >
+        <text class="mask-text">敬请期待</text>
+      </view>
     </view>
   </view>
 </template>
@@ -246,5 +252,25 @@ onPageShow(async () => {
       font-weight: 600;
     }
   }
+}
+
+.activity-mask {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+  pointer-events: none;
+}
+.mask-text {
+  font-size: 22px;
+  font-weight: bold;
+  color: #30a908;
+  text-shadow: 0 2px 8px rgba(48,169,8,0.15);
+  letter-spacing: 4px;
+  opacity: 0.95;
 }
 </style>
