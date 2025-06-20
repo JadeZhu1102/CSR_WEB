@@ -4,7 +4,7 @@
       class="activity-item"
       v-for="activity in activityList"
       :key="activity.id"
-      @click="onJoin(activity.id)"
+      @click="onActivityClick(activity)"
     >
       <view class="activity-overview">
         <image
@@ -72,8 +72,9 @@
         <view class="progress-text">{{ activity.progress ?? 0 }}%</view>
       </view>
       <view
-        v-if="activity.status !== 'Active'"
+        v-if="(activity as any).status !== 'Active'"
         class="activity-mask"
+        @click.stop="onMaskClick"
       >
         <text class="mask-text">敬请期待</text>
       </view>
@@ -91,6 +92,14 @@ import PageUrl from '@/config/page-url';
 
 const activityList = ref<IActivityItem[]>([]);
 
+const onActivityClick = (activity: IActivityItem) => {
+  if (activity.status !== 'Active') {
+    showPopup.value = true;
+    return;
+  }
+  onJoin(activity.id);
+};
+
 const onJoin = (id: number) => {
   uni.navigateTo({
     url: PageUrl.activity.detail(id),
@@ -102,6 +111,13 @@ const getProgressIconStyle = (progress: number) => {
   // left = (progress / 100) * (100% - 25px)
   const left = `calc(${progress}% * (100% - 25px) / 100)`;
   return { left };
+};
+
+const onMaskClick = () => {
+  uni.showToast({
+    title: '活动还没开始哦',
+    icon: 'none'
+  });
 };
 
 onPageShow(async () => {
@@ -263,7 +279,8 @@ onPageShow(async () => {
   justify-content: center;
   z-index: 10;
   border-radius: 12px;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 .mask-text {
   font-size: 22px;
