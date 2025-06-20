@@ -32,25 +32,27 @@
         </view>
       </view>
       <view v-if="tab === 2">
-        <ua-timeline type="card" class="timeline-container-modern">
-          <ua-timeline-item v-for="(item, index) in timelineList" :key="index" :timestamp="item.timestamp"
-            :type="item.type" :size="item.size" :icon="item.icon" :color="item.color" :lineColor="item.lineColor"
-            :lineType="item.lineType" placement="top" class="timeline-item-modern">
-            <view class="timeline-content-row-modern">
-              <view class="left">
-                <h4 class="timeline-title">{{ item.title }}</h4>
-                <div class="timeline-desc">{{ item.content }}</div>
+        <!-- 现代化高科技感活动进度区块 -->
+        <view class="activity-progress-modern">
+          <view v-for="stage in stages" :key="stage.id" class="progress-stage-card">
+            <view class="stage-thumb">
+              <image :src="stage.thumbnail" mode="aspectFill" />
+            </view>
+            <view class="stage-info">
+              <view class="stage-title-row">
+                <span class="stage-title">{{ stage.name }}</span>
+                <span class="stage-time">{{ $d(new Date(stage.time), 'medium') }}</span>
               </view>
-              <view class="right">
-                <button v-if="item.action" class="delete-btn-modern" @click="deleteItem(item.id)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                </button>
+              <view class="stage-desc">{{ stage.description }}</view>
+              <view class="stage-progress-bar">
+                <view class="progress-bar-bg">
+                  <view class="progress-bar-fg" :style="{ width: stage.progress + '%' }"></view>
+                </view>
+                <span class="progress-percent">{{ stage.progress }}%</span>
               </view>
             </view>
-          </ua-timeline-item>
-        </ua-timeline>
-        <button @click="addPersonalEvent" class="timeline-add-modern">+</button>
-        <PersonalEventDialog v-model:visible="showDialog" :typeOptions="eventTypeOptions" @confirm="handlePersonalEventConfirm" />
+          </view>
+        </view>
       </view>
       <view v-if="tab === 3">
         <view class="enroll-card">
@@ -72,6 +74,10 @@ import fetchActivityDetailApi from "@/api/activity-detail.api";
 import fetchActivityEventsApi from "@/api/activity-events";
 import ActivityEnroll from "@/components/activity/activity-enroll.vue";
 import PersonalEventDialog from "@/components/activity/personal-event-dialog.vue";
+// 静态导入缩略图
+import iconAppstore from '@/static/icons/appstore.svg';
+import iconFireActive from '@/static/icons/fire_active.png';
+import iconTrophy from '@/static/icons/trophy.svg';
 
 const tabList = ref([
   {
@@ -91,30 +97,32 @@ const currentActivityId = ref<number>(0);
 const tab = ref<number>(1);
 const activity = ref<IActivityDetail | null>(null);
 
-const publicEvent = ref<Array<Object>>([
+// 活动阶段数据
+const stages = ref([
   {
-    title: "项目筛选",
-    content: "项目提案对比会议",
-    timestamp: "2025-04-19",
-    side: "left",
-    type: "success",
-    size: 26
-
+    id: 1,
+    name: "项目启动会",
+    time: "2025-04-10",
+    description: "参与项目启动会，了解整体流程和目标。",
+    thumbnail: iconAppstore,
+    progress: 100
   },
   {
-    title: "项目确定",
-    content: "确定2025年CSR活动类型",
-    timestamp: "2025-04-25",
-    side: "left",
-    size: 26
+    id: 2,
+    name: "种玉米活动",
+    time: "2025-04-20",
+    description: "参加种玉米活动，体验农业劳动。",
+    thumbnail: iconFireActive,
+    progress: 60
   },
   {
-    title: "项目实施会议",
-    content: "确定CSR活动形式XXX",
-    timestamp: "2025-05-10",
-    side: "left",
-    size: 26
-  },
+    id: 3,
+    name: "成果展示",
+    time: "2025-05-01",
+    description: "展示种植成果，分享收获与心得。",
+    thumbnail: iconTrophy,
+    progress: 0
+  }
 ]);
 
 const showDialog = ref(false);
@@ -340,94 +348,100 @@ const onEnroll = () => {
   margin-bottom: 2.5vw;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
-.timeline-container-modern {
+.activity-progress-modern {
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
-  border-radius: 14px;
-  padding: 2vw 0 3vw 0;
+  gap: 2vw;
+  background: linear-gradient(135deg, #232a34 0%, #2e3a4d 100%);
+  border-radius: 18px;
+  padding: 3vw 2vw 3vw 2vw;
   margin-bottom: 2.5vw;
-  .timeline-item-modern {
-    margin-bottom: 2vw;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    padding: 2vw 4vw;
-    .timeline-content-row-modern {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      .left {
-        flex: 1;
-        min-width: 0;
-        .timeline-title {
-          margin-bottom: 8px;
-          font-size: 1.08rem;
-          font-weight: 600;
-          color: #333;
-        }
-        .timeline-desc {
-          color: #666;
-          font-size: 0.98rem;
-          word-break: break-all;
-        }
-      }
-      .right {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        margin-left: 18px;
-        .delete-btn-modern {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          background: #fff0f0;
-          border: none;
-          color: #ff4d4f;
-          cursor: pointer;
-          transition: background 0.2s;
-          box-shadow: 0 1px 4px rgba(255,77,79,0.08);
-          &:hover {
-            background: #ff4d4f;
-            color: #fff;
-          }
-          svg {
-            display: block;
-          }
-        }
-      }
-    }
+  box-shadow: 0 4px 24px rgba(48,169,8,0.10);
+}
+.progress-stage-card {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  padding: 2vw 2vw;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 6px 24px rgba(48,169,8,0.18);
   }
 }
-.timeline-add-modern {
-  position: fixed;
-  right: 5vw;
-  bottom: 7vw;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: #30a908;
-  color: #fff;
-  font-size: 36px;
-  font-weight: bold;
-  box-shadow: 0 2px 12px rgba(48,169,8,0.18);
-  border: none;
+.stage-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-right: 2vw;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.18s cubic-bezier(.23,1.01,.32,1);
-  &:hover {
-    background: #389e0d;
-    transform: scale(1.08);
+  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+  image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
-  &:active {
-    transform: scale(1.12);
+}
+.stage-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stage-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .stage-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .stage-time {
+    font-size: 0.98rem;
+    color: #30a908;
+    font-weight: 500;
+    background: rgba(48,169,8,0.08);
+    border-radius: 8px;
+    padding: 2px 10px;
+  }
+}
+.stage-desc {
+  color: #cfd8dc;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+.stage-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  .progress-bar-bg {
+    flex: 1;
+    height: 10px;
+    background: #232a34;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(48,169,8,0.10);
+    .progress-bar-fg {
+      height: 100%;
+      background: linear-gradient(90deg, #30a908 0%, #00e0ff 100%);
+      border-radius: 6px;
+      transition: width 0.4s cubic-bezier(.23,1.01,.32,1);
+    }
+  }
+  .progress-percent {
+    color: #30a908;
+    font-size: 0.98rem;
+    font-weight: 600;
+    min-width: 38px;
+    text-align: right;
   }
 }
 .enroll-card {
