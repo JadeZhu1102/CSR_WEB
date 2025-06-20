@@ -41,7 +41,7 @@
             <view class="stage-info">
               <view class="stage-title-row">
                 <span class="stage-title">{{ stage.name }}</span>
-                <span class="stage-time">{{ $d(new Date(stage.time), 'medium') }}</span>
+                <span class="stage-time">{{ formatDate(stage.time) }}</span>
               </view>
               <view class="stage-desc">{{ stage.description }}</view>
               <view class="stage-progress-bar">
@@ -66,15 +66,9 @@
 <script setup lang="ts">
 import { onLoad } from "@dcloudio/uni-app";
 import { ref, computed } from "vue";
-import { v4 as uuidV4 } from "uuid";
-import uaTimeline from "@/components/ua-timeline/ua-timeline.vue";
-import uaTimelineItem from "@/components/ua-timeline-item/ua-timeline-item.vue";
 import type { IActivityDetail } from "@/models/activity";
 import fetchActivityDetailApi from "@/api/activity-detail.api";
-import fetchActivityEventsApi from "@/api/activity-events";
 import ActivityEnroll from "@/components/activity/activity-enroll.vue";
-import PersonalEventDialog from "@/components/activity/personal-event-dialog.vue";
-// 静态导入缩略图
 import iconAppstore from '@/static/icons/appstore.svg';
 import iconFireActive from '@/static/icons/fire_active.png';
 import iconTrophy from '@/static/icons/trophy.svg';
@@ -125,56 +119,13 @@ const stages = ref([
   }
 ]);
 
-const showDialog = ref(false);
-
-const personalEvent = ref<any[]>([]);
-const timelineList = computed(() => {
-  return [...publicEvent.value, ...personalEvent.value].sort((a, b) => {
-    return new Date(a.timestamp) - new Date(b.timestamp)
-  })
-})
-
-const eventTypeOptions = ref<string[]>([]);
-
 const selecTab = (index: number) => {
   tab.value = index;
 };
 
-const addPersonalEvent = async (): Promise<void> => {
-  // 动态获取事件类型
-  if (currentActivityId.value) {
-    const events = await fetchActivityEventsApi(currentActivityId.value);
-    eventTypeOptions.value = events.map(e => e.name);
-  }
-  showDialog.value = true;
-};
-
-const handlePersonalEventConfirm = (data: { type: string; content: string; date: string }) => {
-  personalEvent.value.push({
-    id: uuidV4(),
-    title: data.type,
-    content: data.content,
-    timestamp: data.date,
-    side: "right",
-    action: true,
-    type: data.type === "重要" ? "danger" : data.type === "提醒" ? "warning" : "info",
-    size: 26
-  });
-};
-
-type DetailParam = {
-  id: string;
-};
-
-const deleteItem = (item: number): void => {
-  personalEvent.value = personalEvent.value.filter(i => i.id !== item);
-
-}
-
-onLoad(async (query) => {
-  const activityId = (query as DetailParam).id;
+onLoad(async (query = {}) => {
+  const activityId = query.id;
   currentActivityId.value = Number(activityId);
-
   try {
     uni.showLoading();
     await new Promise(resolve => {
@@ -182,18 +133,22 @@ onLoad(async (query) => {
     });
     const detail: IActivityDetail = await fetchActivityDetailApi(activityId);
     activity.value = detail;
-
     uni.setNavigationBarTitle({ title: detail.name });
   } catch (error) {
     //
   } finally {
     uni.hideLoading();
   }
-
 });
 
 const onEnroll = () => {
   
+}
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  const pad = (n: number) => n < 10 ? '0' + n : n;
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 </script>
 
@@ -352,7 +307,7 @@ const onEnroll = () => {
   display: flex;
   flex-direction: column;
   gap: 2vw;
-  background: linear-gradient(135deg, #232a34 0%, #2e3a4d 100%);
+  background: #f8f9fa;
   border-radius: 18px;
   padding: 3vw 2vw 3vw 2vw;
   margin-bottom: 2.5vw;
@@ -361,61 +316,84 @@ const onEnroll = () => {
 .progress-stage-card {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.08);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(48,169,8,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
   padding: 2vw 2vw;
+  margin-bottom: 0.5vw;
   transition: box-shadow 0.2s;
   &:hover {
-    box-shadow: 0 6px 24px rgba(48,169,8,0.18);
+    box-shadow: 0 8px 32px rgba(48,169,8,0.16);
   }
 }
 .stage-thumb {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
   overflow: hidden;
   margin-right: 2vw;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+  box-shadow: 0 2px 12px rgba(48,169,8,0.10);
   image {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 16px;
+    background: #f4f4f4;
   }
 }
 .stage-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 .stage-title-row {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   .stage-title {
-    font-size: 1.12rem;
-    font-weight: 700;
-    color: #fff;
+    padding-right: 80px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(1rem, 2.5vw, 1.18rem);
+    font-weight: 800;
+    color: #222;
     letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px #f8f9fa, 0 2px 8px #eaf7ef;
+    background: linear-gradient(90deg, #eaf7ef 0%, #f8f9fa 100%);
+    border-radius: 6px;
+    padding: 2px 12px;
+    box-decoration-break: clone;
+    max-width: 220px;
+    width: 100%;
   }
   .stage-time {
-    font-size: 0.98rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 1rem;
     color: #30a908;
-    font-weight: 500;
-    background: rgba(48,169,8,0.08);
+    font-weight: 600;
+    background: rgba(48,169,8,0.10);
     border-radius: 8px;
-    padding: 2px 10px;
+    padding: 2px 12px;
   }
 }
 .stage-desc {
-  color: #cfd8dc;
-  font-size: 0.98rem;
-  line-height: 1.6;
+  color: #444;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  background: #f4f8f6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 .stage-progress-bar {
   display: flex;
@@ -424,8 +402,8 @@ const onEnroll = () => {
   margin-top: 4px;
   .progress-bar-bg {
     flex: 1;
-    height: 10px;
-    background: #232a34;
+    height: 12px;
+    background: #eaf7ef;
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0 1px 4px rgba(48,169,8,0.10);
@@ -434,14 +412,16 @@ const onEnroll = () => {
       background: linear-gradient(90deg, #30a908 0%, #00e0ff 100%);
       border-radius: 6px;
       transition: width 0.4s cubic-bezier(.23,1.01,.32,1);
+      box-shadow: 0 0 8px #30a90844;
     }
   }
   .progress-percent {
     color: #30a908;
-    font-size: 0.98rem;
-    font-weight: 600;
+    font-size: 1.02rem;
+    font-weight: 700;
     min-width: 38px;
     text-align: right;
+    text-shadow: 0 1px 4px #fff;
   }
 }
 .enroll-card {
