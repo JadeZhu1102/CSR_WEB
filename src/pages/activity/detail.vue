@@ -170,6 +170,14 @@ function formatDate(dateStr: string) {
   margin: 0 auto;
   padding: 4vw 2vw 6vw 2vw;
   box-sizing: border-box;
+  @media (max-width: 900px) {
+    max-width: 98vw;
+    padding: 4vw 1vw 6vw 1vw;
+  }
+  @media (max-width: 600px) {
+    max-width: 100vw;
+    padding: 5vw 0.5vw 8vw 0.5vw;
+  }
 }
 .activity-header-card,
 .activity-value-card,
@@ -316,6 +324,9 @@ function formatDate(dateStr: string) {
 .progress-stage-card {
   display: flex;
   align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  min-width: 0;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(48,169,8,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
@@ -327,6 +338,7 @@ function formatDate(dateStr: string) {
   }
 }
 .stage-thumb {
+  flex-shrink: 0;
   width: 72px;
   height: 72px;
   border-radius: 16px;
@@ -346,7 +358,8 @@ function formatDate(dateStr: string) {
   }
 }
 .stage-info {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -370,7 +383,7 @@ function formatDate(dateStr: string) {
     border-radius: 6px;
     padding: 2px 12px;
     box-decoration-break: clone;
-    max-width: 220px;
+    max-width: 60vw;
     width: 100%;
   }
   .stage-time {

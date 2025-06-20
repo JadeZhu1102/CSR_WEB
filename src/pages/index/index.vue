@@ -1,82 +1,84 @@
 <template>
-  <view id="current-activity-list">
-    <view
-      class="activity-item"
-      v-for="activity in activityList"
-      :key="activity.id"
-      @click="onActivityClick(activity)"
-    >
-      <view class="activity-overview">
-        <image
-          class="cover"
-          :src="activity.coverImage"
-          mode="aspectFill"
-          lazy-load
-        />
-        <view class="activity-info">
-          <view class="title-wrap">
-            <text class="title">{{ activity.name }}</text>
-          </view>
-          <view class="slogan">
-            <text>{{ activity.slogan }}</text>
-          </view>
-          <view class="activity-duration">
-            <text>
-              {{ $d(new Date(activity.startDate), 'medium') }}
-              -
-              {{ $d(new Date(activity.endDate), 'medium') }}
-            </text>
-          </view>
-        </view>
-      </view>
-      <view class="activity-detail">
-        <view class="lifecycle">
-          <view class="location">
-            <text>{{ $t('activity.label.location') }}</text>
-            <text>{{ activity.location }}</text>
-          </view>
-          <view>
-            <text>{{ $t('activity.label.number_of_participants') }}</text>
-            <i18n-n :value="activity.numberOfParticipants ?? 0" />
-          </view>
-          <view class="progress">
-            <text>{{ $t('activity.label.progress') }}</text>
-            <text>{{ activity.progress ?? 0 }}%</text>
-          </view>
-        </view>
-        <view class="activity-action">
-          <button :disabled="activity.enrollStatus !== null" class="join" :class="{
-            joined: activity.enrollStatus === 'Approved',
-            pending: activity.enrollStatus === 'Pending',
-          }">
-            {{ activity.enrollStatus === 'Approved' ? $t('activity.joined')
-            : activity.enrollStatus === 'Pending' ? $t('activity.pending') : $t('activity.join') }}
-          </button>
-        </view>
-      </view>
-      <view v-if="activity" class="activity-progress">
-        <view class="progress-bar-wrap">
-          <progress
-            :percent="activity.progress"
-            activeColor="#30a908"
-            stroke-width="8"
-            style="width: 100%; height: 8px; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 1;"
-          />
-          <image
-            v-if="activity['progressIcon']"
-            class="progress-icon"
-            :src="activity['progressIcon']"
-            :style="getProgressIconStyle(activity.progress)"
-          />
-        </view>
-        <view class="progress-text">{{ activity.progress ?? 0 }}%</view>
-      </view>
+  <view class="main-container home-container">
+    <view id="current-activity-list">
       <view
-        v-if="(activity as any).status !== 'Active'"
-        class="activity-mask"
-        @click.stop="onMaskClick"
+        class="activity-item"
+        v-for="activity in activityList"
+        :key="activity.id"
+        @click="onActivityClick(activity)"
       >
-        <text class="mask-text">敬请期待</text>
+        <view class="activity-overview">
+          <image
+            class="cover"
+            :src="activity.coverImage"
+            mode="aspectFill"
+            lazy-load
+          />
+          <view class="activity-info">
+            <view class="title-wrap">
+              <text class="title">{{ activity.name }}</text>
+            </view>
+            <view class="slogan">
+              <text>{{ activity.slogan }}</text>
+            </view>
+            <view class="activity-duration">
+              <text>
+                {{ $d(new Date(activity.startDate), 'medium') }}
+                -
+                {{ $d(new Date(activity.endDate), 'medium') }}
+              </text>
+            </view>
+          </view>
+        </view>
+        <view class="activity-detail">
+          <view class="lifecycle">
+            <view class="location">
+              <text>{{ $t('activity.label.location') }}</text>
+              <text>{{ activity.location }}</text>
+            </view>
+            <view>
+              <text>{{ $t('activity.label.number_of_participants') }}</text>
+              <i18n-n :value="activity.numberOfParticipants ?? 0" />
+            </view>
+            <view class="progress">
+              <text>{{ $t('activity.label.progress') }}</text>
+              <text>{{ activity.progress ?? 0 }}%</text>
+            </view>
+          </view>
+          <view class="activity-action">
+            <button :disabled="activity.enrollStatus !== null" class="join" :class="{
+              joined: activity.enrollStatus === 'Approved',
+              pending: activity.enrollStatus === 'Pending',
+            }">
+              {{ activity.enrollStatus === 'Approved' ? $t('activity.joined')
+              : activity.enrollStatus === 'Pending' ? $t('activity.pending') : $t('activity.join') }}
+            </button>
+          </view>
+        </view>
+        <view v-if="activity" class="activity-progress">
+          <view class="progress-bar-wrap">
+            <progress
+              :percent="activity.progress"
+              activeColor="#30a908"
+              stroke-width="8"
+              style="width: 100%; height: 8px; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 1;"
+            />
+            <image
+              v-if="activity['progressIcon']"
+              class="progress-icon"
+              :src="activity['progressIcon']"
+              :style="getProgressIconStyle(activity.progress)"
+            />
+          </view>
+          <view class="progress-text">{{ activity.progress ?? 0 }}%</view>
+        </view>
+        <view
+          v-if="(activity as any).status !== 'Active'"
+          class="activity-mask"
+          @click.stop="onMaskClick"
+        >
+          <text class="mask-text">敬请期待</text>
+        </view>
       </view>
     </view>
   </view>
@@ -128,6 +130,14 @@ onPageShow(async () => {
 </script>
 
 <style lang="scss">
+.home-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+  width: 100%;
+  min-height: 80vh;
+  box-sizing: border-box;
+}
 #current-activity-list {
   display: flex;
   flex-direction: column;
