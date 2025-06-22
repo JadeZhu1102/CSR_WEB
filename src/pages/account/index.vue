@@ -11,27 +11,27 @@
         </view>
         
         <!-- 我的贡献功能卡片 -->
-        <view class="contribution-card" @click="showContribution">
+        <view class="contribution-card ani-card" @click="showContribution">
             <view class="card-icon">
-                <image src="/static/icons/trophy.svg" class="icon" />
+                <image src="/static/icons/trophy.svg" class="icon ani-icon" />
             </view>
             <view class="card-content">
                 <text class="card-title">{{ $t('account.title.my_contributions') }}</text>
                 <text class="card-subtitle">{{ $t('account.contribution.preview') }}</text>
             </view>
-            <view class="card-arrow">></view>
+            <view class="card-arrow ani-icon">></view>
         </view>
 
         <!-- 意见与反馈功能卡片 -->
-        <view class="feedback-card" @click="showFeedbackDialog = true">
+        <view class="feedback-card ani-card" @click="showFeedbackDialog = true">
             <view class="card-icon">
-                <image src="/static/icons/mail.svg" class="icon" />
+                <image src="/static/icons/mail.svg" class="icon ani-icon" />
             </view>
             <view class="card-content">
                 <text class="card-title">{{ $t('account.button.feedback') }}</text>
                 <text class="card-subtitle">分享您的想法</text>
             </view>
-            <view class="card-arrow">></view>
+            <view class="card-arrow ani-icon">></view>
         </view>
 
         <view class="item-wrappr">
@@ -41,38 +41,30 @@
         </view>
 
         <!-- 语言切换弹窗 -->
-        <view v-if="showLangDialog" class="lang-dialog-mask" @click.self="showLangDialog = false">
-            <view class="lang-dialog ani-scale-pop">
+        <view v-if="showLangDialog" class="lang-dialog-mask ani-dialog-mask" @click.self="showLangDialog = false">
+            <view class="lang-dialog ani-dialog">
                 <view class="lang-title">{{ $t('account.language.title') }}</view>
                 <view class="lang-options">
-                    <view class="lang-option" :class="{active: normalizeLang(currentLanguage) === 'zh-Hans'}" @click="switchLang('zh-Hans')">简体中文</view>
-                    <view class="lang-option" :class="{active: normalizeLang(currentLanguage) === 'zh-Hant'}" @click="switchLang('zh-Hant')">繁體中文</view>
-                    <view class="lang-option" :class="{active: normalizeLang(currentLanguage) === 'en'}" @click="switchLang('en')">English</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hans'}" @click="switchLang('zh-Hans')">简体中文</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hant'}" @click="switchLang('zh-Hant')">繁體中文</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'en'}" @click="switchLang('en')">English</view>
                 </view>
             </view>
         </view>
 
         <!-- 我的贡献弹窗 -->
-        <view v-if="showContributionDialog" class="contribution-dialog-mask" @click.self="showContributionDialog = false">
-            <view class="contribution-dialog ani-scale-pop">
+        <view v-if="showContributionDialog" class="contribution-dialog-mask ani-dialog-mask" @click.self="showContributionDialog = false">
+            <view class="contribution-dialog ani-dialog">
                 <view class="dialog-header">
                     <text class="dialog-title">{{ $t('account.title.my_contributions') }}</text>
-                    <text class="dialog-close" @click="showContributionDialog = false">×</text>
+                    <text class="dialog-close ani-btn" @click="showContributionDialog = false">×</text>
                 </view>
                 
                 <!-- 贡献统计 -->
                 <view class="contribution-stats">
-                    <view class="stat-item">
-                        <text class="stat-number">{{ contributionStats.totalActivities }}</text>
-                        <text class="stat-label">{{ $t('account.achievement.total_activities') }}</text>
-                    </view>
-                    <view class="stat-item">
-                        <text class="stat-number">{{ contributionStats.totalHours }}</text>
-                        <text class="stat-label">{{ $t('account.contribution.total_hours') }}</text>
-                    </view>
-                    <view class="stat-item">
-                        <text class="stat-number">{{ contributionStats.completedActivities }}</text>
-                        <text class="stat-label">{{ $t('account.achievement.completed_activities') }}</text>
+                    <view class="stat-item ani-card" v-for="(stat, index) in statItems" :key="index" :style="{ animationDelay: index * 0.1 + 's' }">
+                        <text class="stat-number">{{ stat.value }}</text>
+                        <text class="stat-label">{{ stat.label }}</text>
                     </view>
                 </view>
 
@@ -80,7 +72,7 @@
                 <view class="activity-records">
                     <text class="records-title">{{ $t('account.contribution.activity_records') }}</text>
                     <view class="record-list">
-                        <view v-for="record in activityRecords" :key="record.id" class="record-item">
+                        <view v-for="(record, index) in activityRecords" :key="record.id" class="record-item ani-list-item" :style="{ animationDelay: index * 0.05 + 's' }">
                             <view class="record-info">
                                 <text class="record-name">{{ record.name }}</text>
                                 <text class="record-date">{{ record.date }}</text>
@@ -92,32 +84,33 @@
                     </view>
                 </view>
 
-                <button class="dialog-close-btn" @click="showContributionDialog = false">
+                <button class="dialog-close-btn ani-btn" @click="showContributionDialog = false">
                     {{ $t('account.contribution.close') }}
                 </button>
             </view>
         </view>
 
         <!-- 意见与反馈弹窗 -->
-        <view v-if="showFeedbackDialog" class="feedback-dialog-mask" @click.self="showFeedbackDialog = false">
-            <view class="feedback-dialog ani-scale-pop">
+        <view v-if="showFeedbackDialog" class="feedback-dialog-mask ani-dialog-mask" @click.self="showFeedbackDialog = false">
+            <view class="feedback-dialog ani-dialog">
                 <view class="dialog-header">
                     <text class="dialog-title">{{ $t('account.feedback.title') }}</text>
-                    <text class="dialog-close" @click="showFeedbackDialog = false">×</text>
+                    <text class="dialog-close ani-btn" @click="showFeedbackDialog = false">×</text>
                 </view>
                 
                 <textarea 
                     v-model="feedbackContent" 
-                    class="feedback-textarea" 
+                    class="feedback-textarea ani-input" 
                     :placeholder="$t('account.feedback.placeholder')"
                     maxlength="500"
                 ></textarea>
                 
                 <view class="feedback-actions">
-                    <button class="feedback-cancel-btn" @click="showFeedbackDialog = false">
+                    <button class="feedback-cancel-btn ani-btn" @click="showFeedbackDialog = false">
                         {{ $t('account.feedback.cancel') }}
                     </button>
-                    <button class="feedback-submit-btn" @click="submitFeedback" :disabled="isLoading">
+                    <button class="feedback-submit-btn ani-btn" @click="submitFeedback" :disabled="isLoading">
+                        <span v-if="isLoading" class="ani-loading"></span>
                         {{ isLoading ? '提交中...' : $t('account.feedback.submit') }}
                     </button>
                 </view>
@@ -128,7 +121,7 @@
 
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app';
-import { ref, getCurrentInstance, nextTick } from 'vue';
+import { ref, getCurrentInstance, nextTick, computed } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
 import submitFeedbackApi from '@/api/feedback.api';
@@ -165,6 +158,25 @@ const contributionStats = ref<IContributionStats>({
 
 // 活动记录数据
 const activityRecords = ref<IActivityRecord[]>([]);
+
+// 获取实例以使用$t
+const instance = getCurrentInstance();
+
+// 计算属性：统计项数据
+const statItems = computed(() => [
+    {
+        value: contributionStats.value.totalActivities,
+        label: instance?.proxy?.$t('account.achievement.total_activities') || '总活动数'
+    },
+    {
+        value: contributionStats.value.totalHours,
+        label: instance?.proxy?.$t('account.contribution.total_hours') || '总时长'
+    },
+    {
+        value: contributionStats.value.completedActivities,
+        label: instance?.proxy?.$t('account.achievement.completed_activities') || '已完成'
+    }
+]);
 
 const getStatusText = (status: string) => {
     const statusMap = {

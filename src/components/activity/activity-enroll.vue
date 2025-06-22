@@ -1,17 +1,17 @@
 <template>
     <view>
-        <view v-if="isJoined === false" class="enroll-view">
+        <view v-if="isJoined === false" class="enroll-view ani-fade-in-up">
             <view class="enroll-tips">
                 <text>You have not yet taken part in the activity.</text>
             </view>
-            <button @click="onEnroll">
+            <button @click="onEnroll" class="ani-btn">
                 {{ $t('activity.button.enroll') }}
             </button>
         </view>
-        <view v-if="isJoined === true" class="contribution-view">
+        <view v-if="isJoined === true" class="contribution-view ani-fade-in-up">
             <view class="event-list">
-                <view class="event-item" v-for="event in eventList">
-                    <image class="event-icon" :src="event.inactiveIcon" />
+                <view class="event-item ani-card" v-for="(event, index) in eventList" :key="event.id" :style="{ animationDelay: index * 0.1 + 's' }">
+                    <image class="event-icon ani-icon" :src="event.inactiveIcon" />
                     <view>{{ event.name }}</view>
                 </view>
             </view>

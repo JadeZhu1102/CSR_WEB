@@ -1,15 +1,15 @@
 <template>
-  <view v-if="visible" class="dialog-mask" @click.stop>
-    <view class="dialog-container">
-      <view class="dialog-title">添加个人事件</view>
-      <view v-if="errorMsg" class="form-error">{{ errorMsg }}</view>
+  <view v-if="visible" class="dialog-mask ani-dialog-mask" @click.stop>
+    <view class="dialog-container ani-dialog">
+      <view class="dialog-title">{{ isEditMode ? '编辑个人事件' : '添加个人事件' }}</view>
+      <view v-if="errorMsg" class="form-error ani-shake">{{ errorMsg }}</view>
       <view class="dialog-form">
         <view class="form-item">
           <text class="label">事件名称</text>
-          <view class="input-select" @click="showTypeSelect = !showTypeSelect">
+          <view class="input-select ani-input" @click="showTypeSelect = !showTypeSelect">
             <text>{{ typeOptionsComputed[form.typeIndex] }}</text>
-            <view v-if="showTypeSelect" class="select-dropdown">
-              <view v-for="(item, idx) in typeOptionsComputed" :key="idx" class="select-option" @click.stop="selectType(idx)">
+            <view v-if="showTypeSelect" class="select-dropdown ani-fade-in-up">
+              <view v-for="(item, idx) in typeOptionsComputed" :key="idx" class="select-option ani-list-item" @click.stop="selectType(idx)">
                 {{ item }}
               </view>
             </view>
@@ -17,11 +17,11 @@
         </view>
         <view class="form-item">
           <text class="label">描述</text>
-          <textarea v-model="form.content" class="input" placeholder="请输入事件描述" />
+          <textarea v-model="form.content" class="input ani-input" placeholder="请输入事件描述" />
         </view>
         <view class="form-item">
           <text class="label">日期</text>
-          <view class="input-select" @click="showCalendar">
+          <view class="input-select ani-input" @click="showCalendar">
             <text>{{ form.date || '请选择日期' }}</text>
           </view>
           <uni-calendar ref="uniCalendarRef" :insert="false" :lunar="false" @confirm="onUniCalendarConfirm" />
@@ -42,15 +42,15 @@
         </view>
       </view>
       <view class="dialog-actions">
-        <button class="btn cancel" @click="onCancel">取消</button>
-        <button class="btn confirm" @click="onConfirm">确认</button>
+        <button class="btn cancel ani-btn" @click="onCancel">取消</button>
+        <button class="btn confirm ani-btn" @click="onConfirm">确认</button>
       </view>
     </view>
   </view>
 </template>
 
 <script lang="ts">
-import { ref, watch, defineComponent, computed, getCurrentInstance } from 'vue';
+import { ref, watch, defineComponent, computed, getCurrentInstance, type PropType } from 'vue';
 import uniCalendar from '@dcloudio/uni-ui/lib/uni-calendar/uni-calendar.vue';
 import uniFilePicker from '@dcloudio/uni-ui/lib/uni-file-picker/uni-file-picker.vue';
 
@@ -81,6 +81,10 @@ export default defineComponent({
     typeOptions: {
       type: Array,
       default: () => ['重要', '普通', '提醒']
+    },
+    editData: {
+      type: Object as PropType<Record<string, any> | null>,
+      default: null
     }
   },
   emits: ['update:visible', 'confirm', 'cancel'],
@@ -94,6 +98,10 @@ export default defineComponent({
     });
     const showTypeSelect = ref(false);
     const uniCalendarRef = ref();
+    
+    // 判断是否为编辑模式
+    const isEditMode = computed(() => !!props.editData);
+    
     const showCalendar = () => {
       const instance = uniCalendarRef.value;
       if (instance && typeof instance.open === 'function') {
@@ -105,13 +113,28 @@ export default defineComponent({
     const onUniCalendarConfirm = (e: any) => {
       form.value.date = e.fulldate;
     };
+    
+    // 监听visible变化，初始化表单数据
     watch(() => props.visible, (val) => {
       if (val) {
-        form.value = { typeIndex: 0, content: '', date: '', images: [] };
+        if (props.editData) {
+          // 编辑模式：填充现有数据
+          const typeIndex = typeOptionsComputed.value.findIndex(type => type === props.editData?.name);
+          form.value = {
+            typeIndex: typeIndex >= 0 ? typeIndex : 0,
+            content: props.editData?.description || '',
+            date: props.editData?.time || '',
+            images: props.editData?.records || []
+          };
+        } else {
+          // 新增模式：清空表单
+          form.value = { typeIndex: 0, content: '', date: '', images: [] };
+        }
         showTypeSelect.value = false;
         errorMsg.value = '';
       }
     });
+    
     const selectType = (idx: number) => {
       form.value.typeIndex = idx;
       showTypeSelect.value = false;
@@ -153,7 +176,8 @@ export default defineComponent({
       selectType,
       onCancel,
       onConfirm,
-      errorMsg
+      errorMsg,
+      isEditMode
     };
   }
 });

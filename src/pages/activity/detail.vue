@@ -21,105 +21,145 @@
       <!-- Tab切换 -->
       <view class="tab-wrapper-modern">
         <view v-for="tabItem in tabList" :key="tabItem.index" @click="selecTab(tabItem.index)"
-          :class="['tab-item-modern', tab === tabItem.index ? 'active' : 'inactive']">
+          :class="['tab-item-modern ani-tab', tab === tabItem.index ? 'active' : 'inactive']">
           {{ $t(tabItem.name) }}
         </view>
       </view>
       <!-- Tab内容 -->
-      <view v-if="tab === 1">
+      <view v-if="tab === 1" class="tab-content ani-fade-in-up">
         <view class="activity-introduction-modern">
           <text>{{ activity.slogan }}</text>
         </view>
       </view>
-      <view v-if="tab === 2">
+      <view v-if="tab === 2" class="tab-content ani-fade-in-up">
         <!-- 现代化高科技感活动进度区块 -->
         <view class="activity-progress-modern" @click="handleProgressAreaClick">
           <view
-            v-for="stage in stages"
+            v-for="(stage, index) in stages"
             :key="stage.id"
-            class="progress-stage-card"
+            class="progress-stage-card ani-card"
+            :style="{ animationDelay: index * 0.1 + 's' }"
             @click.stop="toggleStageExpand(stage.id)"
           >
             <view class="stage-thumb">
-              <image :src="stage.thumbnail" mode="aspectFill" />
+              <image :src="stage.thumbnail" mode="aspectFill" class="ani-icon" />
             </view>
             <view class="stage-info">
               <view class="stage-title-row">
                 <span class="stage-title">{{ stage.name }}</span>
                 <span class="stage-time">{{ formatDate(stage.time) }}</span>
+                <view class="expand-indicator" :class="{ 'expanded': expandedStageId === stage.id }">
+                  <text class="expand-icon">▼</text>
+                </view>
               </view>
               <view class="stage-desc">{{ stage.description }}</view>
               <view class="stage-progress-bar">
                 <view class="progress-bar-bg">
-                  <view class="progress-bar-fg" :style="{ width: stage.progress + '%' }"></view>
+                  <view class="progress-bar-fg ani-progress" :style="{ width: stage.progress + '%' }"></view>
                 </view>
                 <span class="progress-percent">{{ stage.progress }}%</span>
               </view>
-              <view v-if="expandedStageId === stage.id" class="stage-records">
+              <view v-if="expandedStageId === stage.id" class="stage-records ani-expand expanded">
                 <image
                   v-for="(img, idx) in stage.records"
                   :key="idx"
                   :src="img"
-                  class="record-img"
+                  class="record-img ani-card"
                   mode="aspectFill"
                   @click.stop="showPreview(img)"
                 />
               </view>
+              <view class="stage-actions-modern" v-if="expandedStageId === stage.id">
+                <button class="action-btn-modern edit-btn-modern ani-btn" @click.stop="editStage(stage)">
+                  <image src="/static/icons/edit.svg" class="action-icon-modern" />
+                  <text class="action-text">编辑</text>
+                </button>
+                <button class="action-btn-modern delete-btn-modern ani-btn" @click.stop="deleteStage(stage.id)">
+                  <image src="/static/icons/delete.svg" class="action-icon-modern" />
+                  <text class="action-text">删除</text>
+                </button>
+              </view>
             </view>
           </view>
-          <view class="progress-add-btn" @click.stop="showDialog = true">+</view>
+          <view class="progress-add-btn ani-btn" @click.stop="showDialog = true">+</view>
           <PersonalEventDialog
             v-model:visible="showDialog"
             :typeOptions="eventTypeOptions"
             @confirm="handlePersonalEventConfirm"
           />
           <!-- 图片预览弹窗 -->
-          <view v-if="previewImg" class="img-preview-mask" @click="closePreview">
-            <image :src="previewImg" class="img-preview" mode="aspectFit" />
+          <view v-if="previewImg" class="img-preview-mask ani-dialog-mask" @click="closePreview">
+            <image :src="previewImg" class="img-preview ani-dialog" mode="aspectFit" />
           </view>
         </view>
       </view>
-      <view v-if="tab === 3">
+      <view v-if="tab === 3" class="tab-content ani-fade-in-up">
         <view class="activity-progress-modern">
           <view
-            v-for="stage in userStages"
+            v-for="(stage, index) in userStages"
             :key="stage.id"
-            class="progress-stage-card"
-            @click.stop="toggleStageExpand(stage.id)"
+            class="progress-stage-card ani-card"
+            :data-stage-id="stage.id"
+            :class="{ 'expanded': expandedStageId === stage.id }"
+            :style="{ animationDelay: index * 0.1 + 's' }"
+            @click="toggleStageActions(stage.id)"
           >
             <view class="stage-thumb">
-              <image :src="stage.thumbnail" mode="aspectFill" />
+              <image :src="stage.thumbnail" mode="aspectFill" class="ani-icon" />
             </view>
             <view class="stage-info">
               <view class="stage-title-row">
                 <span class="stage-title">{{ stage.name }}</span>
                 <span class="stage-time">{{ formatDate(stage.time) }}</span>
+                <view class="expand-indicator" :class="{ 'expanded': expandedStageId === stage.id }">
+                  <text class="expand-icon">▼</text>
+                </view>
               </view>
               <view class="stage-desc">{{ stage.description }}</view>
               <view class="stage-progress-bar">
                 <view class="progress-bar-bg">
-                  <view class="progress-bar-fg" :style="{ width: stage.progress + '%' }"></view>
+                  <view class="progress-bar-fg ani-progress" :style="{ width: stage.progress + '%' }"></view>
                 </view>
                 <span class="progress-percent">{{ stage.progress }}%</span>
               </view>
-              <view v-if="expandedStageId === stage.id" class="stage-records">
+              <view v-if="expandedStageId === stage.id" class="stage-records ani-expand expanded">
                 <image
                   v-for="(img, idx) in stage.records"
                   :key="idx"
                   :src="img"
-                  class="record-img"
+                  class="record-img ani-card"
                   mode="aspectFill"
                   @click.stop="showPreview(img)"
                 />
               </view>
+              
+              <!-- 操作区域 -->
+              <view class="stage-actions-modern" v-if="expandedStageId === stage.id">
+                <button class="action-btn-modern edit-btn-modern ani-btn" @click.stop="editStage(stage)">
+                  <image src="/static/icons/edit.svg" class="action-icon-modern" />
+                  <text class="action-text">编辑</text>
+                </button>
+                <button class="action-btn-modern delete-btn-modern ani-btn" @click.stop="deleteStage(stage.id)">
+                  <image src="/static/icons/delete.svg" class="action-icon-modern" />
+                  <text class="action-text">删除</text>
+                </button>
+              </view>
             </view>
           </view>
           <!-- 图片预览弹窗复用 -->
-          <view v-if="previewImg" class="img-preview-mask" @click="closePreview">
-            <image :src="previewImg" class="img-preview" mode="aspectFit" />
+          <view v-if="previewImg" class="img-preview-mask ani-dialog-mask" @click="closePreview">
+            <image :src="previewImg" class="img-preview ani-dialog" mode="aspectFit" />
           </view>
           <ActivityEnroll :activityId="currentActivityId" />
         </view>
+        
+        <!-- 编辑事件弹窗 -->
+        <PersonalEventDialog
+          v-model:visible="showEditDialog"
+          :typeOptions="eventTypeOptions"
+          :editData="editingStage"
+          @confirm="handleEditEventConfirm"
+        />
       </view>
     </view>
   </template>
@@ -212,6 +252,27 @@ const stages = ref([
     progress: 0,
     records: [recordImg1, recordImg2],
     isUserAdded: false
+  },
+  // 用户添加的事件
+  {
+    id: 1001,
+    name: "种玉米",
+    time: "2025-04-15T10:00:00",
+    description: "今天在崇明岛种了玉米，天气很好，心情愉快！",
+    thumbnail: iconFireActive,
+    progress: 100,
+    records: [recordImg1, recordImg2],
+    isUserAdded: true
+  },
+  {
+    id: 1002,
+    name: "收玉米",
+    time: "2025-04-25T14:00:00",
+    description: "收获季节到了，玉米长势喜人，收获满满！",
+    thumbnail: iconTrophy,
+    progress: 100,
+    records: [recordImg2, recordImg1],
+    isUserAdded: true
   }
 ]);
 
@@ -264,6 +325,110 @@ function handlePersonalEventConfirm(data: { type: string; content: string; date:
 }
 
 const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
+
+const showEditDialog = ref(false);
+const editingStage = ref<{ 
+  id: number; 
+  name: string; 
+  time: string; 
+  description: string; 
+  progress: number;
+  thumbnail: string;
+  records: string[];
+  isUserAdded: boolean;
+} | null>(null);
+
+function editStage(stage: { 
+  id: number; 
+  name: string; 
+  time: string; 
+  description: string; 
+  progress: number;
+  thumbnail: string;
+  records: string[];
+  isUserAdded: boolean;
+}) {
+  editingStage.value = { ...stage };
+  showEditDialog.value = true;
+}
+
+function deleteStage(id: number) {
+  uni.showModal({
+    title: '确认删除',
+    content: '确定要删除这个事件吗？删除后无法恢复。',
+    confirmText: '删除',
+    confirmColor: '#ff6b35',
+    cancelText: '取消',
+    cancelColor: '#666',
+    success: (res) => {
+      if (res.confirm) {
+        // 添加删除动画效果
+        const stageElement = document.querySelector(`[data-stage-id="${id}"]`);
+        if (stageElement) {
+          stageElement.classList.add('ani-shake');
+          setTimeout(() => {
+            stages.value = stages.value.filter(s => s.id !== id);
+            uni.showToast({
+              title: '删除成功',
+              icon: 'success',
+              duration: 2000
+            });
+          }, 500);
+        } else {
+          stages.value = stages.value.filter(s => s.id !== id);
+          uni.showToast({
+            title: '删除成功',
+            icon: 'success',
+            duration: 2000
+          });
+        }
+      }
+    }
+  });
+}
+
+function handleEditEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
+  const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
+  if (index !== -1 && editingStage.value) {
+    stages.value[index] = {
+      ...editingStage.value,
+      name: data.type,
+      time: data.date,
+      description: data.content,
+      thumbnail: editingStage.value.thumbnail, // 保持原有缩略图
+      progress: editingStage.value.progress, // 保持原有进度
+      records: data.images || editingStage.value.records,
+      isUserAdded: true
+    };
+    // 按时间排序
+    stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    
+    // 添加编辑成功动画效果
+    const stageElement = document.querySelector(`[data-stage-id="${editingStage.value.id}"]`);
+    if (stageElement) {
+      stageElement.classList.add('ani-success');
+      setTimeout(() => {
+        stageElement.classList.remove('ani-success');
+      }, 1000);
+    }
+    
+    uni.showToast({
+      title: '编辑成功',
+      icon: 'success',
+      duration: 2000
+    });
+  }
+  showEditDialog.value = false;
+  editingStage.value = null;
+}
+
+function toggleStageActions(id: number) {
+  if (expandedStageId.value === id) {
+    expandedStageId.value = null;
+  } else {
+    expandedStageId.value = id;
+  }
+}
 </script>
 
 <style lang="scss">
@@ -443,12 +608,33 @@ const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
   min-width: 0;
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(48,169,8,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
   padding: 2vw 2vw;
   margin-bottom: 0.5vw;
-  transition: box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  
   &:hover {
-    box-shadow: 0 8px 32px rgba(48,169,8,0.16);
+    box-shadow: 0 8px 32px rgba(48, 169, 8, 0.16);
+    transform: translateY(-1px);
+  }
+  
+  &.expanded {
+    box-shadow: 0 12px 40px rgba(48, 169, 8, 0.2), 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    border: 2px solid rgba(48, 169, 8, 0.1);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #30a908, #4caf50);
+      border-radius: 16px 16px 0 0;
+    }
   }
 }
 .stage-thumb {
@@ -482,34 +668,47 @@ const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  
   .stage-title {
-    padding-right: 80px;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: clamp(1rem, 2.5vw, 1.18rem);
-    font-weight: 800;
-    color: #222;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 4px #f8f9fa, 0 2px 8px #eaf7ef;
-    background: linear-gradient(90deg, #eaf7ef 0%, #f8f9fa 100%);
-    border-radius: 6px;
-    padding: 2px 12px;
-    box-decoration-break: clone;
-    max-width: 60vw;
-    width: 100%;
-  }
-  .stage-time {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 1rem;
-    color: #30a908;
+    font-size: 1.1rem;
     font-weight: 600;
-    background: rgba(48,169,8,0.10);
-    border-radius: 8px;
-    padding: 2px 12px;
+    color: #222;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .stage-time {
+    font-size: 0.9rem;
+    color: #666;
+    white-space: nowrap;
+  }
+  
+  .expand-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(48, 169, 8, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    .expand-icon {
+      font-size: 12px;
+      color: #30a908;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    &.expanded {
+      background: rgba(48, 169, 8, 0.2);
+      
+      .expand-icon {
+        transform: rotate(180deg);
+      }
+    }
   }
 }
 .stage-desc {
@@ -620,6 +819,137 @@ const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
   }
   &:active {
     transform: scale(1.12);
+  }
+}
+.stage-actions {
+  display: none;
+}
+.stage-actions-modern {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+  
+  .action-btn-modern {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: transparent;
+    
+    .action-icon-modern {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    
+    .action-text {
+      font-weight: 500;
+      color: inherit;
+    }
+    
+    &.edit-btn-modern {
+      color: #059669;
+      border-color: rgba(209, 250, 229, 0.6);
+      background: #f0fdf4;
+      border-width: 0.5px;
+      
+      &:hover {
+        background: #dcfce7;
+        border-color: rgba(167, 243, 208, 0.8);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+      }
+      
+      &:active {
+        background: #bbf7d0;
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(5, 150, 105, 0.1);
+      }
+    }
+    
+    &.delete-btn-modern {
+      color: #dc2626;
+      border-color: rgba(254, 226, 226, 0.6);
+      background: #fef2f2;
+      border-width: 0.5px;
+      
+      &:hover {
+        background: #fecaca;
+        border-color: rgba(252, 165, 165, 0.8);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+      }
+      
+      &:active {
+        background: #fca5a5;
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(220, 38, 38, 0.1);
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 200px;
+  }
+}
+
+// 添加新的动画样式
+.ani-success {
+  animation: successPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.ani-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 32px rgba(48, 169, 8, 0.2), 0 3px 12px rgba(0,0,0,0.08);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
   }
 }
 </style>

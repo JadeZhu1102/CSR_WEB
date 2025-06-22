@@ -89,8 +89,18 @@ $uni-color-subtitle: #555; // 二级标题颜色
 $uni-font-size-subtitle: 18px;
 $uni-color-paragraph: #3f536e; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
+
+/* 动画变量 */
+
 $ani-duration: 0.6s;
+$ani-duration-fast: 0.3s;
+$ani-duration-slow: 0.8s;
 $ani-ease: cubic-bezier(.23, 1.01, .32, 1);
+$ani-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$ani-ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+
+/* 基础动画关键帧 */
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -99,6 +109,39 @@ $ani-ease: cubic-bezier(.23, 1.01, .32, 1);
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
@@ -113,16 +156,161 @@ $ani-ease: cubic-bezier(.23, 1.01, .32, 1);
     }
 }
 
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes rotateIn {
+    from {
+        opacity: 0;
+        transform: rotate(-200deg);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* 动画类 */
+
 .ani-fade-in-up {
     animation: fadeInUp $ani-duration $ani-ease both;
+}
+
+.ani-fade-in-down {
+    animation: fadeInDown $ani-duration $ani-ease both;
+}
+
+.ani-fade-in-left {
+    animation: fadeInLeft $ani-duration $ani-ease both;
+}
+
+.ani-fade-in-right {
+    animation: fadeInRight $ani-duration $ani-ease both;
 }
 
 .ani-scale-pop {
     animation: scalePop 0.38s $ani-ease both;
 }
 
+.ani-slide-in-up {
+    animation: slideInUp $ani-duration $ani-ease both;
+}
+
+.ani-slide-in-down {
+    animation: slideInDown $ani-duration $ani-ease both;
+}
+
+.ani-bounce-in {
+    animation: bounceIn $ani-duration $ani-ease both;
+}
+
+.ani-pulse {
+    animation: pulse 1s $ani-ease infinite;
+}
+
+.ani-shake {
+    animation: shake 0.5s $ani-ease both;
+}
+
+.ani-rotate-in {
+    animation: rotateIn $ani-duration $ani-ease both;
+}
+
+.ani-zoom-in {
+    animation: zoomIn $ani-duration $ani-ease both;
+}
+
+
+/* 交互动画类 */
+
 .ani-btn {
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.18s $ani-ease;
+    transition: all 0.2s $ani-ease;
+    position: relative;
+    overflow: hidden;
     &:hover {
         transform: scale(1.04);
         box-shadow: 0 2px 8px rgba(48, 169, 8, 0.10);
@@ -130,11 +318,313 @@ $ani-ease: cubic-bezier(.23, 1.01, .32, 1);
     &:active {
         transform: scale(0.97);
     }
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s, height 0.3s;
+    }
+    &:active::before {
+        width: 200px;
+        height: 200px;
+    }
+    // 波纹效果
+    &.ripple-effect {
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        &:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+    }
 }
 
-.ani-input:focus {
-    border-color: #30a908;
-    box-shadow: 0 0 0 2px rgba(48, 169, 8, 0.08);
+.ani-card {
+    transition: all 0.3s $ani-ease;
+    cursor: pointer;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    &:active {
+        transform: translateY(0);
+    }
+    // 悬停时的光效
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    &:hover::before {
+        left: 100%;
+    }
+}
+
+.ani-tab {
+    transition: all 0.3s $ani-ease;
+    position: relative;
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: $uni-color-primary;
+        transform: translateX(-50%);
+        transition: width 0.3s $ani-ease;
+    }
+    &.active::after {
+        width: 100%;
+    }
+    &:hover {
+        transform: translateY(-1px);
+    }
+    // 激活时的背景效果
+    &.active {
+        background: rgba(48, 169, 8, 0.1);
+        border-radius: 8px 8px 0 0;
+    }
+}
+
+.ani-input {
+    transition: all 0.3s $ani-ease;
+    &:focus {
+        border-color: $uni-color-primary;
+        box-shadow: 0 0 0 2px rgba(48, 169, 8, 0.08);
+        transform: scale(1.02);
+    }
+    // 标签动画
+    &+label {
+        transition: all 0.3s $ani-ease;
+    }
+    &:focus+label {
+        color: $uni-color-primary;
+        transform: translateY(-20px) scale(0.8);
+    }
+}
+
+.ani-dialog {
+    animation: scalePop 0.3s $ani-ease both;
+    // 弹窗内容动画
+    .dialog-content {
+        animation: fadeInUp 0.4s $ani-ease 0.1s both;
+    }
+    .dialog-actions {
+        animation: fadeInUp 0.4s $ani-ease 0.2s both;
+    }
+}
+
+.ani-dialog-mask {
+    animation: fadeInUp 0.2s $ani-ease both;
+}
+
+.ani-list-item {
+    transition: all 0.3s $ani-ease;
+    &:hover {
+        background: rgba(48, 169, 8, 0.05);
+        transform: translateX(4px);
+    }
+    &:active {
+        transform: translateX(2px);
+    }
+    // 列表项进入动画
+    &.list-enter {
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: fadeInLeft 0.3s $ani-ease both;
+    }
+}
+
+.ani-icon {
+    transition: all 0.3s $ani-ease;
+    &:hover {
+        transform: scale(1.1) rotate(5deg);
+    }
+    &:active {
+        transform: scale(0.95);
+    }
+    // 特殊图标动画
+    &.icon-spin {
+        &:hover {
+            animation: spin 1s linear infinite;
+        }
+    }
+    &.icon-bounce {
+        &:hover {
+            animation: bounce 0.6s ease;
+        }
+    }
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    53%,
+    80%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+    40%,
+    43% {
+        transform: translate3d(0, -8px, 0);
+    }
+    70% {
+        transform: translate3d(0, -4px, 0);
+    }
+    90% {
+        transform: translate3d(0, -2px, 0);
+    }
+}
+
+
+/* 增强的进度条动画 */
+
+.ani-progress {
+    transition: width 0.8s $ani-ease;
+    // 进度条填充动画
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: progressShine 2s linear infinite;
+    }
+}
+
+@keyframes progressShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+/* 增强的展开动画 */
+
+.ani-expand {
+    transition: all 0.3s $ani-ease;
+    overflow: hidden;
+    &.expanded {
+        max-height: 1000px;
+        opacity: 1;
+    }
+    &.collapsed {
+        max-height: 0;
+        opacity: 0;
+    }
+    // 展开时的内容动画
+    .expand-content {
+        animation: fadeInUp 0.3s $ani-ease 0.1s both;
+    }
+}
+
+
+/* 加载动画 */
+
+.ani-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(48, 169, 8, 0.3);
+    border-radius: 50%;
+    border-top-color: $uni-color-primary;
+    animation: spin 1s linear infinite;
+    // 加载文字动画
+    &+span {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* 成功动画 */
+
+.ani-success {
+    animation: bounceIn 0.6s $ani-ease both;
+    &::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: $uni-color-success;
+        font-size: 24px;
+        font-weight: bold;
+        animation: scalePop 0.3s $ani-ease 0.3s both;
+    }
+}
+
+
+/* 错误动画 */
+
+.ani-error {
+    animation: shake 0.5s $ani-ease both;
+    &::after {
+        content: '✗';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: $uni-color-error;
+        font-size: 24px;
+        font-weight: bold;
+        animation: scalePop 0.3s $ani-ease 0.3s both;
+    }
+}
+
+
+/* 页面切换动画 */
+
+.page-enter {
+    animation: fadeInUp $ani-duration $ani-ease both;
+}
+
+.page-leave {
+    animation: fadeInDown $ani-duration $ani-ease both;
+}
+
+
+/* 响应式动画 */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 html {

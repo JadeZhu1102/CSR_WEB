@@ -1,14 +1,15 @@
 <template>
   <view id="current-activity-list">
     <view
-      class="activity-item"
-      v-for="activity in activityList"
+      class="activity-item ani-card"
+      v-for="(activity, index) in activityList"
       :key="activity.id"
+      :style="{ animationDelay: index * 0.1 + 's' }"
       @click="onJoin(activity.id)"
     >
       <view class="activity-overview">
         <image
-          class="cover"
+          class="cover ani-icon"
           :src="activity.coverImage"
           mode="aspectFill"
           lazy-load
@@ -45,7 +46,7 @@
           </view>
         </view>
         <view class="activity-action">
-          <button :disabled="activity.enrollStatus !== null" class="join" :class="{
+          <button :disabled="activity.enrollStatus !== null" class="join ani-btn" :class="{
             joined: activity.enrollStatus === 'Approved',
             pending: activity.enrollStatus === 'Pending',
           }">
@@ -65,11 +66,12 @@
             :percent="activity.progress"
             activeColor="#30a908"
             stroke-width="8"
+            class="ani-progress"
             style="width: 100%; height: 8px; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 1;"
           />
           <image
             v-if="activity.progressIcon"
-            class="progress-icon"
+            class="progress-icon ani-icon"
             :src="activity.progressIcon"
             :style="getProgressIconStyle(activity.progress)"
           />
