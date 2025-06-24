@@ -1,11 +1,11 @@
 export interface ILoginParams {
     username: string;
-    password:  string;
+    password: string;
 }
 
 export interface ILoginResponse {
     accessToken: string;
-    refreshToken:  string;
+    refreshToken: string;
     expiresIn: number; // minutes
     tokenType: 'Bearer';
 }
@@ -45,6 +45,40 @@ export const logoutApi = (refreshToken: string) => {
             dataType: 'json',
             success: (res) => {
                 resolve(res.data as ILogoutResponse);
+            },
+            fail: (error) => {
+                reject(error);
+            },
+        });
+    });
+}
+
+export interface IRegisterParams {
+    username: string;
+    password: string;
+}
+
+export interface IRegisterResponse {
+    //
+}
+
+export const registerApi = (params: IRegisterParams) => {
+    return new Promise<boolean>((resolve, reject) => {
+        uni.request({
+            url: '/api/auth/register',
+            method: 'POST',
+            data: params,
+            header: {
+                'content-type': 'application/json'
+            },
+            dataType: 'json',
+            success: (res) => {
+                // resolve(res.data as IRegisterResponse);
+                if (res.statusCode === 200) {
+                    resolve(true);
+                } else {
+                    reject(new Error('Failed to register'));
+                }
             },
             fail: (error) => {
                 reject(error);

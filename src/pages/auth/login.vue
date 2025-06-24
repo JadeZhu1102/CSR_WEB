@@ -14,6 +14,11 @@
           </button>
         </view>
       </form>
+      <view class="auth-navigation">
+        <navigator url="/pages/auth/register"  hover-class="other-navigator-hover">
+          <text>{{ $t('register.register') }}</text>
+        </navigator>
+      </view>
     </view>
   </view>
 </template>
@@ -104,5 +109,10 @@ const onLogin = async () => {
   box-shadow: 0 2px 8px rgba(48,169,8,0.10);
   border: none;
   margin-top: 8px;
+}
+.auth-navigation {
+  display: flex;
+  align-items: end;
+  margin-top: 28px;
 }
 </style>

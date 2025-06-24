@@ -35,6 +35,12 @@
 			"style": {
 				"navigationBarTitleText": "%title.login%"
 			}
+		},
+		{
+			"path": "pages/auth/register",
+			"style": {
+				"navigationBarTitleText": "%title.register%"
+			}
 		}
 	],
 	"tabBar": {
