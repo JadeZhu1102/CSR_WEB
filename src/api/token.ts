@@ -6,14 +6,13 @@ interface ITokenCache {
     expiredIn: number;
 }
 
-const OneMinute = 60 * 1000;
+const OneSecond = 1000;
+const OneMinute = 60 * OneSecond;
+const RefreshBuffer = 15 * OneSecond;
 
-// 7-days, milliseconds
-const ExpiredTime = OneMinute * 60 * 24 * 7;
-
-const RefreshBuffer = OneMinute;
-
-export const createExpiredTimeStamp = (): number => Date.now() + ExpiredTime - RefreshBuffer;
+export const createExpiredTimeStamp = (expiredIn: number): number => {
+    return Date.now() + expiredIn * OneMinute - RefreshBuffer;
+}
 
 class TokenManager {
     private cacheKey: string = 'CSR_USER_JWT_SESSION';

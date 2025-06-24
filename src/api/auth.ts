@@ -4,8 +4,10 @@ export interface ILoginParams {
 }
 
 export interface ILoginResponse {
-    access: string;
-    refresh:  string;
+    accessToken: string;
+    refreshToken:  string;
+    expiresIn: number; // minutes
+    tokenType: 'Bearer';
 }
 
 export const loginApi = (params: ILoginParams) => {

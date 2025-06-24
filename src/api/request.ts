@@ -2,6 +2,15 @@ import { getLocale } from "@/config/locale";
 import PageUrl from "@/config/page-url";
 import tokenManager from "./token";
 
+const ApiServer = {
+    Host: '',
+};
+
+/* 给微信小程序用的条件编译。小程序接口需指定域名。 */
+// #ifndef MP-WEIXIN
+ApiServer.Host = 'https://8.133.240.77:8080';
+// #endif
+
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {
     return error.statusCode === 401;
 }
@@ -23,7 +32,7 @@ export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestCo
 
         uni.request({
             ...rest,
-            url: requestUrl,
+            url: ApiServer.Host + requestUrl,
             header: {
                 ...rest.header,
                 'Authorization': 'Bearer ' + token,

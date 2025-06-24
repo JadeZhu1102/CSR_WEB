@@ -16,10 +16,10 @@ export const checkIfLogined = async (): Promise<boolean> => {
 export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
     try {
         const res = await loginApi(params);
-        const expiredTimeStamp = createExpiredTimeStamp();
+        const expiredTimeStamp = createExpiredTimeStamp(res.expiresIn);
         tokenManager.save({
-            token: res.access,
-            refreshToken: res.refresh,
+            token: res.accessToken,
+            refreshToken: res.refreshToken,
             expiredIn: expiredTimeStamp,
         });
         console.log(res);
