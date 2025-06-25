@@ -10,8 +10,14 @@ export interface ILoginResponse {
     tokenType: 'Bearer';
 }
 
+export interface ILoginApiResponse {
+    code: number;
+    message: string;
+    data: ILoginResponse;
+}
+
 export const loginApi = (params: ILoginParams) => {
-    return new Promise<ILoginResponse>((resolve, reject) => {
+    return new Promise<ILoginApiResponse>((resolve, reject) => {
         uni.request({
             url: '/api/auth/login',
             method: 'POST',
@@ -21,7 +27,7 @@ export const loginApi = (params: ILoginParams) => {
             },
             dataType: 'json',
             success: (res) => {
-                resolve(res.data as ILoginResponse);
+                resolve(res.data as ILoginApiResponse);
             },
             fail: (error) => {
                 reject(error);

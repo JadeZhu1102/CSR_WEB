@@ -1,82 +1,75 @@
 {
-	"pages": [
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "%title.newest_activities%"
-			}
-		},
-		{
-			"path": "pages/activity/all",
-			"style": {
-				"navigationBarTitleText": "%title.all_activities%"
-			}
-		},
-		{
-			"path": "pages/activity/detail",
-			"style": {
-				"navigationBarTitleText": "%title.activity_detail%"
-			}
-		},
-		{
-			"path": "pages/activity/auto-join",
-			"style": {
-				"navigationBarTitleText": "%title.join_activity%"
-			}
-		},
-		{
-			"path": "pages/account/index",
-			"style": {
-				"navigationBarTitleText": "%title.my_account%"
-			}
-		},
-		{
-			"path": "pages/auth/login",
-			"style": {
-				"navigationBarTitleText": "%title.login%"
-			}
-		},
-		{
-			"path": "pages/auth/register",
-			"style": {
-				"navigationBarTitleText": "%title.register%"
-			}
-		}
-	],
-	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#3cc51f",
-		"borderStyle": "black",
-		"backgroundColor": "#ffffff",
-		"height": "50px",
-		"fontSize": "10px",
-		"iconWidth": "24px",
-		"spacing": "3px",
-		"list": [
-			{
-				"pagePath": "pages/index/index",
-				"iconPath": "static/icons/fire.svg",
-				"selectedIconPath": "static/icons/fire_active.svg",
-				"text": "%tab.newest_activities%"
-			},
-			{
-				"pagePath": "pages/activity/all",
-				"iconPath": "static/icons/unorderedlist.svg",
-				"selectedIconPath": "static/icons/unorderedlist_active.svg",
-				"text": "%tab.all_activities%"
-			},
-			{
-				"pagePath": "pages/account/index",
-				"iconPath": "static/icons/user.svg",
-				"selectedIconPath": "static/icons/user_active.svg",
-				"text": "%tab.my_account%"
-			}
-		]
-	},
-	"globalStyle": {
-		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "CSR",
-		"navigationBarBackgroundColor": "#30a908",
-		"backgroundColor": "#F8F8F8"
-	}
+    "pages": [{
+            "path": "pages/index/index",
+            "style": {
+                "navigationBarTitleText": "%title.newest_activities%",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/activity/detail",
+            "style": {
+                "navigationBarTitleText": "%title.activity_detail%",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/activity/auto-join",
+            "style": {
+                "navigationBarTitleText": "%title.join_activity%",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/account/index",
+            "style": {
+                "navigationBarTitleText": "%title.my_account%",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/login",
+            "style": {
+                "navigationBarTitleText": "%title.login%",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/auth/register",
+            "style": {
+                "navigationBarTitleText": "%title.register%",
+                "navigationStyle": "custom"
+            }
+        }
+    ],
+    "tabBar": {
+        "color": "#7A7E83",
+        "selectedColor": "#3cc51f",
+        "borderStyle": "black",
+        "backgroundColor": "#ffffff",
+        "height": "50px",
+        "fontSize": "10px",
+        "iconWidth": "24px",
+        "spacing": "3px",
+        "list": [{
+                "pagePath": "pages/index/index",
+                "iconPath": "static/icons/fire.svg",
+                "selectedIconPath": "static/icons/fire_active.svg",
+                "text": "%tab.newest_activities%"
+            },
+
+            {
+                "pagePath": "pages/account/index",
+                "iconPath": "static/icons/user.svg",
+                "selectedIconPath": "static/icons/user_active.svg",
+                "text": "%tab.my_account%"
+            }
+        ]
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "white",
+        "navigationBarTitleText": "CSR",
+        "navigationBarBackgroundColor": "#30a908",
+        "backgroundColor": "#F8F8F8"
+    }
 }

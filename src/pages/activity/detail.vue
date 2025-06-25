@@ -1,792 +1,714 @@
 <template>
-  <template v-if="activity">
-    <view class="activity-detail">
-      <!-- 头部信息卡片 -->
-      <view class="activity-header-card">
-        <image class="header-cover" :src="activity.coverImage" mode="aspectFill" />
-        <view class="header-info">
-          <view class="header-title">{{ activity.name }}</view>
-          <view class="header-slogan">{{ activity.slogan }}</view>
-          <view class="header-meta">
-            <text class="meta-item">{{ $d(new Date(activity.startDate), 'medium') }} - {{ $d(new Date(activity.endDate), 'medium') }}</text>
-            <text class="meta-item">{{ $t('activity.label.location') }}{{ activity.location }}</text>
-          </view>
-        </view>
-      </view>
-      <!-- Tab切换 -->
-      <view class="tab-wrapper-modern">
-        <view v-for="tabItem in tabList" :key="tabItem.index" @click="selecTab(tabItem.index)"
-          :class="['tab-item-modern ani-tab', tab === tabItem.index ? 'active' : 'inactive']">
-          {{ $t(tabItem.name) }}
-        </view>
-      </view>
-      <!-- Tab内容 -->
-      <view v-if="tab === 2" class="tab-content ani-fade-in-up">
-        <!-- 现代化高科技感活动进度区块 -->
-        <view class="activity-progress-modern" @click="handleProgressAreaClick">
-          <view
-            v-for="(stage, index) in stages"
-            :key="stage.id"
-            class="progress-stage-card ani-card"
-            :style="{ animationDelay: index * 0.1 + 's' }"
-            @click.stop="toggleStageExpand(stage.id)"
-          >
-            <view class="stage-thumb">
-              <image :src="stage.thumbnail" mode="aspectFill" class="ani-icon" />
-            </view>
-            <view class="stage-info">
-              <view class="stage-title-row">
-                <span class="stage-title">{{ stage.name }}</span>
-                <span class="stage-time">{{ formatDate(stage.time) }}</span>
-                <view class="expand-indicator" :class="{ 'expanded': expandedStageId === stage.id }">
-                  <text class="expand-icon">▼</text>
-                </view>
-              </view>
-              <view class="stage-desc">{{ stage.description }}</view>
-              <view class="stage-participants">参与人数：{{ stage.participants }}人</view>
-              <button class="stage-join-icon-btn" @click.stop="showDialog = true" title="加入我们">
-                <image src="/static/icons/user.svg" class="join-btn-icon" />
-              </button>
-              <view v-if="expandedStageId === stage.id" class="stage-records ani-expand expanded">
-                <image
-                  v-for="(img, idx) in stage.records"
-                  :key="idx"
-                  :src="img"
-                  class="record-img ani-card"
-                  mode="aspectFill"
-                  @click.stop="showPreview(img)"
-                />
-              </view>
-            </view>
-          </view>
-          <PersonalEventDialog
-            v-model:visible="showDialog"
-            :typeOptions="eventTypeOptions"
-            @confirm="handlePersonalEventConfirm"
-          />
-          <!-- 图片预览弹窗 -->
-          <view v-if="previewImg" class="img-preview-mask ani-dialog-mask" @click="closePreview">
-            <image :src="previewImg" class="img-preview ani-dialog" mode="aspectFit" />
-          </view>
-        </view>
-      </view>
-      <view v-if="tab === 3" class="tab-content ani-fade-in-up">
-        <view class="activity-progress-modern">
-          <view
-            v-for="(stage, index) in userStages"
-            :key="stage.id"
-            class="progress-stage-card ani-card"
-            :data-stage-id="stage.id"
-            :class="{ 'expanded': expandedStageId === stage.id }"
-            :style="{ animationDelay: index * 0.1 + 's' }"
-            @click="toggleStageActions(stage.id)"
-          >
-            <view class="stage-thumb">
-              <image :src="stage.thumbnail" mode="aspectFill" class="ani-icon" />
-            </view>
-            <view class="stage-info">
-              <view class="stage-title-row">
-                <span class="stage-title">{{ stage.name }}</span>
-                <span class="stage-time">{{ formatDate(stage.time) }}</span>
-                <view class="expand-indicator" :class="{ 'expanded': expandedStageId === stage.id }">
-                  <text class="expand-icon">▼</text>
-                </view>
-              </view>
-              <view class="stage-desc">{{ stage.description }}</view>
-              <view class="stage-participants">参与人数：{{ stage.participants }}人</view>
-              <view v-if="expandedStageId === stage.id" class="stage-actions">
-                <button class="edit-btn" @click.stop="editStage(stage)" title="编辑">
-                  <image src="/static/icons/edit.svg" class="edit-icon" />
-                </button>
-                <button class="delete-btn" @click.stop="deleteStage(stage.id)" title="删除">
-                  <image src="/static/icons/delete.svg" class="delete-icon" />
-                </button>
-              </view>
-            </view>
-          </view>
-          <!-- 图片预览弹窗复用 -->
-          <view v-if="previewImg" class="img-preview-mask ani-dialog-mask" @click="closePreview">
-            <image :src="previewImg" class="img-preview ani-dialog" mode="aspectFit" />
-          </view>
-          <ActivityEnroll :activityId="currentActivityId" />
-        </view>
-        
-        <!-- 编辑事件弹窗 -->
-        <PersonalEventDialog
-          v-model:visible="showEditDialog"
-          :typeOptions="eventTypeOptions"
-          :editData="editingStage"
-          @confirm="handleEditEventConfirm"
-        />
-      </view>
+  <view class="container">
+    <!-- 顶部导航栏 -->
+    <view class="nav-bar">
+      <a
+        href="https://readdy.ai/home/ac3d2e9b-9a5f-417f-9a17-fc212480eb5f/e18840ee-1598-41dd-be1d-c6cf28c87b4f"
+        data-readdy="true"
+        class="back-btn cursor-pointer"
+      >
+        <uni-icons type="back" size="24" color="#ffffff"></uni-icons>
+      </a>
+      <text class="nav-title">活动详情</text>
+      <view class="placeholder-view"></view>
     </view>
-  </template>
+    <!-- 内容区域 -->
+    <scroll-view
+      scroll-y
+      class="content-scroll"
+      :style="{ height: scrollHeight + 'px' }"
+    >
+      <!-- 活动海报区 -->
+      <view class="poster-container">
+        <image
+          class="poster-image"
+          src="https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event%2C%20large%20crowd%20of%20diverse%20runners%20with%20race%20numbers%20on%20a%20wide%20city%20street%2C%20morning%20sunlight%20creating%20dramatic%20lighting%2C%20urban%20skyline%20backdrop%20with%20iconic%20buildings%2C%20atmosphere%20of%20excitement%20and%20community%20spirit%2C%20professional%20sports%20photography%20style%2C%20high%20energy%20scene%20with%20colorful%20running%20outfits%2C%20race%20banners%20and%20starting%20line%20visible&width=750&height=560&seq=8&orientation=landscape"
+          mode="aspectFill"
+        ></image>
+        <view class="poster-overlay"></view>
+      </view>
+      <!-- 活动基本信息区 -->
+      <view class="activity-basic-info">
+        <view class="activity-status">报名中</view>
+        <text class="activity-title">城市马拉松</text>
+        <view class="info-row">
+          <view class="info-item">
+            <uni-icons type="calendar" size="16" color="#6a11cb"></uni-icons>
+            <text>2025年7月15日 08:00-12:00</text>
+          </view>
+          <view class="info-item">
+            <uni-icons type="location" size="16" color="#6a11cb"></uni-icons>
+            <text>城市中心公园</text>
+          </view>
+          <view class="info-item">
+            <uni-icons type="person" size="16" color="#6a11cb"></uni-icons>
+            <text>1024人已报名</text>
+          </view>
+        </view>
+      </view>
+      <!-- 活动详细内容区 -->
+      <view class="activity-detail-section">
+        <view class="section-card">
+          <view class="section-header">
+            <uni-icons type="info" size="18" color="#6a11cb"></uni-icons>
+            <text class="section-title">活动介绍</text>
+          </view>
+          <view class="section-content">
+            <text class="section-text"
+              >2025城市马拉松是一项大型公益跑步活动，旨在促进全民健身，同时为慈善事业筹集资金。本次活动由市体育局与多家爱心企业联合举办，所有报名费用将全部捐赠给贫困地区的教育事业。</text
+            >
+            <text class="section-text"
+              >活动设有全程马拉松(42.195公里)、半程马拉松(21.0975公里)和迷你马拉松(5公里)三个组别，参与者可根据自身情况选择适合的赛程。赛道经过城市多个标志性建筑，让参与者在运动中欣赏城市美景。</text
+            >
+            <image
+              class="detail-image"
+              src="https://readdy.ai/api/search-image?query=Marathon%20route%20map%20showing%20city%20landmarks%2C%20professional%20sports%20event%20planning%2C%20detailed%20course%20layout%20with%20distance%20markers%2C%20starting%20and%20finishing%20points%2C%20aid%20stations%20marked%2C%20colorful%20design%20on%20white%20background%2C%20top-down%20view%20of%20city%20streets%2C%20clean%20and%20organized%20information%20design&width=690&height=380&seq=9&orientation=landscape"
+              mode="aspectFill"
+            ></image>
+          </view>
+        </view>
+        <view class="section-card">
+          <view class="tabs">
+            <view
+              class="tab-item"
+              :class="{ 'active': activeTab === 'progress' }"
+              @click="activeTab = 'progress'"
+            >
+              <uni-icons
+                type="calendar"
+                size="18"
+                :color="activeTab === 'progress' ? '#6a11cb' : '#666666'"
+              ></uni-icons>
+              <text>活动进度</text>
+            </view>
+            <view
+              class="tab-item"
+              :class="{ 'active': activeTab === 'participation' }"
+              @click="activeTab = 'participation'"
+            >
+              <uni-icons
+                type="person"
+                size="18"
+                :color="activeTab === 'participation' ? '#6a11cb' : '#666666'"
+              ></uni-icons>
+              <text>我的参与</text>
+            </view>
+          </view>
+          <view class="section-content">
+            <view v-if="activeTab === 'progress'" class="timeline">
+              <view
+                class="timeline-item"
+                v-for="(event, index) in activityEvents"
+                :key="index"
+                :class="{ 'completed': event.completed }"
+              >
+                <view class="timeline-dot"></view>
+                <view class="timeline-content">
+                  <view class="event-content">
+                    <view class="event-header">
+                      <text class="event-title">{{ event.title }}</text>
+                      <text
+                        class="event-status"
+                        :class="{ 'status-completed': event.completed }"
+                      >
+                        {{ event.completed ? '已完成' : '进行中' }}
+                      </text>
+                    </view>
+                    <text class="event-time">{{ event.time }}</text>
+                    <text class="event-desc">{{ event.description }}</text>
+                  </view>
+                  <view
+                    class="join-btn"
+                    @click="handleJoinEvent(event)"
+                    v-if="!event.completed"
+                  >
+                    我想参与
+                  </view>
+                </view>
+              </view>
+            </view>
+            <view
+              v-if="activeTab === 'participation'"
+              class="participation-list"
+            >
+              <view
+                class="participation-item"
+                v-for="(record, index) in participationRecords"
+                :key="index"
+              >
+                <view class="record-header">
+                  <text class="record-title">{{ record.title }}</text>
+                  <text class="record-time">{{ record.time }}</text>
+                </view>
+                <text class="record-desc">{{ record.description }}</text>
+                <view class="record-stats">
+                  <view class="stat-item">
+                    <uni-icons
+                      type="medal"
+                      size="16"
+                      color="#6a11cb"
+                    ></uni-icons>
+                    <text>{{ record.achievement }}</text>
+                  </view>
+                  <view class="stat-item">
+                    <uni-icons
+                      type="location"
+                      size="16"
+                      color="#6a11cb"
+                    ></uni-icons>
+                    <text>{{ record.location }}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <!-- 底部留白，确保内容不被底部按钮遮挡 -->
+        <view style="height: 120rpx;"></view>
+      </view>
+    </scroll-view>
+
+    <!-- 参与确认弹窗 -->
+    <uni-popup ref="popup" type="dialog">
+      <uni-popup-dialog
+        type="info"
+        cancelText="取消"
+        confirmText="确认参与"
+        title="参与确认"
+        :content="popupContent"
+        @confirm="handleConfirm"
+        @close="handleClose"
+      ></uni-popup-dialog>
+    </uni-popup>
+  </view>
 </template>
 
-<script setup lang="ts">
-import { onLoad } from "@dcloudio/uni-app";
-import { ref, computed } from "vue";
-import type { IActivityDetail } from "@/models/activity";
-import fetchActivityDetailApi from "@/api/activity-detail.api";
-import ActivityEnroll from "@/components/activity/activity-enroll.vue";
-import iconAppstore from '@/static/icons/appstore.svg';
-import iconFireActive from '@/static/icons/fire_active.png';
-import iconTrophy from '@/static/icons/trophy.svg';
-import recordImg1 from '@/static/icons/appstore.svg';
-import recordImg2 from '@/static/icons/fire_active.png';
-import PersonalEventDialog from '@/components/activity/personal-event-dialog.vue';
-
-const tabList = ref([
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+// 滚动区域高度计算
+const scrollHeight = ref(0);
+// 赞助商数据
+const activityEvents = ref([
   {
-    index: 2,
-    name: "acivity.progress",
+    title: "开始报名",
+    time: "2025年6月1日",
+    description: "马拉松报名正式开始，参与者可通过官方渠道报名参加",
+    completed: true,
   },
   {
-    index: 3,
-    name: "acivity.participation",
+    title: "体检证明提交",
+    time: "2025年6月15日",
+    description: "参赛者需提交近6个月内体检证明",
+    completed: true,
+  },
+  {
+    title: "赛道信息发布",
+    time: "2025年6月30日",
+    description: "公布详细赛道信息，包括补给站位置和医疗点设置",
+    completed: true,
+  },
+  {
+    title: "参赛物资发放",
+    time: "2025年7月12日-14日",
+    description: "参赛者领取比赛物资包，包含号码牌、计时芯片等",
+    completed: false,
+  },
+  {
+    title: "赛前说明会",
+    time: "2025年7月14日",
+    description: "举办赛前技术说明会，讲解比赛注意事项",
+    completed: false,
+  },
+  {
+    title: "正式比赛",
+    time: "2025年7月15日",
+    description: "马拉松正式开始，参赛者按指定时间到达起点",
+    completed: false,
   },
 ]);
-const currentActivityId = ref<number>(0);
-const tab = ref<number>(2);
-const activity = ref<IActivityDetail | null>(null);
+const popup = ref();
+const popupContent = ref("");
+const activeTab = ref("progress");
+const selectedEvent = ref(null);
 
-const expandedStageId = ref<number | null>(null);
-const previewImg = ref<string | null>(null);
-const showDialog = ref(false);
-const eventTypeOptions = ref(['种玉米', '收玉米']);
-
-function toggleStageExpand(id: number) {
-  expandedStageId.value = expandedStageId.value === id ? null : id;
-}
-
-function showPreview(img: string) {
-  previewImg.value = img;
-}
-
-function closePreview() {
-  previewImg.value = null;
-}
-
-function handleProgressAreaClick(e: Event) {
-  if (showDialog.value) return;
-  // 只在点击进度区块空白处时收起
-  if ((e.target as HTMLElement).classList.contains('activity-progress-modern')) {
-    expandedStageId.value = null;
-  }
-}
-
-// 活动阶段数据
-const stages = ref([
-  {
-    id: 1,
-    name: "项目启动会",
-    time: "2025-04-10T08:00:00",
-    description: "参与项目启动会，了解整体流程和目标。",
-    thumbnail: iconAppstore,
-    progress: 100,
-    records: [recordImg1, recordImg2],
-    isUserAdded: false,
-    participants: 12
-  },
-  {
-    id: 2,
-    name: "种玉米活动",
-    time: "2025-04-20T08:00:00",
-    description: "参加种玉米活动，体验农业劳动。",
-    thumbnail: iconFireActive,
-    progress: 60,
-    records: [recordImg2, recordImg1],
-    isUserAdded: false,
-    participants: 15
-  },
-  {
-    id: 3,
-    name: "成果展示",
-    time: "2025-05-01T08:00:00",
-    description: "展示种植成果，分享收获与心得。",
-    thumbnail: iconTrophy,
-    progress: 0,
-    records: [recordImg1, recordImg2],
-    isUserAdded: false,
-    participants: 10
-  },
-  // 用户添加的事件
-  {
-    id: 1001,
-    name: "种玉米",
-    time: "2025-04-15T10:00:00",
-    description: "今天在崇明岛种了玉米，天气很好，心情愉快！",
-    thumbnail: iconFireActive,
-    progress: 100,
-    records: [recordImg1, recordImg2],
-    isUserAdded: true,
-    participants: 10
-  },
-  {
-    id: 1002,
-    name: "收玉米",
-    time: "2025-04-25T14:00:00",
-    description: "收获季节到了，玉米长势喜人，收获满满！",
-    thumbnail: iconTrophy,
-    progress: 100,
-    records: [recordImg2, recordImg1],
-    isUserAdded: true,
-    participants: 12
-  }
-]);
-
-const selecTab = (index: number) => {
-  tab.value = index;
+const handleJoinEvent = (event) => {
+  selectedEvent.value = event;
+  popupContent.value = `是否确认参与"${event.title}"活动？\n时间：${event.time}\n${event.description}`;
+  popup.value.open();
 };
 
-onLoad(async (query = {}) => {
-  const activityId = query.id;
-  currentActivityId.value = Number(activityId);
-  try {
-    uni.showLoading();
-    await new Promise(resolve => {
-      setTimeout(() => resolve(true), 1000);
-    });
-    const detail: IActivityDetail = await fetchActivityDetailApi(activityId);
-    activity.value = detail;
-    uni.setNavigationBarTitle({ title: detail.name });
-  } catch (error) {
-    //
-  } finally {
-    uni.hideLoading();
-  }
-});
-
-const onEnroll = () => {
-  
-}
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  const pad = (n: number) => n < 10 ? '0' + n : n;
-  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function handlePersonalEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
-  stages.value.push({
-    id: Date.now(),
-    name: data.type, // 事件名称
-    time: data.date,
-    description: data.content,
-    thumbnail: iconAppstore, // 可根据type选择不同icon
-    progress: 100,
-    records: data.images || [],
-    isUserAdded: true,
-    participants: 0
+const handleConfirm = () => {
+  // 这里可以添加参与活动的逻辑
+  uni.showToast({
+    title: "参与成功",
+    icon: "success",
   });
-  // 按时间排序
-  stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-  showDialog.value = false;
-}
+  popup.value.close();
+};
 
-const userStages = computed(() => stages.value.filter(s => s.isUserAdded));
+const handleClose = () => {
+  selectedEvent.value = null;
+};
 
-const showEditDialog = ref(false);
-const editingStage = ref<{ 
-  id: number; 
-  name: string; 
-  time: string; 
-  description: string; 
-  progress: number;
-  thumbnail: string;
-  records: string[];
-  isUserAdded: boolean;
-  participants: number;
-} | null>(null);
-
-function editStage(stage: { 
-  id: number; 
-  name: string; 
-  time: string; 
-  description: string; 
-  progress: number;
-  thumbnail: string;
-  records: string[];
-  isUserAdded: boolean;
-  participants: number;
-}) {
-  editingStage.value = { ...stage };
-  showEditDialog.value = true;
-}
-
-function deleteStage(id: number) {
-  uni.showModal({
-    title: '确认删除',
-    content: '确定要删除这个事件吗？删除后无法恢复。',
-    confirmText: '删除',
-    confirmColor: '#ff6b35',
-    cancelText: '取消',
-    cancelColor: '#666',
+const participationRecords = ref([
+  {
+    title: "完成报名",
+    time: "2025年6月2日",
+    description: "成功报名2025城市马拉松全程马拉松项目",
+    achievement: "报名成功",
+    location: "线上报名",
+  },
+  {
+    title: "体检完成",
+    time: "2025年6月10日",
+    description: "在市体检中心完成马拉松体检并提交证明",
+    achievement: "合格",
+    location: "市体检中心",
+  },
+  {
+    title: "训练打卡",
+    time: "2025年6月15日",
+    description: "参加官方组织的训练营，完成10公里训练",
+    achievement: "配速5:30/km",
+    location: "城市公园",
+  },
+]);
+onMounted(() => {
+  // 获取系统信息计算滚动区域高度
+  uni.getSystemInfo({
     success: (res) => {
-      if (res.confirm) {
-        // 添加删除动画效果
-        const stageElement = document.querySelector(`[data-stage-id="${id}"]`);
-        if (stageElement) {
-          stageElement.classList.add('ani-shake');
-          setTimeout(() => {
-            stages.value = stages.value.filter(s => s.id !== id);
-            uni.showToast({
-              title: '删除成功',
-              icon: 'success',
-              duration: 2000
-            });
-          }, 500);
-        } else {
-          stages.value = stages.value.filter(s => s.id !== id);
-          uni.showToast({
-            title: '删除成功',
-            icon: 'success',
-            duration: 2000
-          });
-        }
-      }
-    }
+      // 减去导航栏高度和底部按钮高度
+      scrollHeight.value = res.windowHeight - 100 - 120;
+    },
   });
-}
-
-function handleEditEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
-  const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
-  if (index !== -1 && editingStage.value) {
-    stages.value[index] = {
-      ...editingStage.value,
-      name: data.type,
-      time: data.date,
-      description: data.content,
-      thumbnail: editingStage.value.thumbnail, // 保持原有缩略图
-      progress: editingStage.value.progress, // 保持原有进度
-      records: data.images || editingStage.value.records,
-      isUserAdded: true,
-      participants: editingStage.value.participants
-    };
-    // 按时间排序
-    stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-    
-    // 添加编辑成功动画效果
-    const stageElement = document.querySelector(`[data-stage-id="${editingStage.value.id}"]`);
-    if (stageElement) {
-      stageElement.classList.add('ani-success');
-      setTimeout(() => {
-        stageElement.classList.remove('ani-success');
-      }, 1000);
-    }
-    
-    uni.showToast({
-      title: '编辑成功',
-      icon: 'success',
-      duration: 2000
-    });
-  }
-  showEditDialog.value = false;
-  editingStage.value = null;
-}
-
-function toggleStageActions(id: number) {
-  if (expandedStageId.value === id) {
-    expandedStageId.value = null;
-  } else {
-    expandedStageId.value = id;
-  }
-}
+});
 </script>
 
-<style lang="scss">
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+<style>
+page {
+  height: 100%;
 }
-
-.activity-detail {
-  max-width: 700px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 4vw 2vw 6vw 2vw;
-  box-sizing: border-box;
-  @media (max-width: 900px) {
-    max-width: 98vw;
-    padding: 4vw 1vw 6vw 1vw;
-  }
-  @media (max-width: 600px) {
-    max-width: 100vw;
-    padding: 5vw 0.5vw 8vw 0.5vw;
-  }
-}
-.activity-header-card,
-.activity-value-card,
-.tab-wrapper-modern,
-.timeline-container-modern,
-.enroll-card {
-  animation: fadeInUp 0.6s cubic-bezier(.23,1.01,.32,1) both;
-}
-.activity-header-card {
-  display: flex;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  overflow: hidden;
-  margin-bottom: 2vw;
-  min-height: 100px;
-  @media (max-width: 600px) {
-    flex-direction: column;
-    .header-cover {
-      border-radius: 14px 14px 0 0;
-      width: 100%;
-      height: 32vw;
-      min-height: 100px;
-    }
-    .header-info {
-      padding: 3vw 3vw 2vw 3vw;
-    }
-  }
-  .header-cover {
-    width: 110px;
-    height: 110px;
-    object-fit: cover;
-    border-radius: 14px 0 0 14px;
-    flex-shrink: 0;
-    @media (max-width: 600px) {
-      width: 100%;
-      height: 32vw;
-      border-radius: 14px 14px 0 0;
-    }
-  }
-  .header-info {
-    flex: 1;
-    padding: 24px 24px 16px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    .header-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #222;
-      margin-bottom: 6px;
-      line-height: 1.25;
-      letter-spacing: 0.5px;
-    }
-    .header-slogan {
-      font-size: 1rem;
-      color: #30a908;
-      margin-bottom: 12px;
-      line-height: 1.5;
-      font-weight: 500;
-      letter-spacing: 0.2px;
-    }
-    .header-meta {
-      font-size: 0.92rem;
-      color: #aaa;
-      .meta-item {
-        margin-right: 18px;
-        display: inline-block;
-        margin-bottom: 2px;
-        letter-spacing: 0.1px;
-      }
-    }
-  }
-}
-.activity-value-card {
-  background: #f8f9fa;
-  border-radius: 14px;
-  padding: 2vw 4vw 2vw 4vw;
-  margin-bottom: 2.5vw;
-  .value-title {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: #30a908;
-    margin-bottom: 8px;
-  }
-  .value-content {
-    font-size: 1rem;
-    color: #444;
-    line-height: 1.8;
-  }
-}
-.tab-wrapper-modern {
-  display: flex;
-  background: #f4f4f4;
-  border-radius: 10px;
-  margin-bottom: 2vw;
-  overflow: hidden;
-  .tab-item-modern {
-    flex: 1;
-    text-align: center;
-    padding: 12px 0;
-    font-size: 0.98rem;
-    font-weight: 500;
-    color: #666;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
-    &.active {
-      background: #30a908;
-      color: #fff;
-      font-weight: bold;
-      transform: scale(1.08);
-      box-shadow: 0 2px 8px rgba(48,169,8,0.10);
-    }
-    &.inactive {
-      background: transparent;
-      transform: scale(1);
-    }
-    &:hover {
-      background: #e6f7e6;
-      color: #30a908;
-      transform: scale(1.04);
-    }
-  }
-}
-.activity-introduction-modern {
-  background: #fff;
-  border-radius: 14px;
-  padding: 5vw 4vw;
-  font-size: 1.08rem;
-  color: #444;
-  margin-bottom: 2.5vw;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.activity-progress-modern {
-  display: flex;
-  flex-direction: column;
-  gap: 2vw;
-  background: #f8f9fa;
-  border-radius: 18px;
-  padding: 3vw 2vw 3vw 2vw;
-  margin-bottom: 2.5vw;
-  box-shadow: 0 4px 24px rgba(48,169,8,0.10);
-}
-.progress-stage-card {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-  min-width: 0;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
-  padding: 2vw 2vw;
-  margin-bottom: 0.5vw;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.cursor-pointer {
   cursor: pointer;
-  position: relative;
-  
-  &:hover {
-    box-shadow: 0 8px 32px rgba(48, 169, 8, 0.16);
-    transform: translateY(-1px);
-  }
-  
-  &.expanded {
-    box-shadow: 0 12px 40px rgba(48, 169, 8, 0.2), 0 4px 16px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-    border: 2px solid rgba(48, 169, 8, 0.1);
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #30a908, #4caf50);
-      border-radius: 16px 16px 0 0;
-    }
-  }
 }
-.stage-thumb {
-  flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-right: 2vw;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 12px rgba(48,169,8,0.10);
-  image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 16px;
-    background: #f4f4f4;
-  }
-}
-.stage-info {
-  flex: 1 1 0%;
-  min-width: 0;
+.container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  height: 100%;
+  background-color: #f5f7fa;
 }
-.stage-title-row {
+/* 顶部导航栏样式 */
+.nav-bar {
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  
-  .stage-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #222;
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .stage-time {
-    font-size: 0.9rem;
-    color: #666;
-    white-space: nowrap;
-  }
-  
-  .expand-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(48, 169, 8, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    .expand-icon {
-      font-size: 12px;
-      color: #30a908;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    &.expanded {
-      background: rgba(48, 169, 8, 0.2);
-      
-      .expand-icon {
-        transform: rotate(180deg);
-      }
-    }
-  }
+  align-items: center;
+  height: 100rpx;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  padding: 0 30rpx;
+  z-index: 100;
 }
-.stage-desc {
-  color: #444;
-  font-size: 1.02rem;
-  line-height: 1.7;
-  background: #f4f8f6;
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-.stage-participants {
-  color: #666;
-  font-size: 0.92rem;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-.stage-records {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(48,169,8,0.08);
-  padding: 12px 0;
-  justify-content: flex-start;
-  .record-img {
-    width: 120px;
-    height: 80px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #f4f4f4;
-    box-shadow: 0 1px 6px rgba(48,169,8,0.06);
-    @media (max-width: 600px) {
-      width: 40vw;
-      height: 24vw;
-    }
-  }
-}
-.enroll-card {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 5vw 4vw;
-  margin-bottom: 2.5vw;
-}
-.img-preview-mask {
-  position: fixed;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 9999;
+.back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 60rpx;
+  height: 60rpx;
 }
-.img-preview {
-  max-width: 90vw;
-  max-height: 80vh;
-  border-radius: 16px;
-  box-shadow: 0 4px 32px #0006;
-  background: #fff;
+.nav-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
 }
-.stage-join-icon-btn {
+.placeholder-view {
+  width: 60rpx;
+}
+/* 内容滚动区域 */
+.content-scroll {
+  flex: 1;
+  overflow: auto;
+}
+/* 活动海报区域 */
+.poster-container {
+  position: relative;
+  width: 100%;
+  height: 560rpx;
+}
+.poster-image {
+  width: 100%;
+  height: 100%;
+}
+.poster-overlay {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  padding: 4px 8px;
-  background: #30a908;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 150rpx;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+}
+/* 活动基本信息区域 */
+.activity-basic-info {
+  position: relative;
+  padding: 40rpx 30rpx;
+  background-color: #ffffff;
+  border-radius: 30rpx 30rpx 0 0;
+  margin-top: -30rpx;
+}
+.activity-status {
+  position: absolute;
+  top: -20rpx;
+  right: 30rpx;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  color: #ffffff;
+  padding: 10rpx 30rpx;
+  border-radius: 30rpx;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
+}
+.activity-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 30rpx;
+}
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.info-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
-    box-shadow: 0 4px 16px rgba(48,169,8,0.25);
-    transform: scale(1.15);
-    .join-btn-icon {
-      transform: scale(1.25);
-      filter: brightness(1.2);
-    }
-  }
+  font-size: 14px;
+  color: #666666;
 }
-.join-btn-icon {
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  transition: transform 0.2s, filter 0.2s;
+.info-item text {
+  margin-left: 16rpx;
 }
-.stage-actions {
+/* 活动详细内容区域 */
+.activity-detail-section {
+  padding: 30rpx;
+}
+.section-card {
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.section-header {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  .edit-btn,
-  .delete-btn {
-    padding: 4px 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-    &:hover {
-      transform: scale(1.1);
-    }
-  }
-  .edit-icon,
-  .delete-icon {
-    width: 20px;
-    height: 20px;
-  }
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333333;
+  margin-left: 16rpx;
+}
+.section-content {
+  color: #666666;
+}
+.section-text {
+  display: block;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+.detail-image {
+  width: 100%;
+  height: 380rpx;
+  border-radius: 16rpx;
+  margin-top: 20rpx;
+}
+/* 参与步骤样式 */
+.step-item {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+.step-number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50rpx;
+  height: 50rpx;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  color: #ffffff;
+  border-radius: 25rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+.step-info {
+  margin-left: 20rpx;
+}
+.step-title {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 6rpx;
+}
+.step-desc {
+  display: block;
+  font-size: 14px;
+  color: #666666;
+}
+/* 活动须知样式 */
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+.notice-text {
+  margin-left: 16rpx;
+  font-size: 14px;
+  line-height: 1.5;
+  flex: 1;
+}
+/* 组织者信息样式 */
+.organizer-info {
+  display: flex;
+}
+.organizer-logo {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  flex-shrink: 0;
+}
+.organizer-detail {
+  margin-left: 30rpx;
+  flex: 1;
+}
+.organizer-name {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+.organizer-desc {
+  display: block;
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 20rpx;
+  line-height: 1.5;
+}
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #666666;
+}
+.contact-item text {
+  margin-left: 10rpx;
+}
+/* 赞助商区域 */
+/* 时间线样式 */
+.timeline {
+  position: relative;
+  padding: 20rpx 0;
+}
+.timeline-item {
+  position: relative;
+  padding-left: 40rpx;
+  margin-bottom: 40rpx;
+}
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 15rpx;
+  top: 30rpx;
+  bottom: -40rpx;
+  width: 2rpx;
+  background-color: #e0e0e0;
+}
+.timeline-item:last-child::before {
+  display: none;
+}
+.timeline-dot {
+  position: absolute;
+  left: 6rpx;
+  top: 20rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background:linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  z-index: 1;
+}
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30rpx;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 20rpx 40rpx;
+  color: #666666;
+  position: relative;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: #6a11cb;
+}
+
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2rpx;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  border-radius: 2rpx;
+}
+
+.timeline-content {
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.join-btn {
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+  color: #ffffff;
+  padding: 10rpx 30rpx;
+  border-radius: 30rpx;
+  font-size: 14px;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+.event-content {
+  flex: 1;
+}
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.event-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+}
+.event-status {
+  font-size: 12px;
+  color: #666666;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  background-color: #e0e0e0;
+}
+.status-completed {
+  color: #ffffff;
+  background: linear-gradient(
+    to right,
+    rgba(64, 186, 213, 0.9),
+    rgba(59, 209, 181, 0.9)
+  );
+}
+.event-time {
+  display: block;
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 10rpx;
+}
+.event-desc {
+  display: block;
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.5;
+}
+/* 参与记录样式 */
+.participation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+.participation-item {
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.record-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+}
+.record-time {
+  font-size: 14px;
+  color: #666666;
+}
+.record-desc {
+  display: block;
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 16rpx;
+  line-height: 1.5;
+}
+.record-stats {
+  display: flex;
+  gap: 30rpx;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #666666;
+}
+.stat-item text {
+  margin-left: 8rpx;
 }
 </style>

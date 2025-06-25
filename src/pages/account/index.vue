@@ -6,6 +6,7 @@
             </view>
             <view class="user-info-container">
                 <text class="user-name">{{ userName }}</text>
+                <text class="user-id">ID: {{ userId }}</text>
             </view>
             <button class="ani-btn lang-btn" @click="showLangDialog = true">{{ $t('account.button.language') }}</button>
         </view>
@@ -41,7 +42,7 @@
         </view>
 
         <!-- 语言切换弹窗 -->
-        <view v-if="showLangDialog" class="lang-dialog-mask ani-dialog-mask" @click.self="showLangDialog = false">
+        <view class="lang-bottom-sheet" v-if="showLangDialog" @click.self="showLangDialog = false">
             <view class="lang-dialog ani-dialog">
                 <view class="lang-title">{{ $t('account.language.title') }}</view>
                 <view class="lang-options">
@@ -143,6 +144,7 @@ const showContributionDialog = ref(false);
 const showFeedbackDialog = ref(false);
 const feedbackContent = ref('');
 const isLoading = ref(false);
+const userId = ref('');
 
 // 使用语言管理composable
 const { currentLanguage, setLanguage, initLanguage } = useLanguage();
@@ -282,10 +284,10 @@ const submitFeedback = async () => {
 onLoad(() => {
     // 初始化语言设置
     initLanguage();
-    
     // 可以在这里加载用户数据
     userName.value = '张三';
     avatarUrl.value = '/static/logo.png';
+    userId.value = '10001';
 });
 </script>
 
@@ -298,7 +300,7 @@ onLoad(() => {
 
 #user {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     background: #30a908;
     border-bottom-left-radius: 18px 4px;
@@ -317,7 +319,7 @@ onLoad(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    margin-right: 16px;
     .avatar {
         width: 76px;
         height: 76px;
@@ -330,11 +332,21 @@ onLoad(() => {
     margin-left: 0;
     text-align: center;
     margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     .user-name {
-        font-size: 1.18rem;
+        font-size: 1.35rem;
         font-weight: 700;
         letter-spacing: 0.2px;
         color: #fff;
+        margin-bottom: 4px;
+    }
+    .user-id {
+        font-size: 0.92rem;
+        color: #e0e0e0;
+        margin-top: 0;
     }
 }
 
@@ -458,7 +470,7 @@ onLoad(() => {
 }
 
 // 弹窗样式
-.lang-dialog-mask,
+.lang-bottom-sheet,
 .contribution-dialog-mask,
 .feedback-dialog-mask {
     position: fixed;
@@ -466,7 +478,7 @@ onLoad(() => {
     background: rgba(0,0,0,0.18);
     z-index: 1002;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 }
 
