@@ -13,11 +13,6 @@
           </view>
         </view>
       </view>
-      <!-- 活动详情区块 -->
-      <view class="activity-value-card">
-        <view class="value-title">活动详情</view>
-        <view class="value-content">{{ activity.introduction || '暂无详细介绍。' }}</view>
-      </view>
       <!-- Tab切换 -->
       <view class="tab-wrapper-modern">
         <view v-for="tabItem in tabList" :key="tabItem.index" @click="selecTab(tabItem.index)"
@@ -26,11 +21,6 @@
         </view>
       </view>
       <!-- Tab内容 -->
-      <view v-if="tab === 1" class="tab-content ani-fade-in-up">
-        <view class="activity-introduction-modern">
-          <text>{{ activity.slogan }}</text>
-        </view>
-      </view>
       <view v-if="tab === 2" class="tab-content ani-fade-in-up">
         <!-- 现代化高科技感活动进度区块 -->
         <view class="activity-progress-modern" @click="handleProgressAreaClick">
@@ -53,12 +43,10 @@
                 </view>
               </view>
               <view class="stage-desc">{{ stage.description }}</view>
-              <view class="stage-progress-bar">
-                <view class="progress-bar-bg">
-                  <view class="progress-bar-fg ani-progress" :style="{ width: stage.progress + '%' }"></view>
-                </view>
-                <span class="progress-percent">{{ stage.progress }}%</span>
-              </view>
+              <view class="stage-participants">参与人数：{{ stage.participants }}人</view>
+              <button class="stage-join-icon-btn" @click.stop="showDialog = true" title="加入我们">
+                <image src="/static/icons/user.svg" class="join-btn-icon" />
+              </button>
               <view v-if="expandedStageId === stage.id" class="stage-records ani-expand expanded">
                 <image
                   v-for="(img, idx) in stage.records"
@@ -69,19 +57,8 @@
                   @click.stop="showPreview(img)"
                 />
               </view>
-              <view class="stage-actions-modern" v-if="expandedStageId === stage.id">
-                <button class="action-btn-modern edit-btn-modern ani-btn" @click.stop="editStage(stage)">
-                  <image src="/static/icons/edit.svg" class="action-icon-modern" />
-                  <text class="action-text">编辑</text>
-                </button>
-                <button class="action-btn-modern delete-btn-modern ani-btn" @click.stop="deleteStage(stage.id)">
-                  <image src="/static/icons/delete.svg" class="action-icon-modern" />
-                  <text class="action-text">删除</text>
-                </button>
-              </view>
             </view>
           </view>
-          <view class="progress-add-btn ani-btn" @click.stop="showDialog = true">+</view>
           <PersonalEventDialog
             v-model:visible="showDialog"
             :typeOptions="eventTypeOptions"
@@ -116,32 +93,13 @@
                 </view>
               </view>
               <view class="stage-desc">{{ stage.description }}</view>
-              <view class="stage-progress-bar">
-                <view class="progress-bar-bg">
-                  <view class="progress-bar-fg ani-progress" :style="{ width: stage.progress + '%' }"></view>
-                </view>
-                <span class="progress-percent">{{ stage.progress }}%</span>
-              </view>
-              <view v-if="expandedStageId === stage.id" class="stage-records ani-expand expanded">
-                <image
-                  v-for="(img, idx) in stage.records"
-                  :key="idx"
-                  :src="img"
-                  class="record-img ani-card"
-                  mode="aspectFill"
-                  @click.stop="showPreview(img)"
-                />
-              </view>
-              
-              <!-- 操作区域 -->
-              <view class="stage-actions-modern" v-if="expandedStageId === stage.id">
-                <button class="action-btn-modern edit-btn-modern ani-btn" @click.stop="editStage(stage)">
-                  <image src="/static/icons/edit.svg" class="action-icon-modern" />
-                  <text class="action-text">编辑</text>
+              <view class="stage-participants">参与人数：{{ stage.participants }}人</view>
+              <view v-if="expandedStageId === stage.id" class="stage-actions">
+                <button class="edit-btn" @click.stop="editStage(stage)" title="编辑">
+                  <image src="/static/icons/edit.svg" class="edit-icon" />
                 </button>
-                <button class="action-btn-modern delete-btn-modern ani-btn" @click.stop="deleteStage(stage.id)">
-                  <image src="/static/icons/delete.svg" class="action-icon-modern" />
-                  <text class="action-text">删除</text>
+                <button class="delete-btn" @click.stop="deleteStage(stage.id)" title="删除">
+                  <image src="/static/icons/delete.svg" class="delete-icon" />
                 </button>
               </view>
             </view>
@@ -180,10 +138,6 @@ import PersonalEventDialog from '@/components/activity/personal-event-dialog.vue
 
 const tabList = ref([
   {
-    index: 1,
-    name: "acivity.introduction",
-  },
-  {
     index: 2,
     name: "acivity.progress",
   },
@@ -193,7 +147,7 @@ const tabList = ref([
   },
 ]);
 const currentActivityId = ref<number>(0);
-const tab = ref<number>(1);
+const tab = ref<number>(2);
 const activity = ref<IActivityDetail | null>(null);
 
 const expandedStageId = ref<number | null>(null);
@@ -231,7 +185,8 @@ const stages = ref([
     thumbnail: iconAppstore,
     progress: 100,
     records: [recordImg1, recordImg2],
-    isUserAdded: false
+    isUserAdded: false,
+    participants: 12
   },
   {
     id: 2,
@@ -241,7 +196,8 @@ const stages = ref([
     thumbnail: iconFireActive,
     progress: 60,
     records: [recordImg2, recordImg1],
-    isUserAdded: false
+    isUserAdded: false,
+    participants: 15
   },
   {
     id: 3,
@@ -251,7 +207,8 @@ const stages = ref([
     thumbnail: iconTrophy,
     progress: 0,
     records: [recordImg1, recordImg2],
-    isUserAdded: false
+    isUserAdded: false,
+    participants: 10
   },
   // 用户添加的事件
   {
@@ -262,7 +219,8 @@ const stages = ref([
     thumbnail: iconFireActive,
     progress: 100,
     records: [recordImg1, recordImg2],
-    isUserAdded: true
+    isUserAdded: true,
+    participants: 10
   },
   {
     id: 1002,
@@ -272,7 +230,8 @@ const stages = ref([
     thumbnail: iconTrophy,
     progress: 100,
     records: [recordImg2, recordImg1],
-    isUserAdded: true
+    isUserAdded: true,
+    participants: 12
   }
 ]);
 
@@ -317,7 +276,8 @@ function handlePersonalEventConfirm(data: { type: string; content: string; date:
     thumbnail: iconAppstore, // 可根据type选择不同icon
     progress: 100,
     records: data.images || [],
-    isUserAdded: true
+    isUserAdded: true,
+    participants: 0
   });
   // 按时间排序
   stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
@@ -336,6 +296,7 @@ const editingStage = ref<{
   thumbnail: string;
   records: string[];
   isUserAdded: boolean;
+  participants: number;
 } | null>(null);
 
 function editStage(stage: { 
@@ -347,6 +308,7 @@ function editStage(stage: {
   thumbnail: string;
   records: string[];
   isUserAdded: boolean;
+  participants: number;
 }) {
   editingStage.value = { ...stage };
   showEditDialog.value = true;
@@ -398,7 +360,8 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
       thumbnail: editingStage.value.thumbnail, // 保持原有缩略图
       progress: editingStage.value.progress, // 保持原有进度
       records: data.images || editingStage.value.records,
-      isUserAdded: true
+      isUserAdded: true,
+      participants: editingStage.value.participants
     };
     // 按时间排序
     stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
@@ -721,34 +684,11 @@ function toggleStageActions(id: number) {
   margin-top: 2px;
   margin-bottom: 2px;
 }
-.stage-progress-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 4px;
-  .progress-bar-bg {
-    flex: 1;
-    height: 12px;
-    background: #eaf7ef;
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(48,169,8,0.10);
-    .progress-bar-fg {
-      height: 100%;
-      background: linear-gradient(90deg, #30a908 0%, #00e0ff 100%);
-      border-radius: 6px;
-      transition: width 0.4s cubic-bezier(.23,1.01,.32,1);
-      box-shadow: 0 0 8px #30a90844;
-    }
-  }
-  .progress-percent {
-    color: #30a908;
-    font-size: 1.02rem;
-    font-weight: 700;
-    min-width: 38px;
-    text-align: right;
-    text-shadow: 0 1px 4px #fff;
-  }
+.stage-participants {
+  color: #666;
+  font-size: 0.92rem;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 .stage-records {
   display: flex;
@@ -795,161 +735,58 @@ function toggleStageActions(id: number) {
   box-shadow: 0 4px 32px #0006;
   background: #fff;
 }
-.progress-add-btn {
-  position: fixed;
-  right: 5vw;
-  bottom: 7vw;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
+.stage-join-icon-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 8px;
   background: #30a908;
   color: #fff;
-  font-size: 36px;
-  font-weight: bold;
-  box-shadow: 0 2px 12px rgba(48,169,8,0.18);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.18s cubic-bezier(.23,1.01,.32,1);
+
   &:hover {
-    background: #389e0d;
-    transform: scale(1.08);
+    background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
+    box-shadow: 0 4px 16px rgba(48,169,8,0.25);
+    transform: scale(1.15);
+    .join-btn-icon {
+      transform: scale(1.25);
+      filter: brightness(1.2);
+    }
   }
-  &:active {
-    transform: scale(1.12);
-  }
+}
+.join-btn-icon {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  transition: transform 0.2s, filter 0.2s;
 }
 .stage-actions {
-  display: none;
-}
-.stage-actions-modern {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 0;
-  background: transparent;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
-  
-  .action-btn-modern {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
+  gap: 8px;
+  margin-top: 8px;
+  .edit-btn,
+  .delete-btn {
+    padding: 4px 8px;
     background: transparent;
-    
-    .action-icon-modern {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-    
-    .action-text {
-      font-weight: 500;
-      color: inherit;
-    }
-    
-    &.edit-btn-modern {
-      color: #059669;
-      border-color: rgba(209, 250, 229, 0.6);
-      background: #f0fdf4;
-      border-width: 0.5px;
-      
-      &:hover {
-        background: #dcfce7;
-        border-color: rgba(167, 243, 208, 0.8);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
-      }
-      
-      &:active {
-        background: #bbf7d0;
-        transform: translateY(0);
-        box-shadow: 0 1px 4px rgba(5, 150, 105, 0.1);
-      }
-    }
-    
-    &.delete-btn-modern {
-      color: #dc2626;
-      border-color: rgba(254, 226, 226, 0.6);
-      background: #fef2f2;
-      border-width: 0.5px;
-      
-      &:hover {
-        background: #fecaca;
-        border-color: rgba(252, 165, 165, 0.8);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
-      }
-      
-      &:active {
-        background: #fca5a5;
-        transform: translateY(0);
-        box-shadow: 0 1px 4px rgba(220, 38, 38, 0.1);
-      }
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    &:hover {
+      transform: scale(1.1);
     }
   }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    max-height: 200px;
-  }
-}
-
-// 添加新的动画样式
-.ani-success {
-  animation: successPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.ani-shake {
-  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-@keyframes successPulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 8px 32px rgba(48, 169, 8, 0.2), 0 3px 12px rgba(0,0,0,0.08);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 4px 16px rgba(48, 169, 8, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
-  }
-}
-
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-2px);
-  }
-  20%, 40%, 60%, 80% {
-    transform: translateX(2px);
+  .edit-icon,
+  .delete-icon {
+    width: 20px;
+    height: 20px;
   }
 }
 </style>
