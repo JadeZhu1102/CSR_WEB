@@ -2,13 +2,9 @@
   <view class="container">
     <!-- 顶部导航栏 -->
     <view class="nav-bar">
-      <a
-        href="https://readdy.ai/home/ac3d2e9b-9a5f-417f-9a17-fc212480eb5f/e18840ee-1598-41dd-be1d-c6cf28c87b4f"
-        data-readdy="true"
-        class="back-btn cursor-pointer"
-      >
-        <uni-icons type="back" size="24" color="#ffffff"></uni-icons>
-      </a>
+      <view class="back-btn cursor-pointer" @click="goBack">
+        <uni-icons type="arrow-left" size="24" color="#fff" />
+      </view>
       <text class="nav-title">活动详情</text>
       <view class="placeholder-view"></view>
     </view>
@@ -22,27 +18,27 @@
       <view class="poster-container">
         <image
           class="poster-image"
-          src="https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event%2C%20large%20crowd%20of%20diverse%20runners%20with%20race%20numbers%20on%20a%20wide%20city%20street%2C%20morning%20sunlight%20creating%20dramatic%20lighting%2C%20urban%20skyline%20backdrop%20with%20iconic%20buildings%2C%20atmosphere%20of%20excitement%20and%20community%20spirit%2C%20professional%20sports%20photography%20style%2C%20high%20energy%20scene%20with%20colorful%20running%20outfits%2C%20race%20banners%20and%20starting%20line%20visible&width=750&height=560&seq=8&orientation=landscape"
+          :src="activity?._cover || defaultCover"
           mode="aspectFill"
         ></image>
         <view class="poster-overlay"></view>
       </view>
       <!-- 活动基本信息区 -->
       <view class="activity-basic-info">
-        <view class="activity-status">报名中</view>
-        <text class="activity-title">城市马拉松</text>
+        <view class="activity-status">{{ activity?._statusText || '报名中' }}</view>
+        <text class="activity-title">{{ activity?._title || '活动标题' }}</text>
         <view class="info-row">
           <view class="info-item">
             <uni-icons type="calendar" size="16" color="#6a11cb"></uni-icons>
-            <text>2025年7月15日 08:00-12:00</text>
+            <text>{{ activity?._dateText || '-' }}</text>
           </view>
           <view class="info-item">
             <uni-icons type="location" size="16" color="#6a11cb"></uni-icons>
-            <text>城市中心公园</text>
+            <text>{{ activity?._location || '-' }}</text>
           </view>
           <view class="info-item">
             <uni-icons type="person" size="16" color="#6a11cb"></uni-icons>
-            <text>1024人已报名</text>
+            <text>{{ activity?._enrollCount ? activity._enrollCount + '人已报名' : '-' }}</text>
           </view>
         </view>
       </view>
@@ -54,16 +50,13 @@
             <text class="section-title">活动介绍</text>
           </view>
           <view class="section-content">
-            <text class="section-text"
-              >2025城市马拉松是一项大型公益跑步活动，旨在促进全民健身，同时为慈善事业筹集资金。本次活动由市体育局与多家爱心企业联合举办，所有报名费用将全部捐赠给贫困地区的教育事业。</text
-            >
-            <text class="section-text"
-              >活动设有全程马拉松(42.195公里)、半程马拉松(21.0975公里)和迷你马拉松(5公里)三个组别，参与者可根据自身情况选择适合的赛程。赛道经过城市多个标志性建筑，让参与者在运动中欣赏城市美景。</text
-            >
+            <text class="section-text">{{ activity?._description || '暂无活动介绍' }}</text>
             <image
+              v-if="activity?._detailImage"
               class="detail-image"
-              src="https://readdy.ai/api/search-image?query=Marathon%20route%20map%20showing%20city%20landmarks%2C%20professional%20sports%20event%20planning%2C%20detailed%20course%20layout%20with%20distance%20markers%2C%20starting%20and%20finishing%20points%2C%20aid%20stations%20marked%2C%20colorful%20design%20on%20white%20background%2C%20top-down%20view%20of%20city%20streets%2C%20clean%20and%20organized%20information%20design&width=690&height=380&seq=9&orientation=landscape"
+              :src="activity._detailImage"
               mode="aspectFill"
+              @click="showPreview(activity._detailImage)"
             ></image>
           </view>
         </view>
@@ -98,66 +91,62 @@
             <view v-if="activeTab === 'progress'" class="timeline">
               <view
                 class="timeline-item"
-                v-for="(event, index) in activityEvents"
-                :key="index"
-                :class="{ 'completed': event.completed }"
+                v-for="stage in stages"
+                :key="stage.id"
+                :class="{ 'completed': stage.completed }"
               >
                 <view class="timeline-dot"></view>
                 <view class="timeline-content">
                   <view class="event-content">
                     <view class="event-header">
-                      <text class="event-title">{{ event.title }}</text>
+                      <text class="event-title">{{ stage.name }}</text>
                       <text
                         class="event-status"
-                        :class="{ 'status-completed': event.completed }"
+                        :class="{ 'status-completed': stage.completed }"
                       >
-                        {{ event.completed ? '已完成' : '进行中' }}
+                        {{ stage.completed ? '已完成' : '进行中' }}
                       </text>
                     </view>
-                    <text class="event-time">{{ event.time }}</text>
-                    <text class="event-desc">{{ event.description }}</text>
+                    <text class="event-time">{{ stage.time }}</text>
+                    <text class="event-desc">{{ stage.description }}</text>
                   </view>
-                  <view
-                    class="join-btn"
-                    @click="handleJoinEvent(event)"
-                    v-if="!event.completed"
-                  >
+                  <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">
                     我想参与
                   </view>
+                  <view class="edit-btn" v-if="stage.isUserAdded" @click="editStage(stage)">编辑</view>
+                  <view class="delete-btn" v-if="stage.isUserAdded" @click="deleteStage(stage.id)">删除</view>
                 </view>
               </view>
             </view>
-            <view
-              v-if="activeTab === 'participation'"
-              class="participation-list"
-            >
+            <view v-if="activeTab === 'participation'" class="participation-list">
               <view
                 class="participation-item"
-                v-for="(record, index) in participationRecords"
-                :key="index"
+                v-for="record in userStages"
+                :key="record.id"
               >
                 <view class="record-header">
-                  <text class="record-title">{{ record.title }}</text>
+                  <text class="record-title">{{ record.name }}</text>
                   <text class="record-time">{{ record.time }}</text>
                 </view>
                 <text class="record-desc">{{ record.description }}</text>
                 <view class="record-stats">
                   <view class="stat-item">
-                    <uni-icons
-                      type="medal"
-                      size="16"
-                      color="#6a11cb"
-                    ></uni-icons>
-                    <text>{{ record.achievement }}</text>
+                    <uni-icons type="medal" size="16" color="#6a11cb"></uni-icons>
+                    <text>{{ record.achievement || '-' }}</text>
                   </view>
                   <view class="stat-item">
-                    <uni-icons
-                      type="location"
-                      size="16"
-                      color="#6a11cb"
-                    ></uni-icons>
-                    <text>{{ record.location }}</text>
+                    <uni-icons type="location" size="16" color="#6a11cb"></uni-icons>
+                    <text>{{ record.location || '-' }}</text>
                   </view>
+                </view>
+                <view v-if="record.records && record.records.length" class="record-images">
+                  <image
+                    v-for="(img, idx) in record.records"
+                    :key="idx"
+                    :src="img"
+                    class="record-img"
+                    @click="showPreview(img)"
+                  />
                 </view>
               </view>
             </view>
@@ -180,107 +169,177 @@
         @close="handleClose"
       ></uni-popup-dialog>
     </uni-popup>
+    <!-- 编辑弹窗、图片预览等其它弹窗保留 -->
+    <EditStageDialog v-model:visible="showEditDialog" :stage="editingStage" @confirm="handleEditEventConfirm" />
+    <ImagePreview v-if="previewImg" :src="previewImg" @close="closePreview" />
   </view>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-// 滚动区域高度计算
+import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
+import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
+import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
+import fetchActivityDetailApi from '@/api/activity-detail.api';
+import type { IActivityDetail } from '@/models/activity';
+
 const scrollHeight = ref(0);
-// 赞助商数据
-const activityEvents = ref([
-  {
-    title: "开始报名",
-    time: "2025年6月1日",
-    description: "马拉松报名正式开始，参与者可通过官方渠道报名参加",
-    completed: true,
-  },
-  {
-    title: "体检证明提交",
-    time: "2025年6月15日",
-    description: "参赛者需提交近6个月内体检证明",
-    completed: true,
-  },
-  {
-    title: "赛道信息发布",
-    time: "2025年6月30日",
-    description: "公布详细赛道信息，包括补给站位置和医疗点设置",
-    completed: true,
-  },
-  {
-    title: "参赛物资发放",
-    time: "2025年7月12日-14日",
-    description: "参赛者领取比赛物资包，包含号码牌、计时芯片等",
-    completed: false,
-  },
-  {
-    title: "赛前说明会",
-    time: "2025年7月14日",
-    description: "举办赛前技术说明会，讲解比赛注意事项",
-    completed: false,
-  },
-  {
-    title: "正式比赛",
-    time: "2025年7月15日",
-    description: "马拉松正式开始，参赛者按指定时间到达起点",
-    completed: false,
-  },
-]);
+const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
+const activity = ref<any>(null);
+const stages = ref<any[]>([]);
+const userStages = ref<any[]>([]);
+const showDialog = ref(false);
+const showEditDialog = ref(false);
+const editingStage = ref<any>(null);
+const previewImg = ref<string | null>(null);
+const activeTab = ref('progress');
 const popup = ref();
-const popupContent = ref("");
-const activeTab = ref("progress");
-const selectedEvent = ref(null);
+const popupContent = ref('');
+const currentJoinStage = ref<any>(null);
 
-const handleJoinEvent = (event) => {
-  selectedEvent.value = event;
-  popupContent.value = `是否确认参与"${event.title}"活动？\n时间：${event.time}\n${event.description}`;
+function goBack() {
+  uni.reLaunch({ url: '/pages/index/index' });
+}
+function showPreview(img: string) {
+  previewImg.value = img;
+}
+function closePreview() {
+  previewImg.value = null;
+}
+function handleJoinStage(stage: any) {
+  currentJoinStage.value = stage;
+  popupContent.value = '确认参加吗？';
   popup.value.open();
-};
-
-const handleConfirm = () => {
-  // 这里可以添加参与活动的逻辑
+}
+function editStage(stage: any) {
+  editingStage.value = { ...stage };
+  showEditDialog.value = true;
+}
+function deleteStage(id: number) {
+  stages.value = stages.value.filter(s => s.id !== id);
+  updateUserStages();
+  uni.showToast({ title: '删除成功', icon: 'success', duration: 2000 });
+}
+function handleEditEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
+  const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
+  if (index !== -1 && editingStage.value) {
+    stages.value[index] = {
+      ...editingStage.value,
+      name: data.type,
+      time: data.date,
+      description: data.content,
+      thumbnail: editingStage.value.thumbnail,
+      progress: editingStage.value.progress,
+      records: data.images || editingStage.value.records,
+      isUserAdded: true,
+      participants: editingStage.value.participants,
+      completed: editingStage.value.completed
+    };
+    stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
+  }
+  showEditDialog.value = false;
+  editingStage.value = null;
+  updateUserStages();
+}
+function updateUserStages() {
+  // userStages 只展示报名过的阶段
+  // 这里不再自动同步stages，只保留用户报名的
+  // userStages.value = stages.value.filter(s => s.isUserAdded);
+}
+function handleConfirm() {
+  // 判断是否已报名，避免重复
+  if (currentJoinStage.value && !userStages.value.find((s: any) => s.id === currentJoinStage.value.id)) {
+    userStages.value.push({ ...currentJoinStage.value });
+  }
   uni.showToast({
-    title: "参与成功",
-    icon: "success",
+    title: '报名成功',
+    icon: 'success',
+    duration: 2000
   });
   popup.value.close();
-};
+  currentJoinStage.value = null;
+}
+function handleClose() {
+  popup.value.close();
+  currentJoinStage.value = null;
+}
 
-const handleClose = () => {
-  selectedEvent.value = null;
-};
+function getStatusText(status: string) {
+  switch (status) {
+    case 'pending': return '未开始';
+    case 'in_progress': return '报名中';
+    case 'finished': return '已结束';
+    default: return '报名中';
+  }
+}
+function getDateText(start: string, end: string) {
+  if (!start) return '-';
+  if (!end) return start;
+  return `${start} - ${end}`;
+}
 
-const participationRecords = ref([
-  {
-    title: "完成报名",
-    time: "2025年6月2日",
-    description: "成功报名2025城市马拉松全程马拉松项目",
-    achievement: "报名成功",
-    location: "线上报名",
-  },
-  {
-    title: "体检完成",
-    time: "2025年6月10日",
-    description: "在市体检中心完成马拉松体检并提交证明",
-    achievement: "合格",
-    location: "市体检中心",
-  },
-  {
-    title: "训练打卡",
-    time: "2025年6月15日",
-    description: "参加官方组织的训练营，完成10公里训练",
-    achievement: "配速5:30/km",
-    location: "城市公园",
-  },
-]);
-onMounted(() => {
-  // 获取系统信息计算滚动区域高度
+onMounted(async () => {
   uni.getSystemInfo({
     success: (res) => {
-      // 减去导航栏高度和底部按钮高度
       scrollHeight.value = res.windowHeight - 100 - 120;
     },
   });
+  // 获取活动详情
+  // @ts-ignore
+  const query = (window.getCurrentPages && window.getCurrentPages().slice(-1)[0]?.options) || {};
+  const activityId = query.id;
+  try {
+    uni.showLoading();
+    const detail = await fetchActivityDetailApi(activityId);
+    activity.value = detail;
+    // 兼容UI字段
+    activity.value._cover = ((detail as any).cover || defaultCover);
+    activity.value._statusText = getStatusText((detail as any).status || 'in_progress');
+    activity.value._title = detail.name;
+    activity.value._dateText = getDateText(detail.startDate, detail.endDate);
+    activity.value._enrollCount = detail.numberOfParticipants;
+    activity.value._description = detail.introduction;
+    activity.value._detailImage = (detail as any).detailImage || '';
+    activity.value._location = detail.location || '-';
+    // 阶段数据
+    stages.value = (detail.eventList || []).map((evt: any, idx: number) => ({
+      id: evt.id || idx + 1,
+      name: evt.name,
+      time: evt.startDate,
+      description: evt.description || '',
+      thumbnail: '',
+      progress: evt.progress || 0,
+      records: [],
+      isUserAdded: false,
+      participants: evt.participants || 0,
+      completed: evt.status === 'finished',
+    }));
+    updateUserStages();
+  } catch (error) {
+    // 可选：填充mock数据
+    activity.value = {
+      _cover: defaultCover,
+      _statusText: '报名中',
+      _title: '城市马拉松',
+      _dateText: '2025年7月15日 08:00-12:00',
+      _enrollCount: 1024,
+      _description: '2025城市马拉松是一项大型公益跑步活动，旨在促进全民健身，同时为慈善事业筹集资金。',
+      _detailImage: '',
+      _location: '城市中心公园',
+    };
+    stages.value = [
+      { id: 1, name: '开始报名', time: '2025年6月1日', description: '马拉松报名正式开始，参与者可通过官方渠道报名参加', completed: true, isUserAdded: false },
+      { id: 2, name: '体检证明提交', time: '2025年6月15日', description: '参赛者需提交近6个月内体检证明', completed: true, isUserAdded: false },
+      { id: 3, name: '赛道信息发布', time: '2025年6月30日', description: '公布详细赛道信息，包括补给站位置和医疗点设置', completed: true, isUserAdded: false },
+      { id: 4, name: '参赛物资发放', time: '2025年7月12日-14日', description: '参赛者领取比赛物资包，包含号码牌、计时芯片等', completed: false, isUserAdded: false },
+      { id: 5, name: '赛前说明会', time: '2025年7月14日', description: '举办赛前技术说明会，讲解比赛注意事项', completed: false, isUserAdded: false },
+      { id: 6, name: '正式比赛', time: '2025年7月15日', description: '马拉松正式开始，参赛者按指定时间到达起点', completed: false, isUserAdded: false },
+    ];
+    updateUserStages();
+  } finally {
+    uni.hideLoading();
+  }
 });
 </script>
 
