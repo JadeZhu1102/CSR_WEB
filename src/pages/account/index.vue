@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref, getCurrentInstance, nextTick, computed } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
@@ -357,6 +357,10 @@ onLoad(() => {
     initLanguage();
 
     // 可以在这里加载用户数据
+    refreshUserProfile();
+});
+
+onShow(() => {
     refreshUserProfile();
 });
 </script>

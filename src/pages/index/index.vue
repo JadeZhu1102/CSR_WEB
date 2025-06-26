@@ -45,13 +45,8 @@
       <view class="section-header">
         <view class="section-title">全部活动</view>
         <view class="view-more cursor-pointer">
-          <a
-            href="https://readdy.ai/home/ac3d2e9b-9a5f-417f-9a17-fc212480eb5f/342e9920-b172-4b4f-ab0d-58c17f6854ce"
-            data-readdy="true"
-          >
-            <text>查看更多</text>
-            <uni-icons type="right" size="14" color="#666"></uni-icons>
-          </a>
+          <text>查看更多</text>
+          <uni-icons type="right" size="14" color="#666"></uni-icons>
         </view>
       </view>
       <view class="activity-grid">
@@ -61,16 +56,11 @@
           class="activity-card cursor-pointer"
           @click="goToActivityDetail(item.id)"
         >
-          <a
-            :href="'https://readdy.ai/home/ac3d2e9b-9a5f-417f-9a17-fc212480eb5f/9f928ed5-835e-42c8-a501-50c64307231e'"
-            data-readdy="true"
-          >
-            <image
-              :src="item.coverImage"
-              mode="aspectFill"
-              class="activity-image"
-            ></image>
-          </a>
+          <image
+            :src="item.coverImage"
+            mode="aspectFill"
+            class="activity-image"
+          ></image>
           <view class="activity-info">
             <text class="activity-title">{{ item.name }}</text>
             <text class="activity-desc">{{ item.slogan }}</text>

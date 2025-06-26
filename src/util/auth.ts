@@ -23,8 +23,9 @@ export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
                 refreshToken: data.refreshToken,
                 expiredIn: data.expiresIn,
             });
+            return true;
         }
-        return true;
+        uni.showToast({ title: res.message });
     } catch (error) {
         console.log(error);
     }
