@@ -101,17 +101,14 @@
                   <view class="event-content">
                     <view class="event-header">
                       <text class="event-title">{{ stage.name }}</text>
-                      <text
-                        v-if="stage.completed"
-                        class="event-status status-completed"
-                      >已完成</text>
+                      <span v-if="stage.completed" class="stamp-completed-float"><span class="stamp-text-float">已完成</span></span>
                     </view>
                     <text class="event-time">{{ stage.time }}</text>
                     <text class="event-desc">{{ stage.description }}</text>
                     <view class="stage-meta">
-                      <text class="meta-item">简介：{{ stage.intro || stage.description || '-' }}</text>
-                      <text class="meta-item">参与人数：{{ stage.participants || 0 }}</text>
-                      <text class="meta-item">开始时间：{{ stage.time || '-' }}</text>
+                      <div class="meta-col">简介：{{ stage.intro || stage.description || '-' }}</div>
+                      <div class="meta-col">开始时间：{{ stage.time || '-' }}</div>
+                      <div class="meta-col">参与人数：{{ stage.participants || 0 }}</div>
                     </view>
                     <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
                       <image
@@ -125,7 +122,7 @@
                     </view>
                   </view>
                   <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">
-                    我想参与
+                    报名
                   </view>
                   <view class="edit-btn" v-if="stage.isUserAdded" @click="editStage(stage)">编辑</view>
                   <view class="delete-btn" v-if="stage.isUserAdded" @click="deleteStage(stage.id)">删除</view>
@@ -145,9 +142,9 @@
                   <text class="event-time">{{ record.time }}</text>
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
-                    <text class="meta-item">简介：{{ record.intro || record.description || '-' }}</text>
-                    <text class="meta-item">参与人数：{{ record.participants || 0 }}</text>
-                    <text class="meta-item">开始时间：{{ record.time || '-' }}</text>
+                    <div class="meta-col">简介：{{ record.intro || record.description || '-' }}</div>
+                    <div class="meta-col">开始时间：{{ record.time || '-' }}</div>
+                    <div class="meta-col">参与人数：{{ record.participants || 0 }}</div>
                   </view>
                   <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
                     <image
@@ -714,6 +711,7 @@ page {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10rpx;
+  position: relative;
 }
 .event-title {
   font-size: 16px;
@@ -803,14 +801,18 @@ page {
 }
 .stage-meta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
+  flex-direction: column;
+  gap: 4rpx;
   font-size: 12px;
   color: #888;
   margin: 8rpx 0 0 0;
 }
-.meta-item {
-  margin-right: 16rpx;
+.meta-col {
+  flex: none;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .stage-thumbs {
   display: flex;
@@ -840,5 +842,30 @@ page {
 }
 .icon-btn:active {
   transform: scale(1.15);
+}
+.stamp-completed-float {
+  position: absolute;
+  top: 50%;
+  right: 24rpx;
+  transform: translateY(-50%) rotate(-45deg);
+  width: 120rpx;
+  height: 120rpx;
+  border: 7rpx solid #2edfc2;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(46,223,194,0.12);
+  pointer-events: none;
+}
+.stamp-text-float {
+  color: #2edfc2;
+  font-size: 38rpx;
+  font-weight: bold;
+  letter-spacing: 2rpx;
+  white-space: nowrap;
+  user-select: none;
 }
 </style>

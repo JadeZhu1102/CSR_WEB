@@ -93,7 +93,7 @@
             <view class="feedback-dialog ani-dialog">
                 <view class="dialog-header">
                     <text class="dialog-title">{{ $t('account.feedback.title') }}</text>
-                    <text class="dialog-close ani-btn" @click="showFeedbackDialog = false">×</text>
+                    <!-- <text class="dialog-close ani-btn" @click="showFeedbackDialog = false">×</text> -->
                 </view>
                 
                 <textarea 
@@ -550,19 +550,21 @@ onLoad(() => {
 // 弹窗样式
 .lang-bottom-sheet,
 .contribution-dialog-mask,
-.feedback-dialog-mask {
+.feedback-dialog-mask,
+.pwd-dialog-mask {
     position: fixed;
     left: 0; top: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.18);
-    z-index: 1002;
+    z-index: 3000;
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .lang-dialog,
 .contribution-dialog,
-.feedback-dialog {
+.feedback-dialog,
+.pwd-dialog {
     background: #fff;
     border-radius: 16px;
     min-width: 300px;
@@ -572,6 +574,10 @@ onLoad(() => {
     box-shadow: 0 4px 24px rgba(0,0,0,0.10);
     padding: 24px;
     animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 @keyframes slideInUp {
@@ -836,11 +842,19 @@ onLoad(() => {
 
 // 语言切换弹窗样式
 .lang-dialog {
+    background: #fff;
+    border-radius: 16px;
     min-width: 280px;
+    max-width: 90vw;
+    width: 320px;
+    margin: 0 auto;
     padding: 24px 20px 20px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lang-title {
@@ -1005,5 +1019,37 @@ onLoad(() => {
     font-weight: 700;
     color: #222;
     margin: 0 auto;
+}
+
+// 恢复弹窗内容内部排版
+.contribution-dialog {
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    min-width: 300px;
+    max-width: 90vw;
+    width: 400px;
+    padding: 24px;
+}
+
+.activity-records,
+.record-list,
+.record-item {
+    align-items: stretch !important;
+    text-align: left !important;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.record-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    text-align: left;
 }
 </style>
