@@ -1,14 +1,16 @@
+import type { IResponse } from "@/api/types";
+
 export interface ILoginParams {
     username: string;
     password: string;
 }
 
-export interface ILoginResponse {
+export interface ILoginResponse extends IResponse<{
     accessToken: string;
     refreshToken: string;
     expiresIn: number; // minutes
     tokenType: 'Bearer';
-}
+}> {}
 
 export interface ILoginApiResponse {
     code: number;
@@ -36,7 +38,7 @@ export const loginApi = (params: ILoginParams) => {
     });
 }
 
-export interface ILogoutResponse {
+export interface ILogoutResponse extends IResponse {
 }
 
 export const logoutApi = (refreshToken: string) => {
@@ -44,7 +46,7 @@ export const logoutApi = (refreshToken: string) => {
         uni.request({
             url: '/api/auth/logout',
             method: 'POST',
-            data: { refresh: refreshToken },
+            data: { refreshToken: refreshToken },
             header: {
                 'content-type': 'application/json'
             },
@@ -64,7 +66,7 @@ export interface IRegisterParams {
     password: string;
 }
 
-export interface IRegisterResponse {
+export interface IRegisterResponse extends IResponse {
     //
 }
 
@@ -79,8 +81,8 @@ export const registerApi = (params: IRegisterParams) => {
             },
             dataType: 'json',
             success: (res) => {
-                // resolve(res.data as IRegisterResponse);
-                if (res.statusCode === 200) {
+                const resData = res.data as IRegisterResponse;
+                if (resData.code === 200) {
                     resolve(true);
                 } else {
                     reject(new Error('Failed to register'));

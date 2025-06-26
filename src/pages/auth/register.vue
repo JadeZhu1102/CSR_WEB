@@ -60,7 +60,6 @@ onLoad(() => {
 // TODO: 校验密码强度
 const onRegister = async () => {
   try {
-    debugger;
     if (password.value !== passwordConfirm.value) {
       return;
     }

@@ -16,18 +16,17 @@ export const checkIfLogined = async (): Promise<boolean> => {
 export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
     try {
         const res = await loginApi(params);
-        // 兼容后端返回 { code, data }
-        if (res && res.code === 200 && res.data) {
-            const expiredTimeStamp = createExpiredTimeStamp(res.data.expiresIn);
+        if (res.code === 200) {
+            const data = res.data;
             tokenManager.save({
-                token: res.data.accessToken,
-                refreshToken: res.data.refreshToken,
-                expiredIn: expiredTimeStamp,
+                token: data.accessToken,
+                refreshToken: data.refreshToken,
+                expiredIn: createExpiredTimeStamp(data.expiresIn),
             });
-            return true;
         }
+        return true;
     } catch (error) {
-        //
+        console.log(error);
     }
     return false;
 }

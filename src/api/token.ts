@@ -8,27 +8,35 @@ interface ITokenCache {
 
 const OneSecond = 1000;
 const OneMinute = 60 * OneSecond;
+/** 15秒的Token刷新缓冲时间 */
 const RefreshBuffer = 15 * OneSecond;
 
 export const createExpiredTimeStamp = (expiredIn: number): number => {
-    return Date.now() + expiredIn * OneMinute - RefreshBuffer;
+    return Date.now() + (expiredIn * OneMinute - RefreshBuffer);
 }
 
 class TokenManager {
     private cacheKey: string = 'CSR_USER_JWT_SESSION';
 
+    private cacheData: ITokenCache | null = null;
+
     public save(tokenCache: ITokenCache) {
+        this.cacheData = tokenCache;
         uni.setStorage({ key: this.cacheKey, data: tokenCache });
     }
 
     public clear() {
+        this.cacheData = null;
         uni.removeStorage({ key: this.cacheKey });
     }
 
     public async retrieve(): Promise<ITokenCache | null> {
         try {
-            const tokenCache = await uni.getStorage<ITokenCache | null>({ key: this.cacheKey });
-            return tokenCache.data ?? null;
+            if (this.cacheData === null) {
+                const tokenCache = await uni.getStorage<ITokenCache | null>({ key: this.cacheKey });
+                this.cacheData = tokenCache.data ?? null;
+            }
+            return this.cacheData;
         } catch (error) {
             return null;
         }
@@ -36,6 +44,7 @@ class TokenManager {
 
     public async getToken(): Promise<string> {
         const tokenCache = await this.retrieve();
+
         if (tokenCache) {
             if (tokenCache.expiredIn > Date.now()) {
                 return tokenCache.token;
