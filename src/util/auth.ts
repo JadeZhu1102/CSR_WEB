@@ -1,5 +1,5 @@
 import { loginApi, logoutApi, type ILoginParams } from "@/api/auth";
-import tokenManager, { createExpiredTimeStamp } from "@/api/token";
+import tokenManager from "@/api/token";
 
 /**
  * 检查是否已登录
@@ -21,7 +21,7 @@ export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
             tokenManager.save({
                 token: data.accessToken,
                 refreshToken: data.refreshToken,
-                expiredIn: createExpiredTimeStamp(data.expiresIn),
+                expiredIn: data.expiresIn,
             });
         }
         return true;
