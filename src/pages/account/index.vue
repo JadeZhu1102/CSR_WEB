@@ -8,7 +8,7 @@
                 <text class="user-name">{{ userName }}</text>
                 <text class="user-id">ID: {{ userId }}</text>
             </view>
-            <button class="ani-btn lang-btn" @click="showLangDialog = true">{{ $t('account.button.language') }}</button>
+            <uni-icons type="settings" size="28" color="#888" class="settings-btn" @click="showSettings = true" />
         </view>
         
         <!-- 我的贡献功能卡片 -->
@@ -36,9 +36,7 @@
         </view>
 
         <view class="item-wrappr">
-            <button class="ani-btn logout-btn" type="button" form-type="button" @click="onLogout">
-                {{ $t('account.button.logout') }}
-            </button>
+            <!-- 删除退出登录按钮 -->
         </view>
 
         <!-- 语言切换弹窗 -->
@@ -56,9 +54,8 @@
         <!-- 我的贡献弹窗 -->
         <view v-if="showContributionDialog" class="contribution-dialog-mask ani-dialog-mask" @click.self="showContributionDialog = false">
             <view class="contribution-dialog ani-dialog">
-                <view class="dialog-header">
+                <view class="dialog-header contribution-header">
                     <text class="dialog-title">{{ $t('account.title.my_contributions') }}</text>
-                    <text class="dialog-close ani-btn" @click="showContributionDialog = false">×</text>
                 </view>
                 
                 <!-- 贡献统计 -->
@@ -117,6 +114,33 @@
                 </view>
             </view>
         </view>
+
+        <view v-if="showSettings" class="settings-drawer-mask" @click.self="showSettings = false">
+            <view class="settings-drawer ani-slide-in-left">
+                <view class="drawer-header">
+                    <text class="drawer-title">设置</text>
+                    <uni-icons type="closeempty" size="24" color="#888" class="close-btn" @click="showSettings = false" />
+                </view>
+                <view class="drawer-content">
+                    <button class="ani-btn drawer-btn" @click="onLogout">退出登录</button>
+                    <button class="ani-btn drawer-btn" @click="openLangDialogFromDrawer">语言切换</button>
+                    <button class="ani-btn drawer-btn" @click="showPwdDialog = true">修改密码</button>
+                </view>
+            </view>
+        </view>
+
+        <view v-if="showPwdDialog" class="pwd-dialog-mask" @click.self="showPwdDialog = false">
+            <view class="pwd-dialog ani-dialog">
+                <view class="dialog-title">修改密码</view>
+                <input v-model="oldPwd" class="ani-input pwd-input" type="password" placeholder="原密码" />
+                <input v-model="newPwd" class="ani-input pwd-input" type="password" placeholder="新密码" />
+                <input v-model="confirmPwd" class="ani-input pwd-input" type="password" placeholder="确认新密码" />
+                <view class="dialog-actions">
+                    <button class="ani-btn drawer-btn" @click="showPwdDialog = false">取消</button>
+                    <button class="ani-btn drawer-btn" @click="handleChangePwd">确认</button>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -129,6 +153,7 @@ import submitFeedbackApi from '@/api/feedback.api';
 import getUserContributionApi from '@/api/user-contribution.api';
 import type { IContributionStats, IActivityRecord } from '@/api/user-contribution.api';
 import { useLanguage } from '@/composables/useLanguage';
+import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
 
 function normalizeLang(lang: string) {
     if (lang === 'zh-Hans' || lang === 'zh-CN') return 'zh-Hans';
@@ -145,6 +170,11 @@ const showFeedbackDialog = ref(false);
 const feedbackContent = ref('');
 const isLoading = ref(false);
 const userId = ref('');
+const showSettings = ref(false);
+const showPwdDialog = ref(false);
+const oldPwd = ref('');
+const newPwd = ref('');
+const confirmPwd = ref('');
 
 // 使用语言管理composable
 const { currentLanguage, setLanguage, initLanguage } = useLanguage();
@@ -281,6 +311,31 @@ const submitFeedback = async () => {
     }
 }
 
+const handleChangePwd = () => {
+    if (!oldPwd.value || !newPwd.value || !confirmPwd.value) {
+        uni.showToast({ title: '请填写完整', icon: 'none' });
+        return;
+    }
+    if (newPwd.value !== confirmPwd.value) {
+        uni.showToast({ title: '两次新密码不一致', icon: 'none' });
+        return;
+    }
+    // TODO: 调用后端修改密码接口
+    uni.showToast({ title: '修改成功', icon: 'success' });
+    showPwdDialog.value = false;
+    oldPwd.value = '';
+    newPwd.value = '';
+    confirmPwd.value = '';
+}
+
+const openLangDialogFromDrawer = () => {
+    showSettings.value = false;
+    // 延迟弹出，避免动画冲突
+    setTimeout(() => {
+        showLangDialog.value = true;
+    }, 250);
+};
+
 onLoad(() => {
     // 初始化语言设置
     initLanguage();
@@ -300,53 +355,76 @@ onLoad(() => {
 
 #user {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    background: #30a908;
-    border-bottom-left-radius: 18px 4px;
-    border-bottom-right-radius: 18px 4px;
-    padding: 32px 16px 48px;
+    background: linear-gradient(135deg, #40bad5 0%, #3bd1b5 100%);
+    border-bottom-left-radius: 32px 12px;
+    border-bottom-right-radius: 32px 12px;
+    padding: 44px 16px 56px;
     color: #fff;
+    position: relative;
+    box-shadow: 0 4px 24px rgba(64,186,213,0.08);
 }
 
 .avatar-container {
-    $avatar-size: 84px;
+    $avatar-size: 108px;
     width: $avatar-size;
     height: $avatar-size;
     border-radius: 50%;
-    background-color: #fff;
-    box-shadow: 0 2px 12px rgba(48,169,8,0.10);
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(64,186,213,0.18);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 16px;
+    margin-bottom: 12px;
+    border: 4px solid #fff;
+    position: relative;
     .avatar {
-        width: 76px;
-        height: 76px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
+        box-shadow: 0 2px 8px rgba(64,186,213,0.10);
     }
 }
 
 .user-info-container {
-    margin-left: 0;
+    margin: 0;
     text-align: center;
-    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     .user-name {
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: 1.55rem;
+        font-weight: 800;
         letter-spacing: 0.2px;
         color: #fff;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
+        text-shadow: 0 2px 8px rgba(64,186,213,0.10);
     }
     .user-id {
-        font-size: 0.92rem;
+        font-size: 0.85rem;
         color: #e0e0e0;
+        opacity: 0.85;
         margin-top: 0;
+        letter-spacing: 0.5px;
+    }
+}
+
+.settings-btn {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    z-index: 10;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(64,186,213,0.10);
+    padding: 4px;
+    transition: background 0.2s;
+    &:hover {
+        background: #f0f8fa;
     }
 }
 
@@ -802,5 +880,130 @@ onLoad(() => {
         color: #30a908;
         border-color: #30a908;
     }
+}
+
+.settings-drawer-mask {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 2000;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.settings-drawer {
+    width: 320px;
+    max-width: 80vw;
+    height: 100vh;
+    background: #fff;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 0;
+    animation: slideInLeft 0.3s cubic-bezier(.23, 1.01, .32, 1) both;
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 18px 12px 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.drawer-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+}
+
+.close-btn {
+    cursor: pointer;
+}
+
+.drawer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 32px 18px 0 18px;
+}
+
+.drawer-btn {
+    width: 100%;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-bottom: 0;
+}
+
+.pwd-dialog-mask {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 2100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pwd-dialog {
+    background: #fff;
+    border-radius: 12px;
+    width: 90vw;
+    max-width: 400px;
+    padding: 28px 22px 18px 22px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.pwd-input {
+    margin-bottom: 16px;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.lang-bottom-sheet {
+    align-items: flex-end !important;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.lang-dialog {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding-bottom: env(safe-area-inset-bottom, 24px) !important;
+}
+
+.contribution-header {
+    min-height: 32px;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin: 0 auto;
 }
 </style>

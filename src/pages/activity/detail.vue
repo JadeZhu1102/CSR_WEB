@@ -8,6 +8,7 @@
       <text class="nav-title">活动详情</text>
       <view class="placeholder-view"></view>
     </view>
+    <!-- 活动缩略图区 -->
     <!-- 内容区域 -->
     <scroll-view
       scroll-y
@@ -101,14 +102,27 @@
                     <view class="event-header">
                       <text class="event-title">{{ stage.name }}</text>
                       <text
-                        class="event-status"
-                        :class="{ 'status-completed': stage.completed }"
-                      >
-                        {{ stage.completed ? '已完成' : '进行中' }}
-                      </text>
+                        v-if="stage.completed"
+                        class="event-status status-completed"
+                      >已完成</text>
                     </view>
                     <text class="event-time">{{ stage.time }}</text>
                     <text class="event-desc">{{ stage.description }}</text>
+                    <view class="stage-meta">
+                      <text class="meta-item">简介：{{ stage.intro || stage.description || '-' }}</text>
+                      <text class="meta-item">参与人数：{{ stage.participants || 0 }}</text>
+                      <text class="meta-item">开始时间：{{ stage.time || '-' }}</text>
+                    </view>
+                    <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
+                      <image
+                        v-for="(img, idx) in stage.thumbs"
+                        :key="idx"
+                        :src="img"
+                        class="stage-thumb-img"
+                        mode="aspectFill"
+                        @click="showPreview(img)"
+                      />
+                    </view>
                   </view>
                   <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">
                     我想参与
@@ -124,29 +138,31 @@
                 v-for="record in userStages"
                 :key="record.id"
               >
-                <view class="record-header">
-                  <text class="record-title">{{ record.name }}</text>
-                  <text class="record-time">{{ record.time }}</text>
-                </view>
-                <text class="record-desc">{{ record.description }}</text>
-                <view class="record-stats">
-                  <view class="stat-item">
-                    <uni-icons type="medal" size="16" color="#6a11cb"></uni-icons>
-                    <text>{{ record.achievement || '-' }}</text>
+                <view class="event-content">
+                  <view class="event-header">
+                    <text class="event-title">{{ record.name }}</text>
                   </view>
-                  <view class="stat-item">
-                    <uni-icons type="location" size="16" color="#6a11cb"></uni-icons>
-                    <text>{{ record.location || '-' }}</text>
+                  <text class="event-time">{{ record.time }}</text>
+                  <text class="event-desc">{{ record.description }}</text>
+                  <view class="stage-meta">
+                    <text class="meta-item">简介：{{ record.intro || record.description || '-' }}</text>
+                    <text class="meta-item">参与人数：{{ record.participants || 0 }}</text>
+                    <text class="meta-item">开始时间：{{ record.time || '-' }}</text>
+                  </view>
+                  <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
+                    <image
+                      v-for="(img, idx) in record.thumbs"
+                      :key="idx"
+                      :src="img"
+                      class="stage-thumb-img"
+                      mode="aspectFill"
+                      @click="showPreview(img)"
+                    />
                   </view>
                 </view>
-                <view v-if="record.records && record.records.length" class="record-images">
-                  <image
-                    v-for="(img, idx) in record.records"
-                    :key="idx"
-                    :src="img"
-                    class="record-img"
-                    @click="showPreview(img)"
-                  />
+                <view class="action-icons">
+                  <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="editStage(record)" />
+                  <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="deleteStage(record.id)" />
                 </view>
               </view>
             </view>
@@ -160,6 +176,7 @@
     <!-- 参与确认弹窗 -->
     <uni-popup ref="popup" type="dialog">
       <uni-popup-dialog
+        class="centered-dialog"
         type="info"
         cancelText="取消"
         confirmText="确认参与"
@@ -170,7 +187,7 @@
       ></uni-popup-dialog>
     </uni-popup>
     <!-- 编辑弹窗、图片预览等其它弹窗保留 -->
-    <EditStageDialog v-model:visible="showEditDialog" :stage="editingStage" @confirm="handleEditEventConfirm" />
+    <EditStageDialog v-model:visible="showEditDialog" :editData="editingStage" @confirm="handleEditEventConfirm" />
     <ImagePreview v-if="previewImg" :src="previewImg" @close="closePreview" />
   </view>
 </template>
@@ -178,6 +195,8 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
+import UniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue';
+import UniPopupDialog from '@dcloudio/uni-ui/lib/uni-popup-dialog/uni-popup-dialog.vue';
 import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
 import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
 import fetchActivityDetailApi from '@/api/activity-detail.api';
@@ -228,12 +247,14 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
       name: data.type,
       time: data.date,
       description: data.content,
+      intro: editingStage.value.intro || editingStage.value.description || '',
       thumbnail: editingStage.value.thumbnail,
       progress: editingStage.value.progress,
       records: data.images || editingStage.value.records,
       isUserAdded: true,
       participants: editingStage.value.participants,
-      completed: editingStage.value.completed
+      completed: editingStage.value.completed,
+      thumbs: editingStage.value.thumbs || [defaultCover, defaultCover],
     };
     stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
@@ -308,12 +329,14 @@ onMounted(async () => {
       name: evt.name,
       time: evt.startDate,
       description: evt.description || '',
+      intro: evt.intro || evt.description || '',
       thumbnail: '',
       progress: evt.progress || 0,
       records: [],
       isUserAdded: false,
       participants: evt.participants || 0,
       completed: evt.status === 'finished',
+      thumbs: evt.thumbs || [defaultCover, defaultCover],
     }));
     updateUserStages();
   } catch (error) {
@@ -329,12 +352,12 @@ onMounted(async () => {
       _location: '城市中心公园',
     };
     stages.value = [
-      { id: 1, name: '开始报名', time: '2025年6月1日', description: '马拉松报名正式开始，参与者可通过官方渠道报名参加', completed: true, isUserAdded: false },
-      { id: 2, name: '体检证明提交', time: '2025年6月15日', description: '参赛者需提交近6个月内体检证明', completed: true, isUserAdded: false },
-      { id: 3, name: '赛道信息发布', time: '2025年6月30日', description: '公布详细赛道信息，包括补给站位置和医疗点设置', completed: true, isUserAdded: false },
-      { id: 4, name: '参赛物资发放', time: '2025年7月12日-14日', description: '参赛者领取比赛物资包，包含号码牌、计时芯片等', completed: false, isUserAdded: false },
-      { id: 5, name: '赛前说明会', time: '2025年7月14日', description: '举办赛前技术说明会，讲解比赛注意事项', completed: false, isUserAdded: false },
-      { id: 6, name: '正式比赛', time: '2025年7月15日', description: '马拉松正式开始，参赛者按指定时间到达起点', completed: false, isUserAdded: false },
+      { id: 1, name: '开始报名', time: '2025年6月1日', description: '马拉松报名正式开始，参与者可通过官方渠道报名参加', completed: true, isUserAdded: false, participants: 100, thumbs: [defaultCover, defaultCover] },
+      { id: 2, name: '体检证明提交', time: '2025年6月15日', description: '参赛者需提交近6个月内体检证明', completed: true, isUserAdded: false, participants: 80, thumbs: [defaultCover, defaultCover] },
+      { id: 3, name: '赛道信息发布', time: '2025年6月30日', description: '公布详细赛道信息，包括补给站位置和医疗点设置', completed: true, isUserAdded: false, participants: 60, thumbs: [defaultCover, defaultCover] },
+      { id: 4, name: '参赛物资发放', time: '2025年7月12日-14日', description: '参赛者领取比赛物资包，包含号码牌、计时芯片等', completed: false, isUserAdded: false, participants: 50, thumbs: [defaultCover, defaultCover] },
+      { id: 5, name: '赛前说明会', time: '2025年7月14日', description: '举办赛前技术说明会，讲解比赛注意事项', completed: false, isUserAdded: false, participants: 40, thumbs: [defaultCover, defaultCover] },
+      { id: 6, name: '正式比赛', time: '2025年7月15日', description: '马拉松正式开始，参赛者按指定时间到达起点', completed: false, isUserAdded: false, participants: 30, thumbs: [defaultCover, defaultCover] },
     ];
     updateUserStages();
   } finally {
@@ -769,5 +792,53 @@ page {
 }
 .stat-item text {
   margin-left: 8rpx;
+}
+.centered-dialog {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+}
+.stage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  font-size: 12px;
+  color: #888;
+  margin: 8rpx 0 0 0;
+}
+.meta-item {
+  margin-right: 16rpx;
+}
+.stage-thumbs {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+.stage-thumb-img {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.stage-thumb-img:active {
+  transform: scale(1.08);
+}
+.action-icons {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 10rpx;
+}
+.icon-btn {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.icon-btn:active {
+  transform: scale(1.15);
 }
 </style>

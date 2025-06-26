@@ -171,13 +171,9 @@ onPageShow(async () => {
         margin: 6px 0 0 0;
       }
       .activity-duration {
-        background: #f0f8e8;
-        color: #30a908;
-        font-size: 12px;
-        padding: 2px 8px;
-        border-radius: 4px;
-        margin-top: 10px;
-        display: inline-block;
+        font-size: 13px;
+        color: #666;
+        margin: 4px 0 0 0;
       }
     }
   }

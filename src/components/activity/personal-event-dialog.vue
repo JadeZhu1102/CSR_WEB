@@ -1,10 +1,10 @@
 <template>
   <view v-if="visible" class="dialog-mask ani-dialog-mask" @click.stop>
     <view class="dialog-container ani-dialog">
-      <view class="dialog-title">{{ isEditMode ? '编辑个人事件' : '添加个人事件' }}</view>
+      <view class="dialog-title">{{ isEditMode ? '记录你的活动' : '添加个人事件' }}</view>
       <view v-if="errorMsg" class="form-error ani-shake">{{ errorMsg }}</view>
       <view class="dialog-form">
-        <view class="form-item">
+        <view class="form-item" v-if="!isEditMode">
           <text class="label">事件名称</text>
           <view class="input-select ani-input" @click="showTypeSelect = !showTypeSelect">
             <text>{{ typeOptionsComputed[form.typeIndex] }}</text>
@@ -43,7 +43,7 @@
       </view>
       <view class="dialog-actions">
         <button class="btn cancel ani-btn" @click="onCancel">取消</button>
-        <button class="btn confirm ani-btn" @click="onConfirm">确认</button>
+        <button class="btn confirm ani-btn" @click="onConfirm" :style="isEditMode ? 'background:#30a908;color:#fff;' : ''">确认</button>
       </view>
     </view>
   </view>
@@ -276,16 +276,13 @@ export default defineComponent({
     border-radius: 6px;
     font-size: 15px;
     padding: 6px 0;
-    &.cancel {
-      background: #f5f5f5;
-      color: #888;
-      border: none;
-    }
-    &.confirm {
-      background: #4caf50;
-      color: #fff;
-      border: none;
-    }
+    background: linear-gradient(
+      to right,
+      rgba(64, 186, 213, 0.9),
+      rgba(59, 209, 181, 0.9)
+    ) !important;
+    color: #fff !important;
+    border: none !important;
   }
 }
 .form-error {
