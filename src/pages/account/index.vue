@@ -5,7 +5,16 @@
                 <image class="avatar" :src="avatarUrl" />
             </view>
             <view class="user-info-container">
-                <text class="user-name">{{ userName }}</text>
+                <view class="name-edit-container">
+                    <text class="user-name">{{ userName }}</text>
+                    <uni-icons 
+                        type="compose" 
+                        size="16" 
+                        color="#fff" 
+                        class="edit-icon" 
+                        @click="showProfileEdit = true" 
+                    />
+                </view>
                 <text class="user-id">ID: {{ userId }}</text>
             </view>
             <uni-icons type="settings" size="28" color="#888" class="settings-btn" @click="showSettings = true" />
@@ -122,9 +131,9 @@
                     <uni-icons type="closeempty" size="24" color="#888" class="close-btn" @click="showSettings = false" />
                 </view>
                 <view class="drawer-content">
-                    <button class="ani-btn drawer-btn" @click="onLogout">{{$t('account.button.logout')}}</button>
                     <button class="ani-btn drawer-btn" @click="openLangDialogFromDrawer">{{$t('account.button.language')}}</button>
                     <button class="ani-btn drawer-btn" @click="showPwdDialog = true">{{$t('account.button.change_pwd')}}</button>
+                    <button class="ani-btn logout-drawer-btn" @click="onLogout">{{$t('account.button.logout')}}</button>
                 </view>
             </view>
         </view>
@@ -138,6 +147,42 @@
                 <view class="dialog-actions">
                     <button class="ani-btn drawer-btn" @click="showPwdDialog = false">{{$t('account.feedback.cancel')}}</button>
                     <button class="ani-btn drawer-btn" @click="handleChangePwd">{{$t('account.pwd.confirm_btn')}}</button>
+                </view>
+            </view>
+        </view>
+
+        <!-- 个人信息编辑弹窗 -->
+        <view v-if="showProfileEdit" class="profile-edit-mask" @click.self="showProfileEdit = false">
+            <view class="profile-edit-dialog ani-dialog">
+                <view class="dialog-header">
+                    <text class="dialog-title">编辑个人信息</text>
+                    <uni-icons type="closeempty" size="20" color="#999" class="close-btn" @click="showProfileEdit = false" />
+                </view>
+                
+                <view class="form-content" style="margin-top: 10px;">
+                    <view class="form-item">
+                        <text class="form-label">昵称</text>
+                        <input v-model="profileForm.nickname" class="ani-input form-input" placeholder="请输入昵称" />
+                    </view>
+                    
+                    <view class="form-item">
+                        <text class="form-label">真实姓名</text>
+                        <input v-model="profileForm.realName" class="ani-input form-input" placeholder="请输入真实姓名" />
+                    </view>
+                    
+                    <view class="form-item" style="margin-bottom: 0;">
+                        <text class="form-label">性别</text>
+                        <select v-model="profileForm.gender" class="form-select">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                            <option value="other">保密</option>
+                        </select>
+                    </view>
+                </view>
+                
+                <view class="dialog-actions" style="margin-top: 18px;">
+                    <button class="ani-btn cancel-btn" @click="showProfileEdit = false">取消</button>
+                    <button class="ani-btn confirm-btn" @click="handleUpdateProfile">确定</button>
                 </view>
             </view>
         </view>
@@ -177,6 +222,7 @@ const showPwdDialog = ref(false);
 const oldPwd = ref('');
 const newPwd = ref('');
 const confirmPwd = ref('');
+const showProfileEdit = ref(false);
 
 // 使用语言管理composable
 const { currentLanguage, setLanguage, initLanguage } = useLanguage();
@@ -192,6 +238,13 @@ const contributionStats = ref<IContributionStats>({
 
 // 活动记录数据
 const activityRecords = ref<IActivityRecord[]>([]);
+
+// 个人信息表单数据
+const profileForm = ref({
+    nickname: '',
+    realName: '',
+    gender: 'male'
+});
 
 // 获取实例以使用$t
 const instance = getCurrentInstance();
@@ -330,6 +383,29 @@ const handleChangePwd = () => {
     confirmPwd.value = '';
 }
 
+const handleUpdateProfile = () => {
+    if (!profileForm.value.nickname.trim()) {
+        uni.showToast({ title: '请输入昵称', icon: 'none' });
+        return;
+    }
+    
+    // TODO: 调用后端更新个人信息接口
+    console.log('更新个人信息:', profileForm.value);
+    
+    // 更新本地显示的用户名
+    userName.value = profileForm.value.nickname;
+    
+    uni.showToast({ title: '个人信息更新成功', icon: 'success' });
+    showProfileEdit.value = false;
+    
+    // 重置表单
+    profileForm.value = {
+        nickname: '',
+        realName: '',
+        gender: 'male'
+    };
+}
+
 const openLangDialogFromDrawer = () => {
     showSettings.value = false;
     // 延迟弹出，避免动画冲突
@@ -370,6 +446,11 @@ onShow(() => {
     min-height: 100vh;
     background: linear-gradient(135deg, #e8f5e9 0%, #f8fafc 100%);
     padding-bottom: 32px;
+    
+    /* Web端适配 */
+    @media screen and (min-width: 768px) {
+        padding-bottom: 60px;
+    }
 }
 
 #user {
@@ -383,6 +464,22 @@ onShow(() => {
     color: #fff;
     position: relative;
     box-shadow: 0 4px 24px rgba(64,186,213,0.08);
+    
+    /* Web端适配 */
+    @media screen and (min-width: 768px) {
+        border-bottom-left-radius: 24px;
+        border-bottom-right-radius: 24px;
+        padding: 60px 40px 80px;
+        max-width: 800px;
+        margin: 0 auto;
+        margin-bottom: 40px;
+    }
+    
+    /* 大屏幕适配 */
+    @media screen and (min-width: 1200px) {
+        max-width: 1000px;
+        padding: 80px 60px 100px;
+    }
 }
 
 .avatar-container {
@@ -398,12 +495,26 @@ onShow(() => {
     margin-bottom: 12px;
     border: 4px solid #fff;
     position: relative;
+    
+    /* Web端适配 */
+    @media screen and (min-width: 768px) {
+        width: 140px;
+        height: 140px;
+        margin-bottom: 20px;
+        border-width: 6px;
+    }
+    
     .avatar {
         width: 100px;
         height: 100px;
         border-radius: 50%;
         object-fit: cover;
         box-shadow: 0 2px 8px rgba(64,186,213,0.10);
+        
+        @media screen and (min-width: 768px) {
+            width: 128px;
+            height: 128px;
+        }
     }
 }
 
@@ -414,20 +525,45 @@ onShow(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    .user-name {
-        font-size: 1.55rem;
-        font-weight: 800;
-        letter-spacing: 0.2px;
-        color: #fff;
-        margin-bottom: 2px;
-        text-shadow: 0 2px 8px rgba(64,186,213,0.10);
+    
+    .name-edit-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .user-name {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            color: #fff;
+            margin-bottom: 2px;
+            text-shadow: 0 2px 8px rgba(64,186,213,0.10);
+            
+            @media screen and (min-width: 768px) {
+                font-size: 2rem;
+            }
+        }
+        
+        .edit-icon {
+            cursor: pointer;
+            margin-left: 4px;
+            
+            @media screen and (min-width: 768px) {
+                margin-left: 8px;
+            }
+        }
     }
+    
     .user-id {
         font-size: 0.85rem;
         color: #e0e0e0;
         opacity: 0.85;
         margin-top: 0;
         letter-spacing: 0.5px;
+        
+        @media screen and (min-width: 768px) {
+            font-size: 1rem;
+        }
     }
 }
 
@@ -442,6 +578,13 @@ onShow(() => {
     box-shadow: 0 2px 8px rgba(64,186,213,0.10);
     padding: 4px;
     transition: background 0.2s;
+    
+    @media screen and (min-width: 768px) {
+        top: 40px;
+        right: 40px;
+        padding: 8px;
+    }
+    
     &:hover {
         background: #f0f8fa;
     }
@@ -462,6 +605,20 @@ onShow(() => {
     position: relative;
     overflow: hidden;
     
+    /* Web端适配 */
+    @media screen and (min-width: 768px) {
+        margin: 20px auto;
+        max-width: 800px;
+        padding: 24px;
+        border-radius: 16px;
+    }
+    
+    /* 大屏幕适配 */
+    @media screen and (min-width: 1200px) {
+        max-width: 1000px;
+        padding: 32px;
+    }
+    
     &::before {
         content: '';
         position: absolute;
@@ -476,6 +633,11 @@ onShow(() => {
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        
+        @media screen and (min-width: 768px) {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+        }
         
         &::before {
             left: 100%;
@@ -498,10 +660,22 @@ onShow(() => {
     justify-content: center;
     margin-right: 16px;
     
+    @media screen and (min-width: 768px) {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        margin-right: 24px;
+    }
+    
     .icon {
         width: 24px;
         height: 24px;
         filter: brightness(0) invert(1);
+        
+        @media screen and (min-width: 768px) {
+            width: 32px;
+            height: 32px;
+        }
     }
 }
 
@@ -520,17 +694,30 @@ onShow(() => {
     font-weight: 600;
     color: #222;
     margin-bottom: 4px;
+    
+    @media screen and (min-width: 768px) {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
 }
 
 .card-subtitle {
     font-size: 14px;
     color: #666;
+    
+    @media screen and (min-width: 768px) {
+        font-size: 16px;
+    }
 }
 
 .card-arrow {
     font-size: 18px;
     color: #ccc;
     font-weight: 300;
+    
+    @media screen and (min-width: 768px) {
+        font-size: 24px;
+    }
 }
 
 .item-wrappr {
@@ -538,6 +725,10 @@ onShow(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    
+    @media screen and (min-width: 768px) {
+        padding: 40px 40px 0 40px;
+    }
 }
 
 .logout-btn {
@@ -570,7 +761,8 @@ onShow(() => {
 .lang-bottom-sheet,
 .contribution-dialog-mask,
 .feedback-dialog-mask,
-.pwd-dialog-mask {
+.pwd-dialog-mask,
+.profile-edit-mask {
     position: fixed;
     left: 0; top: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.18);
@@ -583,7 +775,8 @@ onShow(() => {
 .lang-dialog,
 .contribution-dialog,
 .feedback-dialog,
-.pwd-dialog {
+.pwd-dialog,
+.profile-edit-dialog {
     background: #fff;
     border-radius: 16px;
     min-width: 300px;
@@ -597,6 +790,14 @@ onShow(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
+    /* Web端适配 */
+    @media screen and (min-width: 768px) {
+        min-width: 400px;
+        max-width: 600px;
+        border-radius: 20px;
+        padding: 32px;
+    }
 }
 
 @keyframes slideInUp {
@@ -969,9 +1170,44 @@ onShow(() => {
 
 .drawer-btn {
     width: 100%;
-    font-size: 16px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
     border-radius: 8px;
-    margin-bottom: 0;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background: #e0e0e0;
+    }
+}
+
+.logout-drawer-btn {
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 20px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(255,77,79,0.10);
+    
+    &:hover {
+        background: linear-gradient(90deg, #ff3333 0%, #ff6666 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255,77,79,0.15);
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
 }
 
 .pwd-dialog-mask {
@@ -1070,5 +1306,154 @@ onShow(() => {
     margin-bottom: 8px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     text-align: left;
+}
+
+// 个人信息编辑弹窗样式
+.profile-edit-mask {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 2200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-edit-dialog {
+    background: #fff;
+    border-radius: 12px;
+    width: 90vw;
+    max-width: 400px;
+    padding: 28px 22px 18px 22px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.dialog-header {
+    margin-bottom: 8px;
+}
+
+.form-content {
+    padding: 0 18px;
+    gap: 14px;
+    margin-top: 0;
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+}
+
+.form-input {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafbfc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    
+    &:focus {
+        border-color: #30a908;
+        box-shadow: 0 0 0 2px rgba(48,169,8,0.08);
+    }
+}
+
+.form-select {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafbfc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    
+    &:focus {
+        border-color: #30a908;
+        box-shadow: 0 0 0 2px rgba(48,169,8,0.08);
+    }
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.cancel-btn,
+.confirm-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    color: #666;
+    
+    &:hover {
+        background: #e0e0e0;
+    }
+}
+
+.confirm-btn {
+    background: #30a908;
+    color: #fff;
+    
+    &:hover {
+        background: #2d9a08;
+    }
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 767px) {
+    .page {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .contribution-card,
+    .feedback-card {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* 平板端优化 */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    #user {
+        margin: 0 20px 40px 20px;
+    }
+    
+    .contribution-card,
+    .feedback-card {
+        margin: 20px;
+    }
+}
+
+/* 桌面端优化 */
+@media screen and (min-width: 1024px) {
+    .contribution-card:hover,
+    .feedback-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+    }
+    
+    .settings-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(64,186,213,0.2);
+    }
 }
 </style>

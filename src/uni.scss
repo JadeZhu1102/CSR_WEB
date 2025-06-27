@@ -19,8 +19,8 @@
 
 /* 行为相关颜色 */
 
-$uni-color-primary: #30a908;
-$uni-color-success: #007aff;
+$uni-color-primary: #007aff;
+$uni-color-success: #4cd964;
 $uni-color-warning: #f0ad4e;
 $uni-color-error: #dd524d;
 
@@ -34,7 +34,7 @@ $uni-text-color-disable: #c0c0c0;
 
 /* 背景颜色 */
 
-$uni-bg-color: #fff;
+$uni-bg-color: #ffffff;
 $uni-bg-color-grey: #f8f8f8;
 $uni-bg-color-hover: #f1f1f1; // 点击状态颜色
 $uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
@@ -50,7 +50,7 @@ $uni-border-color: #c8c7cc;
 
 $uni-font-size-sm: 12px;
 $uni-font-size-base: 14px;
-$uni-font-size-lg: 16;
+$uni-font-size-lg: 16px;
 
 /* 图片尺寸 */
 
@@ -83,12 +83,209 @@ $uni-opacity-disabled: 0.3; // 组件禁用态的透明度
 
 /* 文章场景相关 */
 
-$uni-color-title: #2c405a; // 文章标题颜色
+$uni-color-title: #2C405A; // 文章标题颜色
 $uni-font-size-title: 20px;
-$uni-color-subtitle: #555; // 二级标题颜色
+$uni-color-subtitle: #555555; // 二级标题颜色
 $uni-font-size-subtitle: 18px;
-$uni-color-paragraph: #3f536e; // 文章段落颜色
+$uni-color-paragraph: #3F536E; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
+
+/* 多端自适应变量 */
+
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+/* 平台检测变量 */
+
+$is-mobile: true;
+$is-web: false;
+$is-miniprogram: false;
+
+/* 响应式混入 */
+
+@mixin mobile-only {
+    @media screen and (max-width: #{$mobile-breakpoint - 1px}) {
+        @content;
+    }
+}
+
+@mixin tablet-up {
+    @media screen and (min-width: #{$mobile-breakpoint}) {
+        @content;
+    }
+}
+
+@mixin desktop-up {
+    @media screen and (min-width: #{$tablet-breakpoint}) {
+        @content;
+    }
+}
+
+@mixin large-desktop-up {
+    @media screen and (min-width: #{$desktop-breakpoint}) {
+        @content;
+    }
+}
+
+
+/* 自适应容器 */
+
+@mixin adaptive-container {
+    @include mobile-only {
+        width: 100%;
+        padding: 0 32rpx;
+    }
+    @include tablet-up {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+}
+
+
+/* 自适应按钮 */
+
+@mixin adaptive-button {
+    @include mobile-only {
+        height: 88rpx;
+        font-size: 32rpx;
+        border-radius: 16rpx;
+        padding: 0 32rpx;
+    }
+    @include tablet-up {
+        height: 44px;
+        font-size: 16px;
+        border-radius: 8px;
+        padding: 0 24px;
+    }
+}
+
+
+/* 自适应输入框 */
+
+@mixin adaptive-input {
+    @include mobile-only {
+        height: 88rpx;
+        font-size: 28rpx;
+        border-radius: 16rpx;
+        padding: 0 24rpx;
+    }
+    @include tablet-up {
+        height: 44px;
+        font-size: 14px;
+        border-radius: 8px;
+        padding: 0 16px;
+    }
+}
+
+
+/* 自适应字体 */
+
+@mixin adaptive-font($mobile-size, $web-size) {
+    @include mobile-only {
+        font-size: $mobile-size;
+    }
+    @include tablet-up {
+        font-size: $web-size;
+    }
+}
+
+
+/* 安全区域适配 */
+
+@mixin safe-area {
+    @include mobile-only {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+
+/* 触摸优化 */
+
+@mixin touch-optimized {
+    @include mobile-only {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+}
+
+
+/* 滚动优化 */
+
+@mixin scroll-optimized {
+    @include mobile-only {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    @include tablet-up {
+        scroll-behavior: smooth;
+    }
+}
+
+
+/* 全局自适应样式 */
+
+.adaptive-container {
+    @include adaptive-container;
+}
+
+.adaptive-button {
+    @include adaptive-button;
+}
+
+.adaptive-input {
+    @include adaptive-input;
+}
+
+.safe-area {
+    @include safe-area;
+}
+
+.touch-optimized {
+    @include touch-optimized;
+}
+
+.scroll-optimized {
+    @include scroll-optimized;
+}
+
+
+/* 移动端优化 */
+
+@include mobile-only {
+    page {
+        @include safe-area;
+    }
+    .touch-element {
+        @include touch-optimized;
+    }
+    .scroll-container {
+        @include scroll-optimized;
+    }
+}
+
+
+/* Web端优化 */
+
+@include tablet-up {
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+    }
+    .hover-effect {
+        transition: all 0.3s ease;
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+    }
+}
+
 
 /* 动画变量 */
 

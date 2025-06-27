@@ -209,42 +209,90 @@ const openAgreement = (type: string) => {
 page {
   height: 100%;
 }
+
 .cursor-pointer {
   cursor: pointer;
 }
+
 .login-container {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #ffffff;
   padding: 0 40rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 40px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+  
+  /* 大屏幕适配 */
+  @media screen and (min-width: 1200px) {
+    max-width: 600px;
+    padding: 0 60px;
+  }
 }
+
 /* 顶部区域 */
 .header {
   padding-top: 60rpx;
   margin-bottom: 60rpx;
+  
+  @media screen and (min-width: 768px) {
+    padding-top: 80px;
+    margin-bottom: 80px;
+  }
 }
+
 .back-button {
   margin-bottom: 40rpx;
+  
+  @media screen and (min-width: 768px) {
+    margin-bottom: 60px;
+  }
 }
+
 .title-container {
   display: flex;
   flex-direction: column;
 }
+
 .title {
   font-size: 36px;
   font-weight: bold;
   color: #333333;
   margin-bottom: 20rpx;
+  
+  @media screen and (min-width: 768px) {
+    font-size: 42px;
+    margin-bottom: 24px;
+  }
 }
+
 .welcome {
   font-size: 14px;
   color: #999999;
+  
+  @media screen and (min-width: 768px) {
+    font-size: 16px;
+  }
 }
+
 /* 表单区域 */
 .form-container {
   margin-top: 60rpx;
+  
+  @media screen and (min-width: 768px) {
+    margin-top: 80px;
+  }
 }
+
 .input-group {
   display: flex;
   align-items: center;
@@ -254,12 +302,25 @@ page {
   padding: 0 30rpx;
   margin-bottom: 30rpx;
   transition: all 0.3s ease;
+  
+  @media screen and (min-width: 768px) {
+    height: 56px;
+    border-radius: 12px;
+    padding: 0 24px;
+    margin-bottom: 24px;
+  }
 }
+
 .input-group.focused {
   border-color: #4a66f0;
   box-shadow: 0 0 8rpx rgba(74, 102, 240, 0.2);
   transform: translateY(-2rpx);
+  
+  @media screen and (min-width: 768px) {
+    box-shadow: 0 0 12px rgba(74, 102, 240, 0.15);
+  }
 }
+
 .input-prefix {
   margin-right: 20rpx;
   width: 40rpx;
@@ -268,12 +329,24 @@ page {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  
+  @media screen and (min-width: 768px) {
+    margin-right: 16px;
+    width: 32px;
+    height: 32px;
+  }
 }
+
 .input-field {
   flex: 1;
   height: 100rpx;
   font-size: 14px;
   color: #333333;
+  
+  @media screen and (min-width: 768px) {
+    height: 56px;
+    font-size: 16px;
+  }
 }
 
 .password-toggle {
@@ -284,7 +357,14 @@ page {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  
+  @media screen and (min-width: 768px) {
+    margin-left: 16px;
+    width: 32px;
+    height: 32px;
+  }
 }
+
 .submit-button {
   height: 100rpx;
   display: flex;
@@ -298,24 +378,48 @@ page {
   margin-top: 60rpx;
   transition: all 0.3s ease;
   border: none;
+  
+  @media screen and (min-width: 768px) {
+    height: 56px;
+    font-size: 18px;
+    border-radius: 12px;
+    margin-top: 80px;
+  }
 }
+
 .submit-button:active {
   transform: scale(0.98);
   opacity: 0.9;
 }
+
 .helper-links {
   display: flex;
   justify-content: center;
   margin-top: 30rpx;
+  
+  @media screen and (min-width: 768px) {
+    margin-top: 40px;
+  }
 }
+
 .helper-link {
   font-size: 14px;
   color: #4a66f0;
+  
+  @media screen and (min-width: 768px) {
+    font-size: 16px;
+  }
 }
+
 .divider {
   margin: 0 20rpx;
   color: #dddddd;
+  
+  @media screen and (min-width: 768px) {
+    margin: 0 24px;
+  }
 }
+
 /* 底部协议 */
 .agreement {
   margin-top: auto;
@@ -323,13 +427,69 @@ page {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  
+  @media screen and (min-width: 768px) {
+    padding: 60px 0;
+  }
 }
+
 .agreement-text {
   font-size: 12px;
   color: #999999;
+  
+  @media screen and (min-width: 768px) {
+    font-size: 14px;
+  }
 }
+
 .agreement-link {
   font-size: 12px;
   color: #4a66f0;
+  
+  @media screen and (min-width: 768px) {
+    font-size: 14px;
+  }
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 767px) {
+  .login-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .input-group {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .submit-button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 平板端优化 */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .login-container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}
+
+/* 桌面端优化 */
+@media screen and (min-width: 1024px) {
+  .login-container {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+  
+  .input-group:hover {
+    border-color: #4a66f0;
+  }
+  
+  .submit-button:hover {
+    background-color: #3a56e0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(74, 102, 240, 0.3);
+  }
 }
 </style>

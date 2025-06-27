@@ -197,16 +197,26 @@ const goToActivityDetail = (id: number) => {
 page {
   height: 100%;
 }
+
 .cursor-pointer {
   cursor: pointer;
 }
+
 .container {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #f5f7fa;
   padding-bottom: 120rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    padding-bottom: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
+
 /* 搜索栏样式 */
 .search-bar {
   display: flex;
@@ -217,41 +227,97 @@ page {
   height: 80rpx;
   border-radius: 40rpx;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    margin: 20px 40px;
+    padding: 0 24px;
+    height: 56px;
+    border-radius: 28px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
 }
+
 .search-input {
   flex: 1;
   height: 80rpx;
   padding: 0 20rpx;
   font-size: 14px;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    height: 56px;
+    padding: 0 16px;
+    font-size: 16px;
+  }
 }
+
 /* 轮播图样式 */
 .swiper-container {
   margin: 30rpx 0;
   padding: 0 30rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    margin: 40px 0;
+    padding: 0 40px;
+  }
 }
+
 .section-title {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 20rpx;
   color: #333;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
 }
+
 .swiper {
   height: 400rpx;
   border-radius: 20rpx;
   overflow: hidden;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    height: 300px;
+    border-radius: 16px;
+  }
+  
+  /* 大屏幕适配 */
+  @media screen and (min-width: 1200px) {
+    height: 400px;
+  }
 }
+
 .swiper-item {
   position: relative;
   width: 100%;
   height: 100%;
   border-radius: 20rpx;
   overflow: hidden;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    border-radius: 16px;
+  }
 }
+
 .swiper-image {
   width: 100%;
   height: 100%;
   border-radius: 20rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    border-radius: 16px;
+  }
 }
+
 .swiper-info {
   position: absolute;
   bottom: 0;
@@ -260,14 +326,28 @@ page {
   padding: 30rpx;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
   border-radius: 0 0 20rpx 20rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    padding: 40px;
+    border-radius: 0 0 16px 16px;
+  }
 }
+
 .swiper-title {
   display: block;
   color: #ffffff;
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
 }
+
 .swiper-desc {
   display: block;
   color: rgba(255, 255, 255, 0.9);
@@ -276,46 +356,95 @@ page {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
 }
+
 .swiper-participants {
   display: flex;
   align-items: center;
   color: #ffffff;
   font-size: 12px;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 14px;
+  }
 }
+
 .swiper-participants text {
   margin-left: 10rpx;
 }
+
 /* 全部活动样式 */
 .all-activities {
   padding: 0 30rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    padding: 0 40px;
+  }
 }
+
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    margin-bottom: 32px;
+  }
 }
+
 .view-more {
   display: flex;
   align-items: center;
   font-size: 14px;
   color: #666;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 16px;
+  }
 }
+
 .view-more a {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: inherit;
 }
+
 .view-more text {
   margin-right: 6rpx;
 }
+
 .activity-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    justify-content: start;
+  }
+  
+  /* 大屏幕适配 */
+  @media screen and (min-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 32px;
+  }
 }
+
 .activity-card {
   width: 330rpx;
   background-color: #ffffff;
@@ -324,21 +453,62 @@ page {
   margin-bottom: 30rpx;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
 }
+
 .activity-card:active {
   transform: translateY(-6rpx);
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    transform: translateY(-8px);
+  }
 }
+
+.activity-card:hover {
+  /* Web端悬停效果 */
+  @media screen and (min-width: 768px) {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
 .activity-image {
   width: 100%;
   height: 220rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    height: 200px;
+  }
+  
+  /* 大屏幕适配 */
+  @media screen and (min-width: 1200px) {
+    height: 240px;
+  }
 }
+
 .activity-card a {
   display: block;
   width: 100%;
 }
+
 .activity-info {
   padding: 20rpx;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    padding: 24px;
+  }
 }
+
 .activity-title {
   display: block;
   font-size: 16px;
@@ -348,7 +518,14 @@ page {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
 }
+
 .activity-desc {
   display: block;
   font-size: 12px;
@@ -360,14 +537,75 @@ page {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 20px;
+    height: auto;
+    -webkit-line-clamp: 2;
+  }
 }
+
 .activity-participants {
   display: flex;
   align-items: center;
   font-size: 12px;
   color: #999;
+  
+  /* Web端适配 */
+  @media screen and (min-width: 768px) {
+    font-size: 14px;
+  }
 }
+
 .activity-participants text {
   margin-left: 6rpx;
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 767px) {
+  .container {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .activity-card {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .swiper-item {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 平板端优化 */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    padding: 0 20px;
+  }
+  
+  .search-bar {
+    margin: 20px 0;
+  }
+  
+  .swiper-container,
+  .all-activities {
+    padding: 0 20px;
+  }
+}
+
+/* 桌面端优化 */
+@media screen and (min-width: 1024px) {
+  .container {
+    padding: 0 40px;
+  }
+  
+  .search-bar:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  .view-more:hover {
+    color: #30a908;
+  }
 }
 </style>

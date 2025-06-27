@@ -1,0 +1,177 @@
+// 响应式断点
+$breakpoints: ( xs: 576px, sm: 768px, md: 992px, lg: 1200px, xl: 1400px);
+// 平台检测变量
+$is-mobile: true;
+$is-web: false;
+$is-miniprogram: false;
+// 响应式混入
+@mixin mobile-only {
+    @media screen and (max-width: 767px) {
+        @content;
+    }
+}
+
+@mixin tablet-up {
+    @media screen and (min-width: 768px) {
+        @content;
+    }
+}
+
+@mixin desktop-up {
+    @media screen and (min-width: 992px) {
+        @content;
+    }
+}
+
+@mixin large-desktop-up {
+    @media screen and (min-width: 1200px) {
+        @content;
+    }
+}
+
+// 平台特定样式
+@mixin platform-mobile {
+    @if $is-mobile {
+        @content;
+    }
+}
+
+@mixin platform-web {
+    @if $is-web {
+        @content;
+    }
+}
+
+@mixin platform-miniprogram {
+    @if $is-miniprogram {
+        @content;
+    }
+}
+
+// 自适应容器
+@mixin adaptive-container {
+    @include platform-mobile {
+        width: 100%;
+        padding: 0 32rpx;
+    }
+    @include platform-web {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+}
+
+// 自适应弹窗
+@mixin adaptive-dialog {
+    @include platform-mobile {
+        width: 90vw;
+        max-width: 400px;
+        border-radius: 16rpx;
+        padding: 40rpx 32rpx;
+    }
+    @include platform-web {
+        width: 500px;
+        max-width: 90vw;
+        border-radius: 12px;
+        padding: 32px 24px;
+    }
+}
+
+// 自适应按钮
+@mixin adaptive-button {
+    @include platform-mobile {
+        height: 88rpx;
+        font-size: 32rpx;
+        border-radius: 16rpx;
+        padding: 0 32rpx;
+    }
+    @include platform-web {
+        height: 44px;
+        font-size: 16px;
+        border-radius: 8px;
+        padding: 0 24px;
+    }
+}
+
+// 自适应输入框
+@mixin adaptive-input {
+    @include platform-mobile {
+        height: 88rpx;
+        font-size: 28rpx;
+        border-radius: 16rpx;
+        padding: 0 24rpx;
+    }
+    @include platform-web {
+        height: 44px;
+        font-size: 14px;
+        border-radius: 8px;
+        padding: 0 16px;
+    }
+}
+
+// 自适应字体
+@mixin adaptive-font($mobile-size, $web-size) {
+    @include platform-mobile {
+        font-size: $mobile-size;
+    }
+    @include platform-web {
+        font-size: $web-size;
+    }
+}
+
+// 自适应间距
+@mixin adaptive-spacing($mobile-spacing, $web-spacing) {
+    @include platform-mobile {
+        margin: $mobile-spacing;
+        padding: $mobile-spacing;
+    }
+    @include platform-web {
+        margin: $web-spacing;
+        padding: $web-spacing;
+    }
+}
+
+// 自适应网格
+@mixin adaptive-grid($mobile-cols: 1, $tablet-cols: 2, $desktop-cols: 3) {
+    display: grid;
+    gap: 20rpx;
+    @include platform-mobile {
+        grid-template-columns: repeat($mobile-cols, 1fr);
+    }
+    @include tablet-up {
+        grid-template-columns: repeat($tablet-cols, 1fr);
+    }
+    @include desktop-up {
+        grid-template-columns: repeat($desktop-cols, 1fr);
+    }
+}
+
+// 安全区域适配
+@mixin safe-area {
+    @include platform-mobile {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+// 触摸优化
+@mixin touch-optimized {
+    @include platform-mobile {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+}
+
+// 滚动优化
+@mixin scroll-optimized {
+    @include platform-mobile {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    @include platform-web {
+        scroll-behavior: smooth;
+    }
+}
