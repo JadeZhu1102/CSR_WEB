@@ -11,22 +11,33 @@ const OneMinute = 60 * OneSecond;
 /** 15秒的Token刷新缓冲时间 */
 const RefreshBuffer = 15 * OneSecond;
 
-export const createExpiredTimeStamp = (expiredIn: number): number => {
-    return Date.now() + (expiredIn * OneMinute - RefreshBuffer);
-}
-
 class TokenManager {
     private cacheKey: string = 'CSR_USER_JWT_SESSION';
 
     private cacheData: ITokenCache | null = null;
 
+    private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+    private refresh() {}
+
     public save(tokenCache: ITokenCache) {
+        const expiredIn = (tokenCache.expiredIn * OneMinute - RefreshBuffer);
+        const expiredTime = Date.now() + expiredIn;
+        tokenCache.expiredIn = expiredTime;
+
         this.cacheData = tokenCache;
         uni.setStorage({ key: this.cacheKey, data: tokenCache });
+
+        this.refreshTimer = setTimeout(() => {
+            this.refresh();
+        }, expiredTime);
     }
 
     public clear() {
         this.cacheData = null;
+        if (this.refreshTimer !== null) {
+            clearTimeout(this.refreshTimer);
+        }
         uni.removeStorage({ key: this.cacheKey });
     }
 

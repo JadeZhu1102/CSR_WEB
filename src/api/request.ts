@@ -1,6 +1,8 @@
 import { getLocale } from "@/config/locale";
 import PageUrl from "@/config/page-url";
-import tokenManager from "./token";
+
+import type { IResponse } from "@/api/types";
+import tokenManager from "@/api/token";
 
 const ApiServer = {
     Host: '',
@@ -26,7 +28,7 @@ const defaultConfig: IRequestConfig = {
 export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestConfig = defaultConfig) {
     const token = await tokenManager.getToken();
 
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<IResponse<T>>((resolve, reject) => {
         const { url, data, ...rest } = options;
         const requestUrl = cfg.useI18n === false ? url : (url.indexOf('?') >= 0 ? url + '&' : url + '?') + 'lang=' + getLocale() ;
 
@@ -44,7 +46,7 @@ export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestCo
                 if (isTokenExpired(res)) {
                     uni.navigateTo({ url: PageUrl.auth.login });
                 }
-                resolve(res.data as T);
+                resolve(res.data as IResponse<T>);
             },
             fail: (error) => {
                 console.log('error', error);

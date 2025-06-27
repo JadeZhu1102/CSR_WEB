@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import { ref, getCurrentInstance, nextTick, computed } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
@@ -154,6 +154,7 @@ import getUserContributionApi from '@/api/user-contribution.api';
 import type { IContributionStats, IActivityRecord } from '@/api/user-contribution.api';
 import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
+import { userProfileApi } from '@/api/user';
 
 function normalizeLang(lang: string) {
     if (lang === 'zh-Hans' || lang === 'zh-CN') return 'zh-Hans';
@@ -164,6 +165,7 @@ function normalizeLang(lang: string) {
 
 const avatarUrl = ref('');
 const userName = ref('-');
+const userRole = ref<string | null>(null);
 const showLangDialog = ref(false);
 const showContributionDialog = ref(false);
 const showFeedbackDialog = ref(false);
@@ -336,13 +338,30 @@ const openLangDialogFromDrawer = () => {
     }, 250);
 };
 
+const refreshUserProfile = async () => {
+    try {
+        const { code, data } = await userProfileApi();
+        if (code === 200) {
+            userName.value = data.username;
+            userRole.value = data.role;
+            avatarUrl.value = '/static/logo.png';
+            userId.value = '10001';
+        }
+    } catch (error) {
+        
+    }
+}
+
 onLoad(() => {
     // 初始化语言设置
     initLanguage();
+
     // 可以在这里加载用户数据
-    userName.value = '张三';
-    avatarUrl.value = '/static/logo.png';
-    userId.value = '10001';
+    refreshUserProfile();
+});
+
+onShow(() => {
+    refreshUserProfile();
 });
 </script>
 
