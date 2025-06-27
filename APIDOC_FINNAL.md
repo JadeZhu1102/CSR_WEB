@@ -91,11 +91,41 @@ Authorization: Bearer {token}
 }
 ```
 
+### 3. 修改个人信息
+**PUT** `/api/profile`
+
+**请求头：**
+```
+Authorization: Bearer {token}
+```
+**请求参数：**
+```json
+{
+  "nickname": "新昵称",
+  "realName": "真实姓名",
+  "gender": "male" // male/female/other
+}
+```
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| nickname | string | 否 | 昵称 |
+| realName | string | 否 | 真实姓名 |
+| gender | string | 否 | 性别（male/female/other）|
+
+**响应：**
+```json
+{
+  "code": 200,
+  "message": "更新成功",
+  "data": null
+}
+```
+
 ---
 
 ## 👥 用户管理
 
-### 3. 获取用户列表
+### 4. 获取用户列表
 **GET** `/api/users?page=1&pageSize=10&username=john&sortField=createTime&sortOrder=descend`
 
 **查询参数：**
@@ -160,7 +190,7 @@ Authorization: Bearer {token}
 | page | integer | 当前页码 |
 | pageSize | integer | 每页条数 |
 
-### 4. 获取用户详情
+### 5. 获取用户详情
 **GET** `/api/users/{id}`
 
 **路径参数：**
@@ -198,7 +228,7 @@ Authorization: Bearer {token}
 | eventCount | integer | 参与事件数 |
 | activityCount | integer | 参与活动数 |
 
-### 5. 更新用户信息
+### 6. 更新用户信息
 **PUT** `/api/users/{id}`
 
 **路径参数：**
@@ -228,7 +258,7 @@ Authorization: Bearer {token}
 }
 ```
 
-### 6. 更新用户审核人
+### 7. 更新用户审核人
 **PUT** `/api/users/{id}/reviewer`
 
 **路径参数：**
@@ -254,7 +284,7 @@ Authorization: Bearer {token}
 }
 ```
 
-### 7. 重置用户密码
+### 8. 重置用户密码
 **PUT** `/api/users/{id}/reset-password`
 
 **路径参数：**
@@ -280,7 +310,7 @@ Authorization: Bearer {token}
 }
 ```
 
-### 8. 获取用户事件记录
+### 9. 获取用户事件记录
 **GET** `/api/users/{id}/events`
 
 **路径参数：**
@@ -311,7 +341,7 @@ Authorization: Bearer {token}
 | duration | string | 事件时长（如"8小时"） |
 | status | string | 事件状态："active" 或 "ended" |
 
-### 9. 获取用户活动记录
+### 10. 获取用户活动记录
 **GET** `/api/users/{id}/activities`
 
 **路径参数：**
@@ -340,7 +370,7 @@ Authorization: Bearer {token}
 | eventName | string | 所属事件名称 |
 | duration | string | 活动时长（如"30分钟"） |
 
-### 10. 批量删除用户
+### 11. 批量删除用户
 **DELETE** `/api/users/batch-delete`
 
 **请求参数：**
@@ -365,7 +395,7 @@ Authorization: Bearer {token}
 
 ## 📅 事件管理
 
-### 11. 获取事件列表
+### 12. 获取事件列表
 **GET** `/api/events`
 
 **查询参数：**
@@ -386,16 +416,6 @@ Authorization: Bearer {token}
       "endTime": "2024-03-20 18:00",
       "is_display": true,
       "bgImage": "https://example.com/bg.jpg",
-      "activities": [
-        {
-          "id": 1,
-          "name": "开场致辞",
-          "description": "公司CEO致开场词",
-          "startTime": "2024-03-20 09:00",
-          "endTime": "2024-03-20 09:30",
-          "status": "registering"
-        }
-      ]
     }
   ]
 }
@@ -416,7 +436,7 @@ Authorization: Bearer {token}
 | activities[].endTime | string | 活动结束时间 |
 | activities[].status | string | 活动状态 |
 
-### 12. 获取事件详情
+### 13. 获取事件详情
 **GET** `/api/events/{id}`
 
 **路径参数：**
@@ -436,7 +456,17 @@ Authorization: Bearer {token}
     "description": "公司年度技术分享大会，邀请各部门技术专家分享最新技术成果...",
     "is_display": true,
     "visibleLocations": ["上海", "深圳"],
-    "visibleRoles": ["admin", "user"]
+    "visibleRoles": ["admin", "user"]，
+    "activities": [
+        {
+          "id": 1,
+          "name": "开场致辞",
+          "description": "公司CEO致开场词",
+          "startTime": "2024-03-20 09:00",
+          "endTime": "2024-03-20 09:30",
+          "status": "registering"
+        }
+      ]
   }
 }
 ```
@@ -451,7 +481,7 @@ Authorization: Bearer {token}
 | visibleLocations | array | 可见地区 |
 | visibleRoles | array | 可见角色 |
 
-### 13. 创建事件
+### 14. 创建事件
 **POST** `/api/events`
 
 **请求参数：**
@@ -488,7 +518,7 @@ Authorization: Bearer {token}
 |------|------|------|
 | id | integer | 新建事件ID |
 
-### 14. 更新事件
+### 15. 更新事件
 **PUT** `/api/events/{id}`
 
 **路径参数：**
@@ -506,7 +536,7 @@ Authorization: Bearer {token}
 }
 ```
 
-### 15. 更新事件展示状态
+### 16. 更新事件展示状态
 **PUT** `/api/events/{id}/display`
 
 **路径参数：**
@@ -532,7 +562,7 @@ Authorization: Bearer {token}
 }
 ```
 
-### 16. 删除事件
+### 17. 删除事件
 **DELETE** `/api/events/{id}`
 
 **路径参数：**
@@ -552,7 +582,7 @@ Authorization: Bearer {token}
 
 ## 🎯 活动管理
 
-### 17. 获取活动列表
+### 18. 获取活动列表（是否可以与13 & 19合并？）
 **GET** `/api/activities`
 
 **查询参数：**
@@ -595,7 +625,7 @@ Authorization: Bearer {token}
 | visibleLocations | array | 可见地区 |
 | visibleRoles | array | 可见角色 |
 
-### 18. 获取活动详情
+### 19. 获取活动详情
 **GET** `/api/activities/{id}`
 
 **响应：**
