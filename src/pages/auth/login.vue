@@ -185,8 +185,16 @@ const handleSubmit = async () => {
 };
 // 忘记密码
 const forgotPassword = () => {
-  uni.navigateTo({
-    url: "/pages/forgot-password/index",
+  uni.showModal({
+    title: '忘记密码',
+    content: '请联系管理员重置密码',
+    showCancel: false,
+    confirmText: '确定',
+    success: (res) => {
+      if (res.confirm) {
+        console.log('用户点击确定');
+      }
+    }
   });
 };
 // 打开协议
@@ -279,7 +287,9 @@ page {
 }
 .submit-button {
   height: 100rpx;
-  line-height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #4a66f0;
   color: #ffffff;
   font-size: 16px;
@@ -287,6 +297,7 @@ page {
   border-radius: 16rpx;
   margin-top: 60rpx;
   transition: all 0.3s ease;
+  border: none;
 }
 .submit-button:active {
   transform: scale(0.98);

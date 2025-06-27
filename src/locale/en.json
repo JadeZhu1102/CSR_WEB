@@ -63,5 +63,21 @@
     "account.contribution.close": "Close",
     "account.contribution.completed": "Completed",
     "account.contribution.ongoing": "Ongoing",
-    "account.contribution.pending": "Pending"
+    "account.contribution.pending": "Pending",
+    "account.card.share_idea": "Share your ideas",
+    "lang.zhHans": "Simplified Chinese",
+    "lang.zhHant": "Traditional Chinese",
+    "lang.en": "English",
+    "account.button.change_pwd": "Change Password",
+    "account.pwd.title": "Change Password",
+    "account.pwd.old": "Old Password",
+    "account.pwd.new": "New Password",
+    "account.pwd.confirm": "Confirm New Password",
+    "account.pwd.confirm_btn": "Confirm",
+    "toast.loading_failed": "Failed to load data",
+    "toast.input_empty": "Please enter your feedback",
+    "toast.submit_failed": "Submission failed, please try again",
+    "toast.fill_all": "Please fill in all fields",
+    "toast.pwd_mismatch": "Passwords do not match",
+    "toast.pwd_changed": "Password changed successfully"
 }

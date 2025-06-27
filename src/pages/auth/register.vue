@@ -22,7 +22,7 @@
           <input class="ani-input" type="password" :placeholder="$t('register.confirm_password')" v-model="passwordConfirm" />
         </view>
         <view class="form-action">
-          <button class="ani-btn register-btn" type="primary" form-type="submit" @click="onRegister">
+          <button class="ani-btn register-btn" type="submit" form-type="submit" @click="onRegister">
             {{ $t('register.register') }}
           </button>
         </view>
@@ -126,6 +126,9 @@ const onRegister = async () => {
 .register-btn {
   width: 100%;
   padding: 13px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
   background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
   color: #fff;

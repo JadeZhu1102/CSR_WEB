@@ -18,7 +18,7 @@
             </view>
             <view class="card-content">
                 <text class="card-title">{{ $t('account.title.my_contributions') }}</text>
-                <text class="card-subtitle">{{ $t('account.contribution.preview') }}</text>
+                <text class="card-subtitle">{{ $t('account.card.share_idea') }}</text>
             </view>
             <view class="card-arrow ani-icon">></view>
         </view>
@@ -44,9 +44,9 @@
             <view class="lang-dialog ani-dialog">
                 <view class="lang-title">{{ $t('account.language.title') }}</view>
                 <view class="lang-options">
-                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hans'}" @click="switchLang('zh-Hans')">简体中文</view>
-                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hant'}" @click="switchLang('zh-Hant')">繁體中文</view>
-                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'en'}" @click="switchLang('en')">English</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hans'}" @click="switchLang('zh-Hans')">{{$t('lang.zhHans')}}</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'zh-Hant'}" @click="switchLang('zh-Hant')">{{$t('lang.zhHant')}}</view>
+                    <view class="lang-option ani-btn" :class="{active: normalizeLang(currentLanguage) === 'en'}" @click="switchLang('en')">{{$t('lang.en')}}</view>
                 </view>
             </view>
         </view>
@@ -122,22 +122,22 @@
                     <uni-icons type="closeempty" size="24" color="#888" class="close-btn" @click="showSettings = false" />
                 </view>
                 <view class="drawer-content">
-                    <button class="ani-btn drawer-btn" @click="onLogout">退出登录</button>
-                    <button class="ani-btn drawer-btn" @click="openLangDialogFromDrawer">语言切换</button>
-                    <button class="ani-btn drawer-btn" @click="showPwdDialog = true">修改密码</button>
+                    <button class="ani-btn drawer-btn" @click="onLogout">{{$t('account.button.logout')}}</button>
+                    <button class="ani-btn drawer-btn" @click="openLangDialogFromDrawer">{{$t('account.button.language')}}</button>
+                    <button class="ani-btn drawer-btn" @click="showPwdDialog = true">{{$t('account.button.change_pwd')}}</button>
                 </view>
             </view>
         </view>
 
         <view v-if="showPwdDialog" class="pwd-dialog-mask" @click.self="showPwdDialog = false">
             <view class="pwd-dialog ani-dialog">
-                <view class="dialog-title">修改密码</view>
-                <input v-model="oldPwd" class="ani-input pwd-input" type="password" placeholder="原密码" />
-                <input v-model="newPwd" class="ani-input pwd-input" type="password" placeholder="新密码" />
-                <input v-model="confirmPwd" class="ani-input pwd-input" type="password" placeholder="确认新密码" />
+                <view class="dialog-title">{{$t('account.pwd.title')}}</view>
+                <input v-model="oldPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.old')" />
+                <input v-model="newPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.new')" />
+                <input v-model="confirmPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.confirm')" />
                 <view class="dialog-actions">
-                    <button class="ani-btn drawer-btn" @click="showPwdDialog = false">取消</button>
-                    <button class="ani-btn drawer-btn" @click="handleChangePwd">确认</button>
+                    <button class="ani-btn drawer-btn" @click="showPwdDialog = false">{{$t('account.feedback.cancel')}}</button>
+                    <button class="ani-btn drawer-btn" @click="handleChangePwd">{{$t('account.pwd.confirm_btn')}}</button>
                 </view>
             </view>
         </view>
@@ -258,7 +258,7 @@ const loadUserContribution = async () => {
     } catch (error) {
         console.error('加载用户贡献数据失败:', error);
         uni.showToast({
-            title: '加载数据失败',
+            title: instance?.proxy?.$t('toast.loading_failed'),
             icon: 'none'
         });
     }
@@ -273,7 +273,7 @@ const showContribution = async () => {
 const submitFeedback = async () => {
     if (!feedbackContent.value.trim()) {
         uni.showToast({
-            title: '请输入反馈内容',
+            title: instance?.proxy?.$t('toast.input_empty'),
             icon: 'none'
         });
         return;
@@ -296,14 +296,14 @@ const submitFeedback = async () => {
             showFeedbackDialog.value = false;
         } else {
             uni.showToast({
-                title: result.message || '提交失败',
+                title: result.message || instance?.proxy?.$t('toast.submit_failed'),
                 icon: 'none'
             });
         }
     } catch (error) {
         console.error('提交反馈失败:', error);
         uni.showToast({
-            title: '提交失败，请重试',
+            title: instance?.proxy?.$t('toast.submit_failed'),
             icon: 'none'
         });
     } finally {
@@ -313,15 +313,15 @@ const submitFeedback = async () => {
 
 const handleChangePwd = () => {
     if (!oldPwd.value || !newPwd.value || !confirmPwd.value) {
-        uni.showToast({ title: '请填写完整', icon: 'none' });
+        uni.showToast({ title: instance?.proxy?.$t('toast.fill_all'), icon: 'none' });
         return;
     }
     if (newPwd.value !== confirmPwd.value) {
-        uni.showToast({ title: '两次新密码不一致', icon: 'none' });
+        uni.showToast({ title: instance?.proxy?.$t('toast.pwd_mismatch'), icon: 'none' });
         return;
     }
     // TODO: 调用后端修改密码接口
-    uni.showToast({ title: '修改成功', icon: 'success' });
+    uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
     showPwdDialog.value = false;
     oldPwd.value = '';
     newPwd.value = '';

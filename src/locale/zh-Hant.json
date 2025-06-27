@@ -62,5 +62,21 @@
     "account.contribution.close": "關閉",
     "account.contribution.completed": "已完成",
     "account.contribution.ongoing": "進行中",
-    "account.contribution.pending": "待參與"
+    "account.contribution.pending": "待參與",
+    "account.card.share_idea": "分享您的想法",
+    "lang.zhHans": "簡體中文",
+    "lang.zhHant": "繁體中文",
+    "lang.en": "English",
+    "account.button.change_pwd": "修改密碼",
+    "account.pwd.title": "修改密碼",
+    "account.pwd.old": "原密碼",
+    "account.pwd.new": "新密碼",
+    "account.pwd.confirm": "確認新密碼",
+    "account.pwd.confirm_btn": "確認",
+    "toast.loading_failed": "加載數據失敗",
+    "toast.input_empty": "請輸入反饋內容",
+    "toast.submit_failed": "提交失敗，請重試",
+    "toast.fill_all": "請填寫完整",
+    "toast.pwd_mismatch": "兩次新密碼不一致",
+    "toast.pwd_changed": "修改成功"
 }
