@@ -1,6 +1,8 @@
 import { request } from "@/api/request";
 
-export interface IActivityDetail {
+interface IActivityDetail {}
+
+export interface IEventItem {
     activities: IActivityDetail[];
     bgImage: string;
     endTime: string | null;
@@ -8,10 +10,12 @@ export interface IActivityDetail {
     isDisplay: boolean;
     name: string;
     startTime: string | null;
+    // TODO:
+    numberOfParticipants?: number;
 }
 
 export interface IEventListResponse {
-    data: IActivityDetail[];
+    data: IEventItem[];
     page: number;
     pageSize: number;
     total: number;

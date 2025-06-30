@@ -24,16 +24,16 @@
         >
           <view class="swiper-item">
             <image
-              :src="item.coverImage"
+              :src="item.bgImage"
               mode="aspectFill"
               class="swiper-image"
             ></image>
             <view class="swiper-info">
               <text class="swiper-title">{{ item.name }}</text>
-              <text class="swiper-desc">{{ item.slogan }}</text>
+              <!-- <text class="swiper-desc">{{ item.name }}</text> -->
               <view class="swiper-participants">
                 <uni-icons type="person" size="14" color="#fff"></uni-icons>
-                <text>{{ item.numberOfParticipants }}人参与</text>
+                <text>{{ item.numberOfParticipants ?? 0 }}人参与</text>
               </view>
             </view>
           </view>
@@ -66,7 +66,7 @@
             <text class="activity-desc">{{ item.slogan }}</text>
             <view class="activity-participants">
               <uni-icons type="person" size="14" color="#666"></uni-icons>
-              <text>{{ item.numberOfParticipants }}人参与</text>
+              <text>10人参与</text>
             </view>
           </view>
         </view>
@@ -77,51 +77,16 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { eventListApi } from "@/api/event";
+import { eventListApi, type IEventItem } from "@/api/event";
 import fetchActivityListApi from '@/api/activity-list';
 import PageUrl from '@/config/page-url';
 import type { IActivityItem } from '@/models/activity';
+
 // 当前选中的标签页
 const activeTab = ref("activities");
 // 当前活动数据
-const currentActivities = ref<IActivityItem[]>([
-  {
-    id: 1,
-    name: "社区环保行动",
-    slogan: "一起参与社区环保，共建美好家园",
-    coverImage: "https://readdy.ai/api/search-image?query=Environmental%20protection%20community%20activity%2C%20people%20cleaning%20up%20park%2C%20planting%20trees%2C%20recycling%20waste%2C%20vibrant%20colors%2C%20inspiring%20scene%2C%20high%20quality%20photograph%2C%20showing%20teamwork%20and%20community%20spirit%2C%20sunny%20day%2C%20urban%20park%20setting%2C%20diverse%20group%20of%20volunteers%2C%20centered%20composition&width=686&height=386&seq=1&orientation=landscape",
-    startDate: "2025-07-01T08:00:00",
-    endDate: "2025-07-01T18:00:00",
-    progress: 80,
-    location: "城市公园",
-    numberOfParticipants: 328,
-    enrollStatus: null
-  },
-  {
-    id: 2,
-    name: "儿童公益教育",
-    slogan: "为山区儿童提供优质教育资源",
-    coverImage: "https://readdy.ai/api/search-image?query=Children%20education%20charity%20event%2C%20volunteers%20teaching%20kids%20in%20rural%20classroom%2C%20warm%20atmosphere%2C%20colorful%20educational%20materials%2C%20engaged%20students%2C%20natural%20lighting%20through%20windows%2C%20showing%20knowledge%20sharing%20and%20learning%2C%20diverse%20group%20of%20children%2C%20centered%20composition&width=686&height=386&seq=2&orientation=landscape",
-    startDate: "2025-07-05T09:00:00",
-    endDate: "2025-07-05T17:00:00",
-    progress: 60,
-    location: "希望小学",
-    numberOfParticipants: 156,
-    enrollStatus: null
-  },
-  {
-    id: 3,
-    name: "老年关爱计划",
-    slogan: "陪伴老人，温暖夕阳生活",
-    coverImage: "https://readdy.ai/api/search-image?query=Elderly%20care%20program%2C%20young%20volunteers%20spending%20time%20with%20senior%20citizens%20in%20community%20center%2C%20playing%20board%20games%2C%20reading%20books%2C%20sharing%20stories%2C%20warm%20lighting%2C%20comfortable%20setting%2C%20showing%20intergenerational%20connection%2C%20smiling%20faces%2C%20centered%20composition&width=686&height=386&seq=3&orientation=landscape",
-    startDate: "2025-07-10T10:00:00",
-    endDate: "2025-07-10T16:00:00",
-    progress: 40,
-    location: "社区养老院",
-    numberOfParticipants: 213,
-    enrollStatus: null
-  }
-]);
+const currentActivities = ref<IEventItem[]>([]);
+
 // 全部活动数据
 const allActivities = ref<IActivityItem[]>([
   {
@@ -180,12 +145,13 @@ const switchTab = (tab: string) => {
 // 页面加载时拉取API数据，成功则覆盖mock，失败保留mock
 onMounted(async () => {
   try {
-      const eventList = await eventListApi();
-      console.log('eventList', eventList);
+    const eventList = await eventListApi();
+    console.log('eventList', eventList);
+    currentActivities.value = eventList.data.data;
+    // currentActivities.value = list.slice(0, 3);
 
     const list = await fetchActivityListApi();
     // 假设最新活动为前3条，全部活动为全部
-    currentActivities.value = list.slice(0, 3);
     allActivities.value = list;
   } catch (e) {
     // 保留mock
