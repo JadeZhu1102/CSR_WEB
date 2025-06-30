@@ -197,7 +197,7 @@ import getUserContributionApi from '@/api/user-contribution.api';
 import type { IContributionStats, IActivityRecord } from '@/api/user-contribution.api';
 import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
-import { userProfileApi, resetPasswordApi, getUserDetailApi, getUserEventsApi, getUserActivitiesApi } from '@/api/user';
+import { userProfileApi, resetPasswordApi, getUserDetailApi, getUserEventsApi, getUserActivitiesApi, updateUserDetailApi } from '@/api/user';
 import tokenManager from '@/api/token';
 
 function normalizeLang(lang: string) {
@@ -344,28 +344,30 @@ const handleChangePwd = async () => {
     }
 }
 
-const handleUpdateProfile = () => {
+const handleUpdateProfile = async () => {
     if (!profileForm.value.nickname.trim()) {
         uni.showToast({ title: '请输入昵称', icon: 'none' });
         return;
     }
-    
-    // TODO: 调用后端更新个人信息接口
-    console.log('更新个人信息:', profileForm.value);
-    handleEditProfile()
-    // 更新本地显示的用户名
-    userName.value = profileForm.value.nickname;
-    
-    uni.showToast({ title: '个人信息更新成功', icon: 'success' });
-    showProfileEdit.value = false;
-    
-    // 重置表单
-    profileForm.value = {
-        nickname: '',
-        realName: '',
-        gender: 'male'
-    };
-}
+    try {
+        const userId = await tokenManager.getUserId();
+        if (!userId) throw new Error('用户ID不存在');
+        const res = await updateUserDetailApi(Number(userId), {
+            username: profileForm.value.nickname,
+            role: userDetail.value?.role || 'user',
+            location: userDetail.value?.location || 'SH',
+        });
+        if (res && res.code === 200) {
+            uni.showToast({ title: '个人信息更新成功', icon: 'success' });
+        } else {
+            uni.showToast({ title: '更新失败，请联系管理员', icon: 'none' });
+        }
+    } catch (e) {
+        uni.showToast({ title: '更新失败，请联系管理员', icon: 'none' });
+    } finally {
+        showProfileEdit.value = false;
+    }
+};
 
 const openLangDialogFromDrawer = () => {
     showSettings.value = false;

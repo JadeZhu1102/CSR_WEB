@@ -83,3 +83,20 @@ export const getUserActivitiesApi = (userId: number) => {
         dataType: 'json',
     });
 };
+
+/**
+ * 更新用户信息
+ * @param userId 用户ID
+ * @param payload 用户信息
+ */
+export const updateUserDetailApi = (userId: number, payload: { username: string; role: string; location: string }) => {
+    return request<null>({
+        url: `/api/users/${userId}`,
+        method: 'PUT',
+        data: payload,
+        header: {
+            'content-type': 'application/json',
+        },
+        dataType: 'json',
+    });
+};
