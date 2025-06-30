@@ -6,10 +6,13 @@ export interface ILoginParams {
 }
 
 export interface ILoginResponse extends IResponse<{
-    accessToken: string;
+    accessToken?: string;
+    token?: string;
     refreshToken: string;
     expiresIn: number; // minutes
     tokenType: 'Bearer';
+    user?: { id: number; username: string; name?: string };
+    id?: number;
 }> {}
 
 export const loginApi = (params: ILoginParams) => {

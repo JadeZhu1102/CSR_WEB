@@ -10,7 +10,7 @@ const ApiServer = {
 
 /* 给微信小程序用的条件编译。小程序接口需指定域名。 */
 // #ifndef MP-WEIXIN
-ApiServer.Host = 'https://8.133.240.77:8080';
+ApiServer.Host = 'http://8.133.240.77:8080';
 // #endif
 
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {

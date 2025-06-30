@@ -200,6 +200,7 @@ import type { IContributionStats, IActivityRecord } from '@/api/user-contributio
 import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
 import { userProfileApi, resetPasswordApi, getUserDetailApi } from '@/api/user';
+import tokenManager from '@/api/token';
 
 function normalizeLang(lang: string) {
     if (lang === 'zh-Hans' || lang === 'zh-CN') return 'zh-Hans';
@@ -216,7 +217,6 @@ const showContributionDialog = ref(false);
 const showFeedbackDialog = ref(false);
 const feedbackContent = ref('');
 const isLoading = ref(false);
-const userId = ref('');
 const showSettings = ref(false);
 const showPwdDialog = ref(false);
 const oldPwd = ref('');
@@ -379,7 +379,9 @@ const handleChangePwd = async () => {
         return;
     }
     try {
-        await resetPasswordApi(Number(userId.value), newPwd.value);
+        const userId = await tokenManager.getUserId();
+        if (!userId) throw new Error('用户ID不存在');
+        await resetPasswordApi(Number(userId), newPwd.value);
         uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
         showPwdDialog.value = false;
         oldPwd.value = '';
@@ -428,19 +430,19 @@ const refreshUserProfile = async () => {
             userName.value = data.username;
             userRole.value = data.role;
             avatarUrl.value = '/static/logo.png';
-            userId.value = '10001';
         }
     } catch (error) {
         
     }
 }
 
-const handleEditProfile = async () => {
+const handleEditProfile = async (uid?: number) => {
     try {
-        const { code, data } = await getUserDetailApi(Number(userId.value));
+        const userId = uid ?? await tokenManager.getUserId();
+        if (!userId) throw new Error('用户ID不存在');
+        const { code, data } = await getUserDetailApi(Number(userId));
         if (code === 200) {
             userDetail.value = data;
-            // 只填充username，其他字段后端未返回则留空
             profileForm.value.nickname = data.username;
             profileForm.value.realName = '';
             profileForm.value.gender = 'male';
@@ -449,18 +451,45 @@ const handleEditProfile = async () => {
     } catch (e) {
         uni.showToast({ title: '获取用户信息失败', icon: 'none' });
     }
-}
+};
+
+const initUserInfo = async () => {
+    const id = await tokenManager.getUserId();
+    if (!id) {
+        uni.showToast({ title: '用户ID不存在', icon: 'none' });
+        return;
+    }
+    // 只拉取信息，不弹窗
+    try {
+        const { code, data } = await getUserDetailApi(Number(id));
+        if (code === 200) {
+            userDetail.value = data;
+            profileForm.value.nickname = data.username;
+            profileForm.value.realName = '';
+            profileForm.value.gender = 'male';
+            userName.value = data.username;
+        }
+    } catch (e) {
+        uni.showToast({ title: '获取用户信息失败', icon: 'none' });
+    }
+};
+
+const userId = computed(() => {
+    // 由于tokenManager.getUserId()是异步的，这里用一个同步getter包装
+    // 实际页面用到userId时建议直接await tokenManager.getUserId()
+    let id = '';
+    tokenManager.getUserId().then(val => { id = val ? String(val) : ''; });
+    return id;
+});
 
 onLoad(() => {
     // 初始化语言设置
     initLanguage();
-
-    // 可以在这里加载用户数据
-    refreshUserProfile();
+    initUserInfo();
 });
 
 onShow(() => {
-    refreshUserProfile();
+    initUserInfo();
 });
 </script>
 

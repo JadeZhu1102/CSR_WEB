@@ -18,10 +18,19 @@ export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
         const res = await loginApi(params);
         if (res.code === 200) {
             const data = res.data;
+            let userId = undefined;
+            console.log('login data', data);
+            if (data.user && typeof data.user.id !== 'undefined') {
+                userId = data.user.id;
+            } else if (typeof data.id !== 'undefined') {
+                userId = data.id;
+            }
+            console.log('save userId', userId);
             tokenManager.save({
-                token: data.accessToken,
+                token: (data.accessToken || data.token) ?? '',
                 refreshToken: data.refreshToken,
                 expiredIn: data.expiresIn,
+                userId: userId,
             });
             return true;
         }

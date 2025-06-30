@@ -4,6 +4,7 @@ interface ITokenCache {
     token: string;
     refreshToken: string;
     expiredIn: number;
+    userId?: number;
 }
 
 const OneSecond = 1000;
@@ -63,6 +64,11 @@ class TokenManager {
         }
         uni.navigateTo({ url: PageUrl.auth.login });
         throw new Error('Token does not exist or is expired');
+    }
+
+    public async getUserId(): Promise<number | undefined> {
+        const tokenCache = await this.retrieve();
+        return tokenCache?.userId;
     }
 }
 
