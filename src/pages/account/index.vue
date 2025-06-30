@@ -12,7 +12,7 @@
                         size="16" 
                         color="#fff" 
                         class="edit-icon" 
-                        @click="showProfileEdit = true" 
+                        @click="handleEditProfile" 
                     />
                 </view>
                 <text class="user-id">ID: {{ userId }}</text>
@@ -199,7 +199,7 @@ import getUserContributionApi from '@/api/user-contribution.api';
 import type { IContributionStats, IActivityRecord } from '@/api/user-contribution.api';
 import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
-import { userProfileApi } from '@/api/user';
+import { userProfileApi, resetPasswordApi, getUserDetailApi } from '@/api/user';
 
 function normalizeLang(lang: string) {
     if (lang === 'zh-Hans' || lang === 'zh-CN') return 'zh-Hans';
@@ -245,6 +245,9 @@ const profileForm = ref({
     realName: '',
     gender: 'male'
 });
+
+// 用户详情数据
+const userDetail = ref<any>(null);
 
 // 获取实例以使用$t
 const instance = getCurrentInstance();
@@ -366,7 +369,7 @@ const submitFeedback = async () => {
     }
 }
 
-const handleChangePwd = () => {
+const handleChangePwd = async () => {
     if (!oldPwd.value || !newPwd.value || !confirmPwd.value) {
         uni.showToast({ title: instance?.proxy?.$t('toast.fill_all'), icon: 'none' });
         return;
@@ -375,12 +378,16 @@ const handleChangePwd = () => {
         uni.showToast({ title: instance?.proxy?.$t('toast.pwd_mismatch'), icon: 'none' });
         return;
     }
-    // TODO: 调用后端修改密码接口
-    uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
-    showPwdDialog.value = false;
-    oldPwd.value = '';
-    newPwd.value = '';
-    confirmPwd.value = '';
+    try {
+        await resetPasswordApi(Number(userId.value), newPwd.value);
+        uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
+        showPwdDialog.value = false;
+        oldPwd.value = '';
+        newPwd.value = '';
+        confirmPwd.value = '';
+    } catch (e) {
+        uni.showToast({ title: '重置失败', icon: 'none' });
+    }
 }
 
 const handleUpdateProfile = () => {
@@ -425,6 +432,22 @@ const refreshUserProfile = async () => {
         }
     } catch (error) {
         
+    }
+}
+
+const handleEditProfile = async () => {
+    try {
+        const { code, data } = await getUserDetailApi(Number(userId.value));
+        if (code === 200) {
+            userDetail.value = data;
+            // 只填充username，其他字段后端未返回则留空
+            profileForm.value.nickname = data.username;
+            profileForm.value.realName = '';
+            profileForm.value.gender = 'male';
+        }
+        showProfileEdit.value = true;
+    } catch (e) {
+        uni.showToast({ title: '获取用户信息失败', icon: 'none' });
     }
 }
 

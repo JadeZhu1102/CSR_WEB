@@ -8,7 +8,8 @@ interface IActivityListApiResponse {
 
 export default async function fetchActivityListApi(): Promise<IActivityItem[]> {
     return request<IActivityListApiResponse>({
-        url: '/api/activity/all?type=newest',
+        url: '/api/events',
+        method: 'GET',
     }).then(res => res.data.map(item => ({
         ...item,
         coverImage: typeof item.coverImage === 'string' ? '/media/' + item.coverImage : item.coverImage,

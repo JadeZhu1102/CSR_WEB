@@ -22,7 +22,7 @@ interface IRequestConfig {
 }
 
 const defaultConfig: IRequestConfig = {
-    useI18n: true,
+    useI18n: false,
 }
 
 export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestConfig = defaultConfig) {
