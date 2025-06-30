@@ -12,10 +12,10 @@
                         size="16" 
                         color="#fff" 
                         class="edit-icon" 
-                        @click="handleEditProfile" 
+                        @click="showProfileEdit = true" 
                     />
                 </view>
-                <text class="user-id">ID: {{ userId }}</text>
+                <text class="user-id">ID: {{ userIdDisplay }}</text>
             </view>
             <uni-icons type="settings" size="28" color="#888" class="settings-btn" @click="showSettings = true" />
         </view>
@@ -27,7 +27,7 @@
             </view>
             <view class="card-content">
                 <text class="card-title">{{ $t('account.title.my_contributions') }}</text>
-                <text class="card-subtitle">{{ $t('account.card.share_idea') }}</text>
+                <!-- <text class="card-subtitle">{{ $t('account.card.share_idea') }}</text> -->
             </view>
             <view class="card-arrow ani-icon">></view>
         </view>
@@ -67,27 +67,25 @@
                     <text class="dialog-title">{{ $t('account.title.my_contributions') }}</text>
                 </view>
                 
-                <!-- 贡献统计 -->
                 <view class="contribution-stats">
-                    <view class="stat-item ani-card" v-for="(stat, index) in statItems" :key="index" :style="{ animationDelay: index * 0.1 + 's' }">
-                        <text class="stat-number">{{ stat.value }}</text>
-                        <text class="stat-label">{{ stat.label }}</text>
+                    <text class="records-title">参与事件</text>
+                    <view v-for="event in userEvents" :key="event.id" class="record-item ani-list-item">
+                        <view class="record-info">
+                            <text class="record-name">{{ event.name }}</text>
+                            <text class="record-date">{{ event.duration }}</text>
+                        </view>
+                        <view class="record-status">{{ event.status }}</view>
                     </view>
                 </view>
 
-                <!-- 活动记录列表 -->
                 <view class="activity-records">
-                    <text class="records-title">{{ $t('account.contribution.activity_records') }}</text>
-                    <view class="record-list">
-                        <view v-for="(record, index) in activityRecords" :key="record.id" class="record-item ani-list-item" :style="{ animationDelay: index * 0.05 + 's' }">
-                            <view class="record-info">
-                                <text class="record-name">{{ record.name }}</text>
-                                <text class="record-date">{{ record.date }}</text>
-                            </view>
-                            <view class="record-status" :class="record.status">
-                                {{ getStatusText(record.status) }}
-                            </view>
+                    <text class="records-title">参与活动</text>
+                    <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
+                        <view class="record-info">
+                            <text class="record-name">{{ activity.name }}</text>
+                            <text class="record-date">{{ activity.duration }}</text>
                         </view>
+                        <view class="record-status">{{ activity.eventName }}</view>
                     </view>
                 </view>
 
@@ -191,7 +189,7 @@
 
 <script setup lang="ts">
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { ref, getCurrentInstance, nextTick, computed } from 'vue';
+import { ref, getCurrentInstance, nextTick, computed, onMounted } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
 import submitFeedbackApi from '@/api/feedback.api';
@@ -199,7 +197,7 @@ import getUserContributionApi from '@/api/user-contribution.api';
 import type { IContributionStats, IActivityRecord } from '@/api/user-contribution.api';
 import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
-import { userProfileApi, resetPasswordApi, getUserDetailApi } from '@/api/user';
+import { userProfileApi, resetPasswordApi, getUserDetailApi, getUserEventsApi, getUserActivitiesApi } from '@/api/user';
 import tokenManager from '@/api/token';
 
 function normalizeLang(lang: string) {
@@ -223,21 +221,18 @@ const oldPwd = ref('');
 const newPwd = ref('');
 const confirmPwd = ref('');
 const showProfileEdit = ref(false);
+const userIdDisplay = ref('');
+const userEvents = ref<any[]>([]);
+const userActivities = ref<any[]>([]);
 
 // 使用语言管理composable
 const { currentLanguage, setLanguage, initLanguage } = useLanguage();
 
-// 贡献统计数据
-const contributionStats = ref<IContributionStats>({
-    totalActivities: 0,
-    totalHours: 0,
-    completedActivities: 0,
-    ongoingActivities: 0,
-    pendingActivities: 0
-});
+// 用户详情数据
+const userDetail = ref<any>(null);
 
-// 活动记录数据
-const activityRecords = ref<IActivityRecord[]>([]);
+// 获取实例以使用$t
+const instance = getCurrentInstance();
 
 // 个人信息表单数据
 const profileForm = ref({
@@ -246,36 +241,14 @@ const profileForm = ref({
     gender: 'male'
 });
 
-// 用户详情数据
-const userDetail = ref<any>(null);
-
-// 获取实例以使用$t
-const instance = getCurrentInstance();
-
-// 计算属性：统计项数据
-const statItems = computed(() => [
-    {
-        value: contributionStats.value.totalActivities,
-        label: instance?.proxy?.$t('account.achievement.total_activities') || '总活动数'
-    },
-    {
-        value: contributionStats.value.totalHours,
-        label: instance?.proxy?.$t('account.contribution.total_hours') || '总时长'
-    },
-    {
-        value: contributionStats.value.completedActivities,
-        label: instance?.proxy?.$t('account.achievement.completed_activities') || '已完成'
-    }
-]);
-
-const getStatusText = (status: string) => {
-    const statusMap = {
-        completed: '已完成',
-        ongoing: '进行中',
-        pending: '待参与'
-    };
-    return statusMap[status as keyof typeof statusMap] || status;
-};
+const contributionStats = ref({
+    totalActivities: 0,
+    totalHours: 0,
+    completedActivities: 0,
+    ongoingActivities: 0,
+    pendingActivities: 0
+});
+const activityRecords = ref<any[]>([]);
 
 const onLogout = () => {
     logoutAccount();
@@ -306,27 +279,6 @@ const switchLang = async (lang: string) => {
         duration: 1500
     });
 }
-
-// 加载用户贡献数据
-const loadUserContribution = async () => {
-    try {
-        const contributionData = await getUserContributionApi();
-        contributionStats.value = contributionData.stats;
-        activityRecords.value = contributionData.records;
-    } catch (error) {
-        console.error('加载用户贡献数据失败:', error);
-        uni.showToast({
-            title: instance?.proxy?.$t('toast.loading_failed'),
-            icon: 'none'
-        });
-    }
-};
-
-// 显示贡献弹窗时加载数据
-const showContribution = async () => {
-    showContributionDialog.value = true;
-    await loadUserContribution();
-};
 
 const submitFeedback = async () => {
     if (!feedbackContent.value.trim()) {
@@ -400,7 +352,7 @@ const handleUpdateProfile = () => {
     
     // TODO: 调用后端更新个人信息接口
     console.log('更新个人信息:', profileForm.value);
-    
+    handleEditProfile()
     // 更新本地显示的用户名
     userName.value = profileForm.value.nickname;
     
@@ -436,11 +388,11 @@ const refreshUserProfile = async () => {
     }
 }
 
-const handleEditProfile = async (uid?: number) => {
+const handleEditProfile = async (uid?: number,) => {
     try {
         const userId = uid ?? await tokenManager.getUserId();
         if (!userId) throw new Error('用户ID不存在');
-        const { code, data } = await getUserDetailApi(Number(userId));
+        const { code, data } = await getUserDetailApi(Number(userId),'PUT');
         if (code === 200) {
             userDetail.value = data;
             profileForm.value.nickname = data.username;
@@ -474,12 +426,13 @@ const initUserInfo = async () => {
     }
 };
 
-const userId = computed(() => {
-    // 由于tokenManager.getUserId()是异步的，这里用一个同步getter包装
-    // 实际页面用到userId时建议直接await tokenManager.getUserId()
-    let id = '';
-    tokenManager.getUserId().then(val => { id = val ? String(val) : ''; });
-    return id;
+const updateUserIdDisplay = async () => {
+    const id = await tokenManager.getUserId();
+    userIdDisplay.value = id ? String(id) : '';
+};
+
+onMounted(() => {
+    updateUserIdDisplay();
 });
 
 onLoad(() => {
@@ -491,6 +444,48 @@ onLoad(() => {
 onShow(() => {
     initUserInfo();
 });
+
+const showContribution = async () => {
+    try {
+        const userId = await tokenManager.getUserId();
+        if (!userId) throw new Error('用户ID不存在');
+        // 并发获取事件和活动
+        const [eventsRes, activitiesRes] = await Promise.all([
+            getUserEventsApi(Number(userId)),
+            getUserActivitiesApi(Number(userId))
+        ]);
+        // 统计区数据（根据新API返回格式化）
+        contributionStats.value.totalActivities = activitiesRes.data.length;
+        contributionStats.value.completedActivities = activitiesRes.data.filter(a => {
+            const { status = '' } = a;
+            return status === 'completed';
+        }).length;
+        contributionStats.value.ongoingActivities = activitiesRes.data.filter(a => {
+            const { status = '' } = a;
+            return status === 'ongoing';
+        }).length;
+        contributionStats.value.pendingActivities = activitiesRes.data.filter(a => {
+            const { status = '' } = a;
+            return status === 'pending';
+        }).length;
+        contributionStats.value.totalHours = 0; // 新API如无hours字段可置0或补充
+        // 活动记录区数据
+        activityRecords.value = activitiesRes.data.map(a => {
+            const { id, name, eventName = '', status = '' } = a;
+            return {
+                id,
+                name,
+                date: '',
+                status,
+                hours: '',
+                description: eventName
+            };
+        });
+        showContributionDialog.value = true;
+    } catch (e) {
+        uni.showToast({ title: '获取贡献数据失败', icon: 'none' });
+    }
+};
 </script>
 
 <style lang="scss">

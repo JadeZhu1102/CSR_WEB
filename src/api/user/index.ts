@@ -23,7 +23,7 @@ export const resetPasswordApi = (userId: number, password: string) => {
  * 获取用户详情
  * @param userId 用户ID
  */
-export const getUserDetailApi = (userId: number) => {
+export const getUserDetailApi = (userId: number, method: string = 'GET') => {
     return request<{
         id: number;
         username: string;
@@ -36,6 +36,46 @@ export const getUserDetailApi = (userId: number) => {
         activityCount: number;
     }>({
         url: `/api/users/${userId}`,
+        method: method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'TRACE' | 'CONNECT' | undefined,
+        header: {
+            'content-type': 'application/json',
+        },
+        dataType: 'json',
+    });
+};
+
+/**
+ * 获取用户参与的事件列表
+ */
+export const getUserEventsApi = (userId: number) => {
+    return request<Array<{
+        id: number;
+        name: string;
+        type: string;
+        duration: string;
+        status: string;
+    }>>({
+        url: `/api/users/${userId}/events`,
+        method: 'GET',
+        header: {
+            'content-type': 'application/json',
+        },
+        dataType: 'json',
+    });
+};
+
+/**
+ * 获取用户参与的活动列表
+ */
+export const getUserActivitiesApi = (userId: number) => {
+    return request<Array<{
+        id: number;
+        name: string;
+        eventName: string;
+        duration: string;
+        status?: string;
+    }>>({
+        url: `/api/users/${userId}/activities`,
         method: 'GET',
         header: {
             'content-type': 'application/json',
