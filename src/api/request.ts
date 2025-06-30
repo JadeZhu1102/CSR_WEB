@@ -5,7 +5,8 @@ import type { IResponse } from "@/api/types";
 import tokenManager from "@/api/token";
 
 const ApiServer = {
-    Host: '',
+    // TODO: 在域名配置修改
+    Host: 'http://8.133.240.77:8080',
 };
 
 /* 给微信小程序用的条件编译。小程序接口需指定域名。 */

@@ -77,6 +77,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
+import { eventListApi } from "@/api/event";
 import fetchActivityListApi from '@/api/activity-list';
 import PageUrl from '@/config/page-url';
 import type { IActivityItem } from '@/models/activity';
@@ -179,6 +180,9 @@ const switchTab = (tab: string) => {
 // 页面加载时拉取API数据，成功则覆盖mock，失败保留mock
 onMounted(async () => {
   try {
+      const eventList = await eventListApi();
+      console.log('eventList', eventList);
+
     const list = await fetchActivityListApi();
     // 假设最新活动为前3条，全部活动为全部
     currentActivities.value = list.slice(0, 3);
