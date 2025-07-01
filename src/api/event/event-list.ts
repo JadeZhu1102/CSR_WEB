@@ -1,9 +1,6 @@
 import { request } from "@/api/request";
 
-interface IActivityDetail {}
-
 export interface IEventItem {
-    activities: IActivityDetail[];
     bgImage: string;
     endTime: string | null;
     id: number;
