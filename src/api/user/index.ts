@@ -85,13 +85,13 @@ export const getUserActivitiesApi = (userId: number) => {
 };
 
 /**
- * 更新用户信息
+ * 更新用户信息（支持nickname, realName, gender等字段）
  * @param userId 用户ID
  * @param payload 用户信息
  */
-export const updateUserDetailApi = (userId: number, payload: { username: string; role: string; location: string }) => {
+export const updateUserDetailApi = (userId: number, payload: { nickname?: string; realName?: string; gender?: string; [key: string]: any }) => {
     return request<null>({
-        url: `/api/users/${userId}`,
+        url: `/api/profile`,
         method: 'PUT',
         data: payload,
         header: {

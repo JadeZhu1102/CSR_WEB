@@ -3,6 +3,9 @@ import type { IResponse } from "@/api/types";
 export interface IRegisterParams {
     username: string;
     password: string;
+    email?: string;
+    gender?: string;
+    city?: string;
 }
 
 export interface IRegisterResponse extends IResponse {

@@ -79,7 +79,7 @@
                 </view>
 
                 <view class="activity-records">
-                    <text class="records-title">参与活动</text>
+                    <text class="records-title">参与时长</text>
                     <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
                         <view class="record-info">
                             <text class="record-name">{{ activity.name }}</text>
@@ -88,7 +88,16 @@
                         <view class="record-status">{{ activity.eventName }}</view>
                     </view>
                 </view>
-
+                <view class="money-records">
+                    <text class="records-title">我的捐款</text>
+                    <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
+                        <view class="record-info">
+                            <text class="record-name">{{ activity.name }}</text>
+                            <text class="record-date">{{ activity.duration }}</text>
+                        </view>
+                        <view class="record-status">{{ activity.eventName }}</view>
+                    </view>
+                </view>
                 <button class="dialog-close-btn ani-btn" @click="showContributionDialog = false">
                     {{ $t('account.contribution.close') }}
                 </button>
@@ -164,16 +173,24 @@
                     </view>
                     
                     <view class="form-item">
-                        <text class="form-label">真实姓名</text>
-                        <input v-model="profileForm.realName" class="ani-input form-input" placeholder="请输入真实姓名" />
+                        <text class="form-label">工作邮箱</text>
+                        <input v-model="profileForm.email" class="ani-input form-input" placeholder="请输入工作邮箱" />
                     </view>
                     
-                    <view class="form-item" style="margin-bottom: 0;">
+                    <view class="form-item">
                         <text class="form-label">性别</text>
                         <select v-model="profileForm.gender" class="form-select">
                             <option value="male">男</option>
                             <option value="female">女</option>
                             <option value="other">保密</option>
+                        </select>
+                    </view>
+                    
+                    <view class="form-item">
+                        <text class="form-label">城市</text>
+                        <select v-model="profileForm.city" class="form-select">
+                            <option value="SH">上海</option>
+                            <option value="SZ">深圳</option>
                         </select>
                     </view>
                 </view>
@@ -237,8 +254,9 @@ const instance = getCurrentInstance();
 // 个人信息表单数据
 const profileForm = ref({
     nickname: '',
-    realName: '',
-    gender: 'male'
+    email: '',
+    gender: 'male',
+    city: 'SH',
 });
 
 const contributionStats = ref({
@@ -353,9 +371,10 @@ const handleUpdateProfile = async () => {
         const userId = await tokenManager.getUserId();
         if (!userId) throw new Error('用户ID不存在');
         const res = await updateUserDetailApi(Number(userId), {
-            username: profileForm.value.nickname,
-            role: userDetail.value?.role || 'user',
-            location: userDetail.value?.location || 'SH',
+            nickname: profileForm.value.nickname,
+            email: profileForm.value.email,
+            gender: profileForm.value.gender,
+            city: profileForm.value.city,
         });
         if (res && res.code === 200) {
             uni.showToast({ title: '个人信息更新成功', icon: 'success' });
@@ -398,8 +417,9 @@ const handleEditProfile = async (uid?: number,) => {
         if (code === 200) {
             userDetail.value = data;
             profileForm.value.nickname = data.username;
-            profileForm.value.realName = '';
+            profileForm.value.email = '';
             profileForm.value.gender = 'male';
+            profileForm.value.city = 'SH';
         }
         showProfileEdit.value = true;
     } catch (e) {
@@ -419,8 +439,9 @@ const initUserInfo = async () => {
         if (code === 200) {
             userDetail.value = data;
             profileForm.value.nickname = data.username;
-            profileForm.value.realName = '';
+            profileForm.value.email = '';
             profileForm.value.gender = 'male';
+            profileForm.value.city = 'SH';
             userName.value = data.username;
         }
     } catch (e) {
@@ -1394,6 +1415,7 @@ const showContribution = async () => {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-bottom: 18px;
 }
 
 .form-label {
@@ -1418,18 +1440,18 @@ const showContribution = async () => {
 }
 
 .form-select {
-    padding: 12px 16px;
+    padding: 12px 32px 12px 16px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
     background: #fafbfc;
     transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
-    
-    &:focus {
-        border-color: #30a908;
-        box-shadow: 0 0 0 2px rgba(48,169,8,0.08);
-    }
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23999" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
 }
 
 .dialog-actions {
