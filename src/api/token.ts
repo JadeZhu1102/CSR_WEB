@@ -1,4 +1,5 @@
 import PageUrl from "@/config/page-url";
+import { refreshTokenApi } from "@/api/auth";
 
 interface ITokenCache {
     token: string;
@@ -19,7 +20,46 @@ class TokenManager {
 
     private refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-    private refresh() {}
+    private clearRefresh() {
+        if (this.refreshTimer) {
+            window.clearTimeout(this.refreshTimer);
+        }
+    }
+
+    private goToLoginPage() {
+        uni.navigateTo({ url: PageUrl.auth.login });
+    }
+
+    private async refresh(refreshToken: string) {
+        const response = await refreshTokenApi(refreshToken);
+        if (response.code === 200) {
+            const data = response.data;
+            this.save({
+                refreshToken: data.refreshToken,
+                token: data.accessToken,
+                expiredIn: data.expiresIn,
+            });
+        } 
+    }
+
+    private async initialize() {
+        const tokenCache = await this.retrieve();
+
+        if (tokenCache) {
+            const now = Date.now();
+            // valid
+            if (tokenCache.expiredIn > now) {
+                const expiredTime = tokenCache.expiredIn - now;
+                this.refreshTimer = setTimeout(() => {
+                    this.refresh(tokenCache.refreshToken);
+                }, expiredTime);
+            }
+        }
+    }
+
+    public constructor() {
+        this.initialize();
+    }
 
     public save(tokenCache: ITokenCache) {
         const expiredIn = (tokenCache.expiredIn * OneMinute - RefreshBuffer);
@@ -29,9 +69,11 @@ class TokenManager {
         this.cacheData = tokenCache;
         uni.setStorage({ key: this.cacheKey, data: tokenCache });
 
-        this.refreshTimer = setTimeout(() => {
-            this.refresh();
-        }, expiredTime);
+        if (tokenCache.refreshToken) {
+            this.refreshTimer = setTimeout(() => {
+                this.refresh(tokenCache.refreshToken);
+            }, expiredTime);
+        }
     }
 
     public clear() {
@@ -62,7 +104,9 @@ class TokenManager {
                 return tokenCache.token;
             }
         }
-        uni.navigateTo({ url: PageUrl.auth.login });
+
+        this.clearRefresh();
+        this.goToLoginPage();
         throw new Error('Token does not exist or is expired');
     }
 

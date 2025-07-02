@@ -1,1 +1,2 @@
-export * from './event-list-api';
+export * from './event-list';
+export * from './event-detail';

@@ -194,14 +194,26 @@ import { ref, onMounted } from "vue";
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
 import UniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue';
 import UniPopupDialog from '@dcloudio/uni-ui/lib/uni-popup-dialog/uni-popup-dialog.vue';
+
 import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
 import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
-import fetchActivityDetailApi from '@/api/activity-detail.api';
-import type { IActivityDetail } from '@/models/activity';
+import { eventDetailApi } from '@/api/event';
+
+//---- Page -----
+interface IEventInformation {
+  _cover: string;
+  _title:  string;
+  _statusText:  string;
+  _dateText:  string;
+  _enrollCount: number;
+  _description:  string;
+  _detailImage:  string;
+  _location:  string;
+}
 
 const scrollHeight = ref(0);
 const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
-const activity = ref<any>(null);
+const activity = ref<IEventInformation | null>(null);
 const stages = ref<any[]>([]);
 const userStages = ref<any[]>([]);
 const showDialog = ref(false);
@@ -236,6 +248,7 @@ function deleteStage(id: number) {
   updateUserStages();
   uni.showToast({ title: '删除成功', icon: 'success', duration: 2000 });
 }
+
 function handleEditEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
   const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
   if (index !== -1 && editingStage.value) {
@@ -260,11 +273,13 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
   editingStage.value = null;
   updateUserStages();
 }
+
 function updateUserStages() {
   // userStages 只展示报名过的阶段
   // 这里不再自动同步stages，只保留用户报名的
   // userStages.value = stages.value.filter(s => s.isUserAdded);
 }
+
 function handleConfirm() {
   // 判断是否已报名，避免重复
   if (currentJoinStage.value && !userStages.value.find((s: any) => s.id === currentJoinStage.value.id)) {
@@ -278,6 +293,7 @@ function handleConfirm() {
   popup.value.close();
   currentJoinStage.value = null;
 }
+
 function handleClose() {
   popup.value.close();
   currentJoinStage.value = null;
@@ -291,7 +307,7 @@ function getStatusText(status: string) {
     default: return '报名中';
   }
 }
-function getDateText(start: string, end: string) {
+function getDateText(start: string | null, end: string | null) {
   if (!start) return '-';
   if (!end) return start;
   return `${start} - ${end}`;
@@ -306,48 +322,47 @@ onMounted(async () => {
   // 获取活动详情
   // @ts-ignore
   const query = (window.getCurrentPages && window.getCurrentPages().slice(-1)[0]?.options) || {};
-  const activityId = query.id;
+  const eventId = query.id;
   try {
     uni.showLoading();
-    const detail = await fetchActivityDetailApi(activityId);
-    activity.value = detail;
-    // 兼容UI字段
-    activity.value._cover = ((detail as any).cover || defaultCover);
-    activity.value._statusText = getStatusText((detail as any).status || 'in_progress');
-    activity.value._title = detail.name;
-    activity.value._dateText = getDateText(detail.startDate, detail.endDate);
-    activity.value._enrollCount = detail.numberOfParticipants;
-    activity.value._description = detail.introduction;
-    activity.value._detailImage = (detail as any).detailImage || '';
-    activity.value._location = detail.location || '-';
-    // 阶段数据
-    stages.value = (detail.eventList || []).map((evt: any, idx: number) => ({
-      id: evt.id || idx + 1,
-      name: evt.name,
-      time: evt.startDate,
-      description: evt.description || '',
-      intro: evt.intro || evt.description || '',
-      thumbnail: '',
-      progress: evt.progress || 0,
-      records: [],
-      isUserAdded: false,
-      participants: evt.participants || 0,
-      completed: evt.status === 'finished',
-      thumbs: evt.thumbs || [defaultCover, defaultCover],
-    }));
+    const res = await eventDetailApi(eventId);
+    if (res.code === 404) {
+      // TODO: 设计404页面
+      return;
+    }
+    const detail = res.data;
+    if (detail) {
+      // 兼容UI字段
+      activity.value = {
+        _cover: detail.icon || defaultCover,
+        _title: detail.name,
+        _statusText: getStatusText(detail.status || 'in_progress'),
+        _dateText: getDateText(detail.startTime, detail.endTime),
+        _enrollCount: detail.numberOfParticipants,
+        _description: detail.description,
+        _detailImage: detail.bgImage || '',
+        _location: detail.visibleLocations.join(' | ') || '-',
+      };
+      // 阶段数据
+      stages.value = (detail.activities || []).map((evt: any, idx: number) => ({
+        id: evt.id || idx + 1,
+        name: evt.name,
+        time: evt.startDate,
+        description: evt.description || '',
+        intro: evt.intro || evt.description || '',
+        thumbnail: '',
+        progress: evt.progress || 0,
+        records: [],
+        isUserAdded: false,
+        participants: evt.participants || 0,
+        completed: evt.status === 'finished',
+        thumbs: evt.thumbs || [defaultCover, defaultCover],
+      }));
+    }
     updateUserStages();
   } catch (error) {
     // 可选：填充mock数据
-    activity.value = {
-      _cover: defaultCover,
-      _statusText: '报名中',
-      _title: '城市马拉松',
-      _dateText: '2025年7月15日 08:00-12:00',
-      _enrollCount: 1024,
-      _description: '2025城市马拉松是一项大型公益跑步活动，旨在促进全民健身，同时为慈善事业筹集资金。',
-      _detailImage: '',
-      _location: '城市中心公园',
-    };
+    // TODO: handle error
     stages.value = [
       { id: 1, name: '开始报名', time: '2025年6月1日', description: '马拉松报名正式开始，参与者可通过官方渠道报名参加', completed: true, isUserAdded: false, participants: 100, thumbs: [defaultCover, defaultCover] },
       { id: 2, name: '体检证明提交', time: '2025年6月15日', description: '参赛者需提交近6个月内体检证明', completed: true, isUserAdded: false, participants: 80, thumbs: [defaultCover, defaultCover] },
