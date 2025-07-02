@@ -326,6 +326,10 @@ onMounted(async () => {
   try {
     uni.showLoading();
     const res = await eventDetailApi(eventId);
+    if (res.code === 404) {
+      // TODO: 设计404页面
+      return;
+    }
     const detail = res.data;
     if (detail) {
       // 兼容UI字段
@@ -335,26 +339,26 @@ onMounted(async () => {
         _statusText: getStatusText(detail.status || 'in_progress'),
         _dateText: getDateText(detail.startTime, detail.endTime),
         _enrollCount: detail.numberOfParticipants,
-        _description: detail.introduction,
-        _detailImage: (detail).bgImage || '',
+        _description: detail.description,
+        _detailImage: detail.bgImage || '',
         _location: detail.visibleLocations.join(' | ') || '-',
       };
+      // 阶段数据
+      stages.value = (detail.activities || []).map((evt: any, idx: number) => ({
+        id: evt.id || idx + 1,
+        name: evt.name,
+        time: evt.startDate,
+        description: evt.description || '',
+        intro: evt.intro || evt.description || '',
+        thumbnail: '',
+        progress: evt.progress || 0,
+        records: [],
+        isUserAdded: false,
+        participants: evt.participants || 0,
+        completed: evt.status === 'finished',
+        thumbs: evt.thumbs || [defaultCover, defaultCover],
+      }));
     }
-    // 阶段数据
-    stages.value = (detail.activities || []).map((evt: any, idx: number) => ({
-      id: evt.id || idx + 1,
-      name: evt.name,
-      time: evt.startDate,
-      description: evt.description || '',
-      intro: evt.intro || evt.description || '',
-      thumbnail: '',
-      progress: evt.progress || 0,
-      records: [],
-      isUserAdded: false,
-      participants: evt.participants || 0,
-      completed: evt.status === 'finished',
-      thumbs: evt.thumbs || [defaultCover, defaultCover],
-    }));
     updateUserStages();
   } catch (error) {
     // 可选：填充mock数据

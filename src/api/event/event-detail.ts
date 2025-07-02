@@ -18,9 +18,9 @@ export interface IEventDetailResponse {
     isDisplay: boolean;
     visibleLocations: string[];
     visibleRoles: ('admin' | 'user')[];
+    description: string;
 
     // TODO:
-    introduction: string;
     activities: IActivityDetail[];
     bgImage: string;
     endTime: string | null;

@@ -2,6 +2,7 @@ import { request } from "@/api/request";
 
 export interface IRefreshTokenResponse {
     accessToken: string;
+    refreshToken: string;
     tokenType: 'Bearer';
     expiresIn: number
 }
