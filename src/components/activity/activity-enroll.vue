@@ -22,8 +22,7 @@
 <script lang="ts">
 import { ref } from "vue";
 import type { IActivityEvent } from "@/models/event";
-import enrollActivityListApi from "@/api/activity-enroll";
-import fetchActivityEventsApi from "@/api/activity-events";
+import { activityEnrollApi } from "@/api/activity";
 
 export default {
     props: {
@@ -46,7 +45,7 @@ export default {
         async onEnroll() {
             try {
                 uni.showLoading()
-                const res = await enrollActivityListApi(this.activityId);
+                const res = await activityEnrollApi(this.activityId);
                 if (res) {
                     uni.showToast({
                         icon: 'success',
@@ -61,8 +60,7 @@ export default {
             }
         },
         async refreshEventList() {
-            const newEventList = await fetchActivityEventsApi(this.activityId);
-            this.eventList = newEventList;
+            this.eventList = [];
         },
     },
     mounted() {

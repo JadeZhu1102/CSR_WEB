@@ -1,4 +1,4 @@
-import { request } from "./request";
+import { request } from "@/api/request";
 
 export interface IActivityJoinResult {
     id: number;
@@ -12,7 +12,7 @@ export interface IActivityJoinResult {
  * 如果未参加，则自动参加。
  * @param activitySession
  */
-export default async function activityJoinCheckApi(activitySession: string): Promise<IActivityJoinResult> {
+export async function activityJoinCheckApi(activitySession: string): Promise<IActivityJoinResult> {
     return Promise.resolve<IActivityJoinResult>({
         id: 1,
         title: '收获玉米',
