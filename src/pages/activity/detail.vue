@@ -198,6 +198,8 @@ import UniPopupDialog from '@dcloudio/uni-ui/lib/uni-popup-dialog/uni-popup-dial
 import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
 import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
 import { eventDetailApi } from '@/api/event';
+import { eventActivitiesApi, eventJoinedActivitiesApi } from '@/api/activity';
+import { onLoad } from "@dcloudio/uni-app";
 
 //---- Page -----
 interface IEventInformation {
@@ -212,6 +214,8 @@ interface IEventInformation {
 }
 
 const scrollHeight = ref(0);
+
+const eventId = ref<number|null>(null);
 const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
 const activity = ref<IEventInformation | null>(null);
 const stages = ref<any[]>([]);
@@ -277,7 +281,10 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
 function updateUserStages() {
   // userStages 只展示报名过的阶段
   // 这里不再自动同步stages，只保留用户报名的
-  // userStages.value = stages.value.filter(s => s.isUserAdded);
+
+  eventJoinedActivitiesApi(eventId.value!).then(res => {
+      userStages.value = res ?? [];
+  });
 }
 
 function handleConfirm() {
@@ -307,11 +314,16 @@ function getStatusText(status: string) {
     default: return '报名中';
   }
 }
+
 function getDateText(start: string | null, end: string | null) {
   if (!start) return '-';
   if (!end) return start;
   return `${start} - ${end}`;
 }
+
+onLoad((query) => {
+  eventId.value = Number((query as { id: string }).id);
+})
 
 onMounted(async () => {
   uni.getSystemInfo({
@@ -323,6 +335,7 @@ onMounted(async () => {
   // @ts-ignore
   const query = (window.getCurrentPages && window.getCurrentPages().slice(-1)[0]?.options) || {};
   const eventId = query.id;
+
   try {
     uni.showLoading();
     const res = await eventDetailApi(eventId);

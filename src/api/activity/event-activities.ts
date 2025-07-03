@@ -6,9 +6,22 @@ interface IEventListApiResponse {
     data: IActivityEvent[];
 }
 
-export default async function eventActivitiesApi(activityId: number): Promise<IActivityEvent[]> {
+/**
+ * 某个event下所有的activity的列表
+ */
+export async function eventActivitiesApi(eventId: number): Promise<IActivityEvent[]> {
     return request<IEventListApiResponse>({
-        url: `/api/events/${activityId}/activities`,
+        url: `/api/events/${eventId}/activities/all`,
+        method: 'GET',
+    }).then(res => res.data.data);
+}
+
+/**
+ * 某个event下，用户已参与的activity的列表
+ */
+export async function eventJoinedActivitiesApi(eventId: number): Promise<IActivityEvent[]> {
+    return request<IEventListApiResponse>({
+        url: `/api/events/${eventId}/activities/joined`,
         method: 'GET',
     }).then(res => res.data.data);
 }
