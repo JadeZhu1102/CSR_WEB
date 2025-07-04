@@ -19,7 +19,7 @@
             <text class="title">{{ activity.name }}</text>
           </view>
           <view class="slogan">
-            <text>{{ activity.slogan }}</text>
+            <text>{{ $t('activity.slogan', { slogan: activity.slogan }) }}</text>
           </view>
           <view class="activity-duration">
             <text>
@@ -33,15 +33,15 @@
       <view class="activity-detail">
         <view class="lifecycle">
           <view class="location">
-            <text>{{ $t("activity.label.location") }}</text>
+            <text>{{ $t('activity.label.location') }}</text>
             <text>{{ activity.location }}</text>
           </view>
           <view>
-            <text>{{ $t("activity.label.number_of_participants") }}</text>
+            <text>{{ $t('activity.label.number_of_participants') }}</text>
             <i18n-n :value="activity.numberOfParticipants ?? 0" />
           </view>
           <view class="progress">
-            <text>{{ $t("activity.label.progress") }}</text>
+            <text>{{ $t('activity.label.progress') }}</text>
             <text>{{ activity.progress ?? 0 }}%</text>
           </view>
         </view>

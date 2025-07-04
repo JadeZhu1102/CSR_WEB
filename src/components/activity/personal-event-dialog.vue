@@ -1,11 +1,11 @@
 <template>
   <view v-if="visible" class="dialog-mask ani-dialog-mask" @click.stop>
     <view class="dialog-container ani-dialog">
-      <view class="dialog-title">{{ isEditMode ? '记录你的活动' : '添加个人事件' }}</view>
+      <view class="dialog-title">{{ isEditMode ? $t('event.dialog.edit_title') : $t('event.dialog.add_title') }}</view>
       <view v-if="errorMsg" class="form-error ani-shake">{{ errorMsg }}</view>
       <view class="dialog-form">
         <view class="form-item" v-if="!isEditMode">
-          <text class="label">事件名称</text>
+          <text class="label">{{ $t('event.dialog.name') }}</text>
           <view class="input-select ani-input" @click="showTypeSelect = !showTypeSelect">
             <text>{{ typeOptionsComputed[form.typeIndex] }}</text>
             <view v-if="showTypeSelect" class="select-dropdown ani-fade-in-up">
@@ -16,18 +16,18 @@
           </view>
         </view>
         <view class="form-item">
-          <text class="label">描述</text>
-          <textarea v-model="form.content" class="input ani-input" placeholder="请输入事件描述" />
+          <text class="label">{{ $t('event.dialog.desc') }}</text>
+          <textarea v-model="form.content" class="input ani-input" :placeholder="$t('event.dialog.desc_placeholder')" />
         </view>
         <view class="form-item">
-          <text class="label">日期</text>
+          <text class="label">{{ $t('event.dialog.date') }}</text>
           <view class="input-select ani-input" @click="showCalendar">
-            <text>{{ form.date || '请选择日期' }}</text>
+            <text>{{ form.date || $t('event.dialog.date_placeholder') }}</text>
           </view>
           <uni-calendar ref="uniCalendarRef" :insert="false" :lunar="false" @confirm="onUniCalendarConfirm" />
         </view>
         <view class="form-item">
-          <text class="label">图片上传</text>
+          <text class="label">{{ $t('event.dialog.images') }}</text>
           <uni-file-picker
             v-model="form.images"
             file-mediatype="image"
@@ -42,8 +42,8 @@
         </view>
       </view>
       <view class="dialog-actions">
-        <button class="btn cancel ani-btn" @click="onCancel">取消</button>
-        <button class="btn confirm ani-btn" @click="onConfirm" :style="isEditMode ? 'background:#30a908;color:#fff;' : ''">确认</button>
+        <button class="btn cancel ani-btn" @click="onCancel">{{ $t('event.dialog.cancel') }}</button>
+        <button class="btn confirm ani-btn" @click="onConfirm" :style="isEditMode ? 'background:#30a908;color:#fff;' : ''">{{ $t('event.dialog.confirm') }}</button>
       </view>
     </view>
   </view>
@@ -89,6 +89,8 @@ export default defineComponent({
   },
   emits: ['update:visible', 'confirm', 'cancel'],
   setup(props, { emit }) {
+    const instance = getCurrentInstance();
+    const $t = instance?.proxy?.$t || ((k:string)=>k);
     const typeOptionsComputed = computed(() => (props.typeOptions && props.typeOptions.length > 0 ? props.typeOptions as string[] : ['重要', '普通', '提醒']));
     const form = ref({
       typeIndex: 0,
@@ -146,15 +148,15 @@ export default defineComponent({
     };
     const onConfirm = () => {
       if (!typeOptionsComputed.value[form.value.typeIndex]) {
-        showError('事件名称不能为空');
+        showError($t('event.dialog.name_required'));
         return;
       }
       if (!form.value.content) {
-        showError('描述不能为空');
+        showError($t('event.dialog.desc_required'));
         return;
       }
       if (!form.value.date) {
-        showError('日期不能为空');
+        showError($t('event.dialog.date_required'));
         return;
       }
       emit('confirm', {

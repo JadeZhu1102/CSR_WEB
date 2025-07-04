@@ -5,7 +5,7 @@
       <view class="back-btn cursor-pointer" @click="goBack">
         <uni-icons type="arrow-left" size="24" color="#fff" />
       </view>
-      <text class="nav-title">活动详情</text>
+      <text class="nav-title">{{ $t('activity.detail.title') }}</text>
       <view class="placeholder-view"></view>
     </view>
     <!-- 活动缩略图区 -->
@@ -26,8 +26,8 @@
       </view>
       <!-- 活动基本信息区 -->
       <view class="activity-basic-info">
-        <view class="activity-status">{{ activity?._statusText || '报名中' }}</view>
-        <text class="activity-title">{{ activity?._title || '活动标题' }}</text>
+        <view class="activity-status">{{ activity?._statusText || $t('activity.detail.status_enrolling') }}</view>
+        <text class="activity-title">{{ activity?._title || $t('activity.detail.title_placeholder') }}</text>
         <view class="info-row">
           <view class="info-item">
             <uni-icons type="calendar" size="16" color="#6a11cb"></uni-icons>
@@ -39,7 +39,7 @@
           </view>
           <view class="info-item">
             <uni-icons type="person" size="16" color="#6a11cb"></uni-icons>
-            <text>{{ activity?._enrollCount ? activity._enrollCount + '人已报名' : '-' }}</text>
+            <text>{{ activity?._enrollCount ? activity._enrollCount + $t('activity.detail.enrolled_suffix') : '-' }}</text>
           </view>
         </view>
       </view>
@@ -48,10 +48,10 @@
         <view class="section-card">
           <view class="section-header">
             <uni-icons type="info" size="18" color="#6a11cb"></uni-icons>
-            <text class="section-title">活动介绍</text>
+            <text class="section-title">{{ $t('activity.detail.intro') }}</text>
           </view>
           <view class="section-content">
-            <text class="section-text">{{ activity?._description || '暂无活动介绍' }}</text>
+            <text class="section-text">{{ activity?._description || $t('activity.detail.no_intro') }}</text>
             <image
               v-if="activity?._detailImage"
               class="detail-image"
@@ -73,7 +73,7 @@
                 size="18"
                 :color="activeTab === 'progress' ? '#6a11cb' : '#666666'"
               ></uni-icons>
-              <text>活动进度</text>
+              <text>{{ $t('activity.detail.progress_tab') }}</text>
             </view>
             <view
               class="tab-item"
@@ -85,7 +85,7 @@
                 size="18"
                 :color="activeTab === 'participation' ? '#6a11cb' : '#666666'"
               ></uni-icons>
-              <text>我的参与</text>
+              <text>{{ $t('activity.detail.participation_tab') }}</text>
             </view>
           </view>
           <view class="section-content">
@@ -101,14 +101,14 @@
                   <view class="event-content">
                     <view class="event-header">
                       <text class="event-title">{{ stage.name }}</text>
-                      <span v-if="stage.completed" class="stamp-completed-float"><span class="stamp-text-float">已完成</span></span>
+                      <span v-if="stage.completed" class="stamp-completed-float"><span class="stamp-text-float">{{ $t('activity.detail.completed') }}</span></span>
                     </view>
                     <text class="event-time">{{ stage.time }}</text>
                     <text class="event-desc">{{ stage.description }}</text>
                     <view class="stage-meta">
-                      <div class="meta-col">简介：{{ stage.intro || stage.description || '-' }}</div>
-                      <div class="meta-col">开始时间：{{ stage.time || '-' }}</div>
-                      <div class="meta-col">参与人数：{{ stage.participants || 0 }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.intro || stage.description || '-' }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.time || '-' }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.participants || 0 }}</div>
                     </view>
                     <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
                       <image
@@ -121,11 +121,9 @@
                       />
                     </view>
                   </view>
-                  <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">
-                    报名
-                  </view>
-                  <view class="edit-btn" v-if="stage.isUserAdded" @click="editStage(stage)">编辑</view>
-                  <view class="delete-btn" v-if="stage.isUserAdded" @click="deleteStage(stage.id)">删除</view>
+                  <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
+                  <view class="edit-btn" v-if="stage.isUserAdded" @click="editStage(stage)">{{ $t('activity.detail.edit_btn') }}</view>
+                  <view class="delete-btn" v-if="stage.isUserAdded" @click="deleteStage(stage.id)">{{ $t('activity.detail.delete_btn') }}</view>
                 </view>
               </view>
             </view>
@@ -142,9 +140,9 @@
                   <text class="event-time">{{ record.time }}</text>
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
-                    <div class="meta-col">简介：{{ record.intro || record.description || '-' }}</div>
-                    <div class="meta-col">开始时间：{{ record.time || '-' }}</div>
-                    <div class="meta-col">参与人数：{{ record.participants || 0 }}</div>
+                    <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ record.intro || record.description || '-' }}</div>
+                    <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ record.time || '-' }}</div>
+                    <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div>
                   </view>
                   <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
                     <image
@@ -175,9 +173,9 @@
       <uni-popup-dialog
         class="centered-dialog"
         type="info"
-        cancelText="取消"
-        confirmText="确认参与"
-        title="参与确认"
+        :cancelText="$t('activity.detail.cancel')"
+        :confirmText="$t('activity.detail.confirm_join')"
+        :title="$t('activity.detail.confirm_title')"
         :content="popupContent"
         @confirm="handleConfirm"
         @close="handleClose"

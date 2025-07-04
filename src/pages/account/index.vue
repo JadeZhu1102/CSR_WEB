@@ -39,7 +39,7 @@
             </view>
             <view class="card-content">
                 <text class="card-title">{{ $t('account.button.feedback') }}</text>
-                <text class="card-subtitle">分享您的想法</text>
+                <text class="card-subtitle">{{ $t('account.card.share_idea') }}</text>
             </view>
             <view class="card-arrow ani-icon">></view>
         </view>
@@ -68,7 +68,7 @@
                 </view>
                 
                 <view class="contribution-stats">
-                    <text class="records-title">参与事件</text>
+                    <text class="records-title">{{ $t('account.contribution.events') }}</text>
                     <view v-for="event in userEvents" :key="event.id" class="record-item ani-list-item">
                         <view class="record-info">
                             <text class="record-name">{{ event.name }}</text>
@@ -79,7 +79,7 @@
                 </view>
 
                 <view class="activity-records">
-                    <text class="records-title">参与时长</text>
+                    <text class="records-title">{{ $t('account.contribution.duration') }}</text>
                     <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
                         <view class="record-info">
                             <text class="record-name">{{ activity.name }}</text>
@@ -89,7 +89,7 @@
                     </view>
                 </view>
                 <view class="money-records">
-                    <text class="records-title">我的捐款</text>
+                    <text class="records-title">{{ $t('account.contribution.donation') }}</text>
                     <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
                         <view class="record-info">
                             <text class="record-name">{{ activity.name }}</text>
@@ -125,7 +125,7 @@
                     </button>
                     <button class="feedback-submit-btn ani-btn" @click="submitFeedback" :disabled="isLoading">
                         <span v-if="isLoading" class="ani-loading"></span>
-                        {{ isLoading ? '提交中...' : $t('account.feedback.submit') }}
+                        {{ isLoading ? $t('account.feedback.submitting') : $t('account.feedback.submit') }}
                     </button>
                 </view>
             </view>
@@ -134,7 +134,7 @@
         <view v-if="showSettings" class="settings-drawer-mask" @click.self="showSettings = false">
             <view class="settings-drawer ani-slide-in-left">
                 <view class="drawer-header">
-                    <text class="drawer-title">设置</text>
+                    <text class="drawer-title">{{ $t('account.settings.title') }}</text>
                     <uni-icons type="closeempty" size="24" color="#888" class="close-btn" @click="showSettings = false" />
                 </view>
                 <view class="drawer-content">
@@ -162,42 +162,42 @@
         <view v-if="showProfileEdit" class="profile-edit-mask" @click.self="showProfileEdit = false">
             <view class="profile-edit-dialog ani-dialog">
                 <view class="dialog-header">
-                    <text class="dialog-title">编辑个人信息</text>
+                    <text class="dialog-title">{{ $t('account.profile.edit_title') }}</text>
                     <uni-icons type="closeempty" size="20" color="#999" class="close-btn" @click="showProfileEdit = false" />
                 </view>
                 
                 <view class="form-content" style="margin-top: 10px;">
                     <view class="form-item">
-                        <text class="form-label">昵称</text>
-                        <input v-model="profileForm.nickname" class="ani-input form-input" placeholder="请输入昵称" />
+                        <text class="form-label">{{ $t('account.profile.nickname') }}</text>
+                        <input v-model="profileForm.nickname" class="ani-input form-input" :placeholder="$t('account.profile.nickname_placeholder')" />
                     </view>
                     
                     <view class="form-item">
-                        <text class="form-label">工作邮箱</text>
-                        <input v-model="profileForm.email" class="ani-input form-input" placeholder="请输入工作邮箱" />
+                        <text class="form-label">{{ $t('account.profile.email') }}</text>
+                        <input v-model="profileForm.email" class="ani-input form-input" :placeholder="$t('account.profile.email_placeholder')" />
                     </view>
                     
                     <view class="form-item">
-                        <text class="form-label">性别</text>
+                        <text class="form-label">{{ $t('account.profile.gender') }}</text>
                         <select v-model="profileForm.gender" class="form-select">
-                            <option value="male">男</option>
-                            <option value="female">女</option>
-                            <option value="other">保密</option>
+                            <option value="male">{{ $t('account.profile.male') }}</option>
+                            <option value="female">{{ $t('account.profile.female') }}</option>
+                            <option value="other">{{ $t('account.profile.other') }}</option>
                         </select>
                     </view>
                     
                     <view class="form-item">
-                        <text class="form-label">城市</text>
+                        <text class="form-label">{{ $t('account.profile.city') }}</text>
                         <select v-model="profileForm.city" class="form-select">
-                            <option value="SH">上海</option>
-                            <option value="SZ">深圳</option>
+                            <option value="SH">{{ $t('account.profile.shanghai') }}</option>
+                            <option value="SZ">{{ $t('account.profile.shenzhen') }}</option>
                         </select>
                     </view>
                 </view>
                 
                 <view class="dialog-actions" style="margin-top: 18px;">
-                    <button class="ani-btn cancel-btn" @click="showProfileEdit = false">取消</button>
-                    <button class="ani-btn confirm-btn" @click="handleUpdateProfile">确定</button>
+                    <button class="ani-btn cancel-btn" @click="showProfileEdit = false">{{ $t('account.profile.cancel') }}</button>
+                    <button class="ani-btn confirm-btn" @click="handleUpdateProfile">{{ $t('account.profile.confirm') }}</button>
                 </view>
             </view>
         </view>

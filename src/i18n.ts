@@ -11,7 +11,11 @@ const messages = {
 // 获取当前语言设置
 function getCurrentLocale() {
 	try {
-		return uni.getLocale() || 'zh-Hans';
+		const raw = uni.getLocale() || 'zh-Hans';
+		if (raw.startsWith('zh-Hans')) return 'zh-Hans';
+		if (raw.startsWith('zh-Hant')) return 'zh-Hant';
+		if (raw.startsWith('en')) return 'en';
+		return 'zh-Hans';
 	} catch (error) {
 		return 'zh-Hans';
 	}

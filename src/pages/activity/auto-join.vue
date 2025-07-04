@@ -4,18 +4,18 @@
       <icon type="fail" size="26" />
       <!--
       <view>
-        <text>您未参与“{{ activity.title }}”。</text>
+        <text>您未参与"{{ activity.title }}"。</text>
       </view>
       -->
       <view>
-        <text>活动自动参与失败。</text>
-        <button class="join-button">参与活动</button>
+        <text>{{ $t('activity.auto_join.failed') }}</text>
+        <button class="join-button">{{ $t('activity.auto_join.join_btn') }}</button>
       </view>
     </view>
     <view v-else-if="activity">
       <icon type="sucess" size="26" />
       <view>
-        <text>您已成功参与“{{ activity.title }}”。</text>
+        <text>{{ $t('activity.auto_join.success', { title: activity.title }) }}</text>
       </view>
     </view>
   </view>

@@ -7,7 +7,10 @@ import i18nConfig from "./i18n";
 export function createApp() {
   const app = createSSRApp(App);
 
-  const i18n = createI18n(i18nConfig);
+  const i18n = createI18n({
+    ...i18nConfig,
+    legacy: false,
+  });
   app.use(i18n);
 
   return {

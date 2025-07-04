@@ -2,7 +2,7 @@
     <view>
         <view v-if="isJoined === false" class="enroll-view ani-fade-in-up">
             <view class="enroll-tips">
-                <text>You have not yet taken part in the activity.</text>
+                <text>{{ $t('activity.enroll.not_joined') }}</text>
             </view>
             <button @click="onEnroll" class="ani-btn">
                 {{ $t('activity.button.enroll') }}
