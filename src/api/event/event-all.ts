@@ -1,12 +1,32 @@
-import type { IActivityItem } from "@/models/activity";
 import { request } from "@/api/request";
+
+export interface IEventItemMock {
+    /** 活动ID */
+    id: number;
+    /** 活动名称 */
+    name: string;
+    /** 活动介绍 */
+    slogan: string;
+    /** 正常的封面 */
+    coverImage: string;
+    /** 开始时间 */
+    startDate: string;
+    /** 结束时间 */
+    endDate: string;
+    /** 进度 */
+    progress: number;
+    /** 活动地址 */
+    location: string;
+    /** 参加人数 */
+    numberOfParticipants: number;
+}
 
 interface IActivityListApiResponse {
     lang: string;
-    data: IActivityItem[];
+    data: IEventItemMock[];
 }
 
-export async function allEventsListApi(): Promise<IActivityItem[]> {
+export async function allEventsListApi(): Promise<IEventItemMock[]> {
     // return request<IActivityItem[]>({
     //     url: '/api/events/all',
     //     method: 'GET',

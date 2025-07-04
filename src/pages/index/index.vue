@@ -78,8 +78,8 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import PageUrl from '@/config/page-url';
-import type { IActivityItem } from '@/models/activity';
-import { eventListApi, type IEventItem, allEventsListApi } from "@/api/event";
+import type { IEventItem } from '@/models/event';
+import { eventListApi, allEventsListApi, type IEventItemMock } from "@/api/event";
 
 // 当前选中的标签页
 const activeTab = ref("activities");
@@ -87,7 +87,7 @@ const activeTab = ref("activities");
 const currentActivities = ref<IEventItem[]>([]);
 
 // 全部活动数据
-const allActivities = ref<IActivityItem[]>();
+const allActivities = ref<IEventItemMock[]>();
 
 // 切换标签页
 const switchTab = (tab: string) => {

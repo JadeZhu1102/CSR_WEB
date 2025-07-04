@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { ref } from "vue";
-import type { IActivityEvent } from "@/models/event";
+import type { IActivity } from "@/models/activity";
 import { activityEnrollApi } from "@/api/activity";
 
 export default {
@@ -34,7 +34,7 @@ export default {
     setup(props, { expose }) {
         expose()
         const isJoined = ref<boolean | null>(true);
-        const eventList = ref<IActivityEvent[]>([]);
+        const eventList = ref<IActivity[]>([]);
 
         return {
             isJoined,
