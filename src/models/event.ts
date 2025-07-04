@@ -1,17 +1,22 @@
 
-export interface IActivityEvent {
-    /** 活动ID */
+interface IEventProps {
+    bgImage: string;
+    endTime: string | null;
     id: number;
-
-    /** 活动名称 */
+    isDisplay: boolean;
     name: string;
-
-    /** 活动介绍 */
-    description: string;
-
-    inactiveIcon: string;
-
-    activeIcon: string;
-
-    canJoin: boolean;
+    startTime: string | null;
+    // TODO:
+    numberOfParticipants?: number;
 }
+
+export interface IEventItem extends IEventProps {
+    /** 当前用户是否已参加 */
+    enrollStatus: 'Approved' | 'Pending' | null;
+}
+
+export interface IActivityDetail extends IEventItem {
+    introduction: string;
+    eventList: IEventItem[];
+}
+

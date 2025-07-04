@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import activityJoinCheckApi, { type IActivityJoinResult } from "@/api/activity-join-check.api";
+import { activityJoinCheckApi, type IActivityJoinResult } from "@/api/activity";
 
 const currentActivityId = ref<string | null>(null);
 const activity = ref<IActivityJoinResult | null>(null);

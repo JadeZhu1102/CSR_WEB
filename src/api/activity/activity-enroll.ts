@@ -1,6 +1,9 @@
-import { request } from "./request";
+import { request } from "@/api/request";
 
-export default async function enrollActivityListApi(activity_id: number) {
+/**
+ * 报名活动
+ */
+export async function activityEnrollApi(activity_id: number) {
     return request<boolean>({
         url: `/api/activity/enroll/${activity_id}`,
         method: 'POST',

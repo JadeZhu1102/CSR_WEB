@@ -103,12 +103,10 @@
                       <text class="event-title">{{ stage.name }}</text>
                       <span v-if="stage.completed" class="stamp-completed-float"><span class="stamp-text-float">{{ $t('activity.detail.completed') }}</span></span>
                     </view>
-                    <text class="event-time">{{ stage.time }}</text>
-                    <text class="event-desc">{{ stage.description }}</text>
                     <view class="stage-meta">
-                      <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.intro || stage.description || '-' }}</div>
-                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.time || '-' }}</div>
-                      <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.participants || 0 }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.description || '-' }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}：{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.totalParticipants || 0 }}</div>
                     </view>
                     <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
                       <image
@@ -189,13 +187,17 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
 import UniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue';
 import UniPopupDialog from '@dcloudio/uni-ui/lib/uni-popup-dialog/uni-popup-dialog.vue';
 
 import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
 import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
+
+import type { IActivity } from "@/models/activity";
 import { eventDetailApi } from '@/api/event';
+import { eventActivitiesApi, eventJoinedActivitiesApi } from '@/api/activity';
 
 //---- Page -----
 interface IEventInformation {
@@ -210,9 +212,11 @@ interface IEventInformation {
 }
 
 const scrollHeight = ref(0);
+
+const eventId = ref<number|null>(null);
 const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
 const activity = ref<IEventInformation | null>(null);
-const stages = ref<any[]>([]);
+const stages = ref<IActivity[]>([]);
 const userStages = ref<any[]>([]);
 const showDialog = ref(false);
 const showEditDialog = ref(false);
@@ -232,6 +236,18 @@ function showPreview(img: string) {
 function closePreview() {
   previewImg.value = null;
 }
+
+function refreshStages() {
+  if (eventId.value) {
+    eventActivitiesApi({
+      eventId: eventId.value,
+      page: 1,
+      pageSize: 50.
+    }).then(res => {
+      stages.value = res;
+    })
+  }
+}
 function handleJoinStage(stage: any) {
   currentJoinStage.value = stage;
   popupContent.value = '确认参加吗？';
@@ -241,6 +257,7 @@ function editStage(stage: any) {
   editingStage.value = { ...stage };
   showEditDialog.value = true;
 }
+
 function deleteStage(id: number) {
   stages.value = stages.value.filter(s => s.id !== id);
   updateUserStages();
@@ -275,7 +292,10 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
 function updateUserStages() {
   // userStages 只展示报名过的阶段
   // 这里不再自动同步stages，只保留用户报名的
-  // userStages.value = stages.value.filter(s => s.isUserAdded);
+
+  eventJoinedActivitiesApi(eventId.value!).then(res => {
+      userStages.value = res ?? [];
+  });
 }
 
 function handleConfirm() {
@@ -305,11 +325,20 @@ function getStatusText(status: string) {
     default: return '报名中';
   }
 }
+
 function getDateText(start: string | null, end: string | null) {
   if (!start) return '-';
   if (!end) return start;
   return `${start} - ${end}`;
 }
+
+onLoad((query) => {
+  eventId.value = Number((query as { id: string }).id);
+})
+
+onShow(() => {
+  refreshStages();
+})
 
 onMounted(async () => {
   uni.getSystemInfo({
@@ -321,6 +350,7 @@ onMounted(async () => {
   // @ts-ignore
   const query = (window.getCurrentPages && window.getCurrentPages().slice(-1)[0]?.options) || {};
   const eventId = query.id;
+
   try {
     uni.showLoading();
     const res = await eventDetailApi(eventId);

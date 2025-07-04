@@ -21,9 +21,8 @@
 
 <script lang="ts">
 import { ref } from "vue";
-import type { IActivityEvent } from "@/models/event";
-import enrollActivityListApi from "@/api/activity-enroll";
-import fetchActivityEventsApi from "@/api/activity-events";
+import type { IActivity } from "@/models/activity";
+import { activityEnrollApi } from "@/api/activity";
 
 export default {
     props: {
@@ -35,7 +34,7 @@ export default {
     setup(props, { expose }) {
         expose()
         const isJoined = ref<boolean | null>(true);
-        const eventList = ref<IActivityEvent[]>([]);
+        const eventList = ref<IActivity[]>([]);
 
         return {
             isJoined,
@@ -46,7 +45,7 @@ export default {
         async onEnroll() {
             try {
                 uni.showLoading()
-                const res = await enrollActivityListApi(this.activityId);
+                const res = await activityEnrollApi(this.activityId);
                 if (res) {
                     uni.showToast({
                         icon: 'success',
@@ -61,8 +60,7 @@ export default {
             }
         },
         async refreshEventList() {
-            const newEventList = await fetchActivityEventsApi(this.activityId);
-            this.eventList = newEventList;
+            this.eventList = [];
         },
     },
     mounted() {
