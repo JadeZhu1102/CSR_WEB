@@ -160,5 +160,7 @@
     "event.dialog.confirm": "Confirm",
     "event.dialog.name_required": "Event name is required",
     "event.dialog.desc_required": "Description is required",
-    "event.dialog.date_required": "Date is required"
+    "event.dialog.date_required": "Date is required",
+    "section.title": "Section Title",
+    "common.view_more": "View More"
 }

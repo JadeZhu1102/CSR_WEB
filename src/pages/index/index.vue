@@ -7,7 +7,7 @@
     </view>
     <!-- 轮播图区域 -->
     <view class="swiper-container">
-      <view class="section-title">当前活动</view>
+      <view class="section-title">{{$t('section.title')}}</view>
       <swiper
         class="swiper"
         circular
@@ -43,9 +43,9 @@
     <!-- 全部活动区域 -->
     <view class="all-activities">
       <view class="section-header">
-        <view class="section-title">全部活动</view>
+        <view class="section-title">{{$t('section.title')}}</view>
         <view class="view-more cursor-pointer">
-          <text>查看更多</text>
+          <text>{{$t('common.view_more')}}</text>
           <uni-icons type="right" size="14" color="#666"></uni-icons>
         </view>
       </view>

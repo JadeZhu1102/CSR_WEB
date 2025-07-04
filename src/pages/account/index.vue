@@ -640,7 +640,7 @@ const showContribution = async () => {
 .settings-btn {
     position: absolute;
     top: 32px;
-    right: 32px;
+    left: 32px;
     z-index: 10;
     cursor: pointer;
     background: #fff;

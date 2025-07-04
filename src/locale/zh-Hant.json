@@ -159,5 +159,7 @@
     "login.username_password_error": "用戶名或密碼錯誤",
     "login.register_success": "註冊成功，請登入",
     "login.register_failed": "註冊失敗",
-    "login.contact_administrator_reset_password": "請聯繫管理員重置密碼"
+    "login.contact_administrator_reset_password": "請聯繫管理員重置密碼",
+    "section.title": "分區標題",
+    "common.view_more": "查看更多"
 }
