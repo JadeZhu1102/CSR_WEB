@@ -102,8 +102,7 @@
     "activity.slogan": "{slogan}",
     "activity.auto_join.failed": "活动自动参与失败。",
     "activity.auto_join.join_btn": "参与活动",
-    "activity.auto_join.success": "您已成功参与" { title }
-    "。",
+    "activity.auto_join.success": "您已成功参与",
     "activity.detail.title": "活动详情",
     "activity.detail.status_enrolling": "报名中",
     "activity.detail.title_placeholder": "活动标题",
@@ -146,6 +145,7 @@
     "register.city": "城市",
     "register.shanghai": "上海",
     "register.shenzhen": "深圳",
+    "register.register_account": "注册新账户",
     "login.forgot_password": "忘记密码",
     "login.register_account": "注册新账户",
     "login.has_account": "已有账户？去登录",

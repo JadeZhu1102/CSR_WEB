@@ -49,7 +49,7 @@
         <input
           class="input-field"
           :type="showPassword ? 'text' : 'password'"
-          placeholder="$t('login.password')"
+          :placeholder="$t('login.password')"
           v-model="password"
           @focus="focusedInput = 'password'"
           @blur="focusedInput = ''"

@@ -1,4 +1,5 @@
 import type { IResponse } from "@/api/types";
+import { ApiServer } from "@/api/request";
 
 export interface ILoginParams {
     username: string;
@@ -20,7 +21,7 @@ export interface ILoginResponse extends IResponse<{
 export const loginApi = (params: ILoginParams) => {
     return new Promise<ILoginResponse>((resolve, reject) => {
         uni.request({
-            url: '/api/auth/login',
+            url: ApiServer.Host + '/api/auth/login',
             method: 'POST',
             data: params,
             header: {

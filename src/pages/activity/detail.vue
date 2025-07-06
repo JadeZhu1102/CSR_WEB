@@ -230,29 +230,63 @@ const currentJoinStage = ref<any>(null);
 function goBack() {
   uni.reLaunch({ url: '/pages/index/index' });
 }
+
 function showPreview(img: string) {
   previewImg.value = img;
 }
+
 function closePreview() {
   previewImg.value = null;
 }
 
-function refreshStages() {
-  if (eventId.value) {
-    eventActivitiesApi({
-      eventId: eventId.value,
-      page: 1,
-      pageSize: 50.
-    }).then(res => {
-      stages.value = res;
-    })
-  }
+async function refreshEventDetail() {
+    const res = await eventDetailApi(eventId.value!);
+    if (res.code === 404) {
+      // TODO: 设计404页面
+      return;
+    }
+    const detail = res.data;
+    if (detail) {
+      // 兼容UI字段
+      activity.value = {
+        _cover: detail.icon || defaultCover,
+        _title: detail.name,
+        _statusText: getStatusText(detail.status || 'in_progress'),
+        _dateText: getDateText(detail.startTime, detail.endTime),
+        _enrollCount: detail.numberOfParticipants,
+        _description: detail.description,
+        _detailImage: detail.bgImage || '',
+        _location: detail.visibleLocations.join(' | ') || '-',
+      };
+    }
 }
+
+/**
+ * 刷新 event 下的所有 activity 列表
+ */
+async function refreshStages() {
+    const res = await eventActivitiesApi({
+      eventId: eventId.value!,
+      page: 1,
+      pageSize: 100,
+    });
+    stages.value = res;
+}
+
+/**
+ * 刷新 event 下的当前登录用户已报名的 activity 列表
+ */
+async function refreshUserStages() {
+  const res = await eventJoinedActivitiesApi(eventId.value!);
+  userStages.value = res ?? [];
+}
+
 function handleJoinStage(stage: any) {
   currentJoinStage.value = stage;
   popupContent.value = '确认参加吗？';
   popup.value.open();
 }
+
 function editStage(stage: any) {
   editingStage.value = { ...stage };
   showEditDialog.value = true;
@@ -260,7 +294,7 @@ function editStage(stage: any) {
 
 function deleteStage(id: number) {
   stages.value = stages.value.filter(s => s.id !== id);
-  updateUserStages();
+  refreshUserStages();
   uni.showToast({ title: '删除成功', icon: 'success', duration: 2000 });
 }
 
@@ -287,15 +321,6 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
   showEditDialog.value = false;
   editingStage.value = null;
   updateUserStages();
-}
-
-function updateUserStages() {
-  // userStages 只展示报名过的阶段
-  // 这里不再自动同步stages，只保留用户报名的
-
-  eventJoinedActivitiesApi(eventId.value!).then(res => {
-      userStages.value = res ?? [];
-  });
 }
 
 function handleConfirm() {
@@ -336,8 +361,21 @@ onLoad((query) => {
   eventId.value = Number((query as { id: string }).id);
 })
 
-onShow(() => {
-  refreshStages();
+onShow(async () => {
+  // 获取活动详情
+  // @ts-ignore
+  try {
+    uni.showLoading();
+    await Promise.all([
+      refreshEventDetail(),
+      refreshStages(),
+      refreshUserStages(),
+    ]);
+  } catch (error) {
+    //
+  } finally {
+    uni.hideLoading();
+  }
 })
 
 onMounted(async () => {
@@ -346,63 +384,6 @@ onMounted(async () => {
       scrollHeight.value = res.windowHeight - 100 - 120;
     },
   });
-  // 获取活动详情
-  // @ts-ignore
-  const query = (window.getCurrentPages && window.getCurrentPages().slice(-1)[0]?.options) || {};
-  const eventId = query.id;
-
-  try {
-    uni.showLoading();
-    const res = await eventDetailApi(eventId);
-    if (res.code === 404) {
-      // TODO: 设计404页面
-      return;
-    }
-    const detail = res.data;
-    if (detail) {
-      // 兼容UI字段
-      activity.value = {
-        _cover: detail.icon || defaultCover,
-        _title: detail.name,
-        _statusText: getStatusText(detail.status || 'in_progress'),
-        _dateText: getDateText(detail.startTime, detail.endTime),
-        _enrollCount: detail.numberOfParticipants,
-        _description: detail.description,
-        _detailImage: detail.bgImage || '',
-        _location: detail.visibleLocations.join(' | ') || '-',
-      };
-      // 阶段数据
-      stages.value = (detail.activities || []).map((evt: any, idx: number) => ({
-        id: evt.id || idx + 1,
-        name: evt.name,
-        time: evt.startDate,
-        description: evt.description || '',
-        intro: evt.intro || evt.description || '',
-        thumbnail: '',
-        progress: evt.progress || 0,
-        records: [],
-        isUserAdded: false,
-        participants: evt.participants || 0,
-        completed: evt.status === 'finished',
-        thumbs: evt.thumbs || [defaultCover, defaultCover],
-      }));
-    }
-    updateUserStages();
-  } catch (error) {
-    // 可选：填充mock数据
-    // TODO: handle error
-    stages.value = [
-      { id: 1, name: '开始报名', time: '2025年6月1日', description: '马拉松报名正式开始，参与者可通过官方渠道报名参加', completed: true, isUserAdded: false, participants: 100, thumbs: [defaultCover, defaultCover] },
-      { id: 2, name: '体检证明提交', time: '2025年6月15日', description: '参赛者需提交近6个月内体检证明', completed: true, isUserAdded: false, participants: 80, thumbs: [defaultCover, defaultCover] },
-      { id: 3, name: '赛道信息发布', time: '2025年6月30日', description: '公布详细赛道信息，包括补给站位置和医疗点设置', completed: true, isUserAdded: false, participants: 60, thumbs: [defaultCover, defaultCover] },
-      { id: 4, name: '参赛物资发放', time: '2025年7月12日-14日', description: '参赛者领取比赛物资包，包含号码牌、计时芯片等', completed: false, isUserAdded: false, participants: 50, thumbs: [defaultCover, defaultCover] },
-      { id: 5, name: '赛前说明会', time: '2025年7月14日', description: '举办赛前技术说明会，讲解比赛注意事项', completed: false, isUserAdded: false, participants: 40, thumbs: [defaultCover, defaultCover] },
-      { id: 6, name: '正式比赛', time: '2025年7月15日', description: '马拉松正式开始，参赛者按指定时间到达起点', completed: false, isUserAdded: false, participants: 30, thumbs: [defaultCover, defaultCover] },
-    ];
-    updateUserStages();
-  } finally {
-    uni.hideLoading();
-  }
 });
 </script>
 

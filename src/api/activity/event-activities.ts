@@ -1,11 +1,17 @@
 import type { IActivity } from "@/models/activity";
 import { request } from "@/api/request";
+import tokenManager from "@/api/token";
 
 export interface IEventListApiRequest {
     /** 所属事件ID */
     eventId: number
+
+    /** 用户ID */
+    userId?: number
+
     /** 页码（从1开始，默认1） */
     page: number
+
     /** 每页条数（默认10） */
     pageSize: number
 }
@@ -25,8 +31,14 @@ export async function eventActivitiesApi(payload: IEventListApiRequest): Promise
  * 某个event下，用户已参与的activity的列表
  */
 export async function eventJoinedActivitiesApi(eventId: number): Promise<IActivity[]> {
-    return request<IActivity[]>({
-        url: `/api/events/${eventId}/activities/joined`,
-        method: 'GET',
-    }).then(res => res.data);
+    const userId = await tokenManager.getUserId();
+    if (userId === null || userId === undefined) {
+        throw new Error('Failed to load activities.');
+    }
+    return eventActivitiesApi({
+        eventId,
+        userId: userId,
+        page: 1,
+        pageSize: 100,
+    })
 }

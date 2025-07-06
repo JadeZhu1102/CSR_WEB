@@ -351,14 +351,17 @@ const handleChangePwd = async () => {
     try {
         const userId = await tokenManager.getUserId();
         if (!userId) throw new Error('用户ID不存在');
-        await resetPasswordApi(Number(userId), newPwd.value);
+        const res = await resetPasswordApi(Number(userId), newPwd.value);
+        if (res.code !== 200) {
+            throw new Error('重置失败');
+        }
         uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
         showPwdDialog.value = false;
         oldPwd.value = '';
         newPwd.value = '';
         confirmPwd.value = '';
     } catch (e) {
-        uni.showToast({ title: '重置失败', icon: 'none' });
+        uni.showToast({ title: '重置失败', icon: 'error' });
     }
 }
 

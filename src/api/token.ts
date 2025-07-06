@@ -42,6 +42,17 @@ class TokenManager {
         } 
     }
 
+    private async scheduleRefresh(expiredIn: number, refreshToken: string) {
+        const now = Date.now();
+        // valid
+        if (expiredIn > now) {
+            const expiredTime = expiredIn - now;
+            this.refreshTimer = setTimeout(() => {
+                this.refresh(refreshToken);
+            }, expiredTime);
+        }
+    }
+
     private async initialize() {
         const tokenCache = await this.retrieve();
 
@@ -61,19 +72,14 @@ class TokenManager {
         this.initialize();
     }
 
-    public save(tokenCache: ITokenCache) {
+    public save(tokenCache: ITokenCache, isFromLogin: boolean = false) {
         const expiredIn = (tokenCache.expiredIn * OneMinute - RefreshBuffer);
         const expiredTime = Date.now() + expiredIn;
         tokenCache.expiredIn = expiredTime;
 
-        this.cacheData = tokenCache;
         uni.setStorage({ key: this.cacheKey, data: tokenCache });
-
-        if (tokenCache.refreshToken) {
-            this.refreshTimer = setTimeout(() => {
-                this.refresh(tokenCache.refreshToken);
-            }, expiredTime);
-        }
+        this.cacheData = tokenCache;
+        this.scheduleRefresh(tokenCache.expiredIn, tokenCache.refreshToken);
     }
 
     public clear() {
