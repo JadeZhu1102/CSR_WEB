@@ -127,6 +127,7 @@
     "event.dialog.desc": "描述",
     "event.dialog.desc_placeholder": "請輸入事件描述",
     "event.dialog.date": "日期",
+    "event.dialog.money": "金额（元）",
     "event.dialog.date_placeholder": "請選擇日期",
     "event.dialog.images": "圖片上傳",
     "event.dialog.cancel": "取消",

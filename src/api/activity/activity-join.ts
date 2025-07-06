@@ -6,6 +6,7 @@ interface IJoinActivityRequest {
   activityId: number;
   detail: {
     comment: string;
+    amount?: number;
   }
 }
 

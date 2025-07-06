@@ -138,7 +138,6 @@
                   <text class="event-time">{{ record.time }}</text>
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
-                    <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ record.intro || record.description || '-' }}</div>
                     <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ record.time || '-' }}</div>
                     <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div>
                   </view>
@@ -197,7 +196,7 @@ import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图
 
 import type { IActivity } from "@/models/activity";
 import { eventDetailApi } from '@/api/event';
-import { eventActivitiesApi, eventJoinedActivitiesApi } from '@/api/activity';
+import { activityJoinApi, eventActivitiesApi, eventJoinedActivitiesApi } from '@/api/activity';
 
 //---- Page -----
 interface IEventInformation {
@@ -298,9 +297,17 @@ function deleteStage(id: number) {
   uni.showToast({ title: '删除成功', icon: 'success', duration: 2000 });
 }
 
-function handleEditEventConfirm(data: { type: string; content: string; date: string; images?: any[] }) {
+function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
   const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
   if (index !== -1 && editingStage.value) {
+    activityJoinApi({
+    activityId: stages.value[index].id,
+    detail: {
+      comment: data.content,
+      amount: data.money,
+    }
+  });
+
     stages.value[index] = {
       ...editingStage.value,
       name: data.type,
@@ -315,12 +322,12 @@ function handleEditEventConfirm(data: { type: string; content: string; date: str
       completed: editingStage.value.completed,
       thumbs: editingStage.value.thumbs || [defaultCover, defaultCover],
     };
-    stages.value.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    stages.value.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
   }
   showEditDialog.value = false;
   editingStage.value = null;
-  updateUserStages();
+  refreshUserStages();
 }
 
 function handleConfirm() {

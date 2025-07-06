@@ -154,6 +154,7 @@
     "event.dialog.desc": "Description",
     "event.dialog.desc_placeholder": "Please enter event description",
     "event.dialog.date": "Date",
+    "event.dialog.money": "Money",
     "event.dialog.date_placeholder": "Please select a date",
     "event.dialog.images": "Image Upload",
     "event.dialog.cancel": "Cancel",

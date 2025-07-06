@@ -20,6 +20,13 @@
           <textarea v-model="form.content" class="input ani-input" :placeholder="$t('event.dialog.desc_placeholder')" />
         </view>
         <view class="form-item">
+          <text class="label">{{ $t('event.dialog.money') }}</text>
+          <view class="input-select ani-input" @click="showCalendar">
+            <input inputmode="decimal" v-model="form.money" />
+          </view>
+        </view>
+        <!--
+        <view class="form-item">
           <text class="label">{{ $t('event.dialog.date') }}</text>
           <view class="input-select ani-input" @click="showCalendar">
             <text>{{ form.date || $t('event.dialog.date_placeholder') }}</text>
@@ -40,6 +47,7 @@
             style="margin-bottom: 0;"
           />
         </view>
+        -->
       </view>
       <view class="dialog-actions">
         <button class="btn cancel ani-btn" @click="onCancel">{{ $t('event.dialog.cancel') }}</button>
@@ -95,6 +103,7 @@ export default defineComponent({
     const form = ref({
       typeIndex: 0,
       content: '',
+      money: 1,
       date: '',
       images: [] as any[]
     });
@@ -155,15 +164,18 @@ export default defineComponent({
         showError($t('event.dialog.desc_required'));
         return;
       }
+      /*
       if (!form.value.date) {
         showError($t('event.dialog.date_required'));
         return;
       }
+      */
       emit('confirm', {
         type: typeOptionsComputed.value[form.value.typeIndex],
         content: form.value.content,
-        date: form.value.date,
-        images: form.value.images
+        money: form.value.money,
+        // date: form.value.date,
+        // images: form.value.images
       });
       emit('update:visible', false);
       errorMsg.value = '';
