@@ -2,7 +2,7 @@
     <view class="page ani-fade-in-up">
         <view id="user">
             <view class="avatar-container">
-                <image class="avatar" :src="avatarUrl" />
+                <img class="avatar" :src="avatarUrl" style="width:100px;height:100px;border-radius:50%;object-fit:cover;" />
             </view>
             <view class="user-info-container">
                 <view class="name-edit-container">
@@ -206,7 +206,7 @@
 
 <script setup lang="ts">
 import { onLoad, onShow } from '@dcloudio/uni-app';
-import { ref, getCurrentInstance, nextTick, computed, onMounted } from 'vue';
+import { ref, getCurrentInstance, nextTick, computed, onMounted, watchEffect } from 'vue';
 import { logoutAccount } from '@/util/auth';
 import PageUrl from '@/config/page-url';
 import submitFeedbackApi from '@/api/feedback.api';
@@ -224,7 +224,12 @@ function normalizeLang(lang: string) {
     return 'zh-Hans'; // 默认简体中文
 }
 
-const avatarUrl = ref('');
+const avatarUrl = computed(() => {
+    if (userDetail.value && userDetail.value.gender === 'female') {
+        return '/static/avator/female.svg';
+    }
+    return '/static/avator/male.png';
+});
 const userName = ref('-');
 const userRole = ref<string | null>(null);
 const showLangDialog = ref(false);
@@ -405,7 +410,7 @@ const refreshUserProfile = async () => {
         if (code === 200) {
             userName.value = data.username;
             userRole.value = data.role;
-            avatarUrl.value = '/static/logo.png';
+            userDetail.value = { ...(data as any), gender: (data as any)?.gender ?? 'male' };
         }
     } catch (error) {
         
@@ -421,7 +426,7 @@ const handleEditProfile = async (uid?: number,) => {
             userDetail.value = data;
             profileForm.value.nickname = data.username;
             profileForm.value.email = '';
-            profileForm.value.gender = 'male';
+            profileForm.value.gender = (data as any)?.gender ?? 'male';
             profileForm.value.city = 'SH';
         }
         showProfileEdit.value = true;
@@ -443,8 +448,8 @@ const initUserInfo = async () => {
             userDetail.value = data;
             profileForm.value.nickname = data.username;
             profileForm.value.email = '';
-            profileForm.value.gender = 'male';
-            profileForm.value.city = 'SH';
+            profileForm.value.gender = (data as any)?.gender ?? 'male';
+            profileForm.value.city = data?.location ?? 'SH';
             userName.value = data.username;
         }
     } catch (e) {
@@ -512,6 +517,11 @@ const showContribution = async () => {
         uni.showToast({ title: '获取贡献数据失败', icon: 'none' });
     }
 };
+
+// 调试：输出 avatarUrl 和 userDetail
+watchEffect(() => {
+  console.log('avatarUrl:', avatarUrl.value, 'userDetail:', userDetail.value);
+});
 </script>
 
 <style lang="scss">
