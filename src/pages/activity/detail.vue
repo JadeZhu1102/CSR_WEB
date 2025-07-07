@@ -173,7 +173,7 @@
         :cancelText="$t('activity.detail.cancel')"
         :confirmText="$t('activity.detail.confirm_join')"
         :title="$t('activity.detail.confirm_title')"
-        :content="popupContent"
+        :content="$t(popupContent)"
         @confirm="handleConfirm"
         @close="handleClose"
       ></uni-popup-dialog>
@@ -196,7 +196,13 @@ import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图
 
 import type { IActivity } from "@/models/activity";
 import { eventDetailApi } from '@/api/event';
-import { activityJoinApi, eventActivitiesApi, eventJoinedActivitiesApi } from '@/api/activity';
+import {
+  activityJoinApi,
+  activitySignupApi,
+  activityWithdrawApi,
+  eventActivitiesApi,
+  eventJoinedActivitiesApi,
+} from '@/api/activity';
 
 //---- Page -----
 interface IEventInformation {
@@ -226,7 +232,7 @@ const popup = ref();
 const popupContent = ref('');
 const popupAction = ref<'join' | 'cancel' | null>(null);
 let pendingDeleteId: number | null = null;
-const currentJoinStage = ref<any>(null);
+const currentJoinStage = ref<IActivity|null>(null);
 
 function goBack() {
   uni.reLaunch({ url: '/pages/index/index' });
@@ -283,7 +289,7 @@ async function refreshUserStages() {
 }
 
 function handleJoinStage(stage: any) {
-  popupContent.value = $t('activity.detail.confirm_join_content') || '确定要报名参加该阶段吗？';
+  popupContent.value = 'activity.detail.confirm_join_content';
   popupAction.value = 'join';
   popup.value.open();
   currentJoinStage.value = stage;
@@ -301,6 +307,10 @@ function deleteStage(id: number) {
   popup.value.open();
 }
 
+/**
+ * 修改参与活动的详情。
+ * 备注、时间、金额等。
+ */
 function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
   const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
   if (index !== -1 && editingStage.value) {
@@ -334,11 +344,13 @@ function handleEditEventConfirm(data: { type: string; content: string; money: nu
   refreshUserStages();
 }
 
-function handleConfirm() {
+async function handleConfirm() {
   if (popupAction.value === 'join') {
+    const selectedActivity = currentJoinStage.value;
     // 判断是否已报名，避免重复
-    if (currentJoinStage.value && !userStages.value.find((s: any) => s.id === currentJoinStage.value.id)) {
-      userStages.value.push({ ...currentJoinStage.value });
+    if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
+      await activitySignupApi(selectedActivity.id);
+      refreshUserStages();
     }
     uni.showToast({
       title: '报名成功',
@@ -350,8 +362,12 @@ function handleConfirm() {
   } else if (popupAction.value === 'cancel' && pendingDeleteId !== null) {
     // 执行取消报名逻辑
     // 这里调用原有的删除逻辑
-    // 例如：doDeleteStage(pendingDeleteId)
-    stages.value = stages.value.filter(s => s.id !== pendingDeleteId);
+    await activityWithdrawApi(pendingDeleteId);
+    uni.showToast({
+      title: '取消报名',
+      icon: 'success',
+      duration: 2000
+    });
     refreshUserStages();
     pendingDeleteId = null;
   }

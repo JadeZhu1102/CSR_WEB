@@ -147,6 +147,7 @@
     "activity.detail.cancel": "Cancel",
     "activity.detail.confirm_join": "Confirm Join",
     "activity.detail.confirm_title": "Join Confirmation",
+    "activity.detail.confirm_join_content": "Are you sure you want to join this activity?",
     "activity.enroll.not_joined": "You have not yet taken part in the activity.",
     "event.dialog.edit_title": "Edit Your Activity",
     "event.dialog.add_title": "Add Personal Event",

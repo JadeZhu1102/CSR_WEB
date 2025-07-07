@@ -120,6 +120,7 @@
     "activity.detail.cancel": "取消",
     "activity.detail.confirm_join": "確認參與",
     "activity.detail.confirm_title": "參與確認",
+    "activity.detail.confirm_join_content": "您确定要报名参加该活动吗？",
     "activity.enroll.not_joined": "您尚未參與該活動。",
     "event.dialog.edit_title": "記錄你的活動",
     "event.dialog.add_title": "添加個人事件",
