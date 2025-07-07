@@ -154,6 +154,8 @@
     "event.dialog.name": "Event Name",
     "event.dialog.desc": "Description",
     "event.dialog.desc_placeholder": "Please enter event description",
+    "event.dialog.remark": "Remark",
+    "event.dialog.remark_placeholder": "Please enter your remark",
     "event.dialog.date": "Date",
     "event.dialog.money": "Money",
     "event.dialog.date_placeholder": "Please select a date",

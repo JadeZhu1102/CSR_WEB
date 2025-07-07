@@ -127,6 +127,8 @@
     "event.dialog.name": "事件名稱",
     "event.dialog.desc": "描述",
     "event.dialog.desc_placeholder": "請輸入事件描述",
+    "event.dialog.remark": "备注",
+    "event.dialog.remark_placeholder": "请输入你的备注",
     "event.dialog.date": "日期",
     "event.dialog.money": "金额（元）",
     "event.dialog.date_placeholder": "請選擇日期",

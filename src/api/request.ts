@@ -4,15 +4,17 @@ import PageUrl from "@/config/page-url";
 import type { IResponse } from "@/api/types";
 import tokenManager from "@/api/token";
 
+declare var process: any;
+
 export const ApiServer = {
     // TODO: 在域名配置修改
     Host: 'http://8.133.240.77:8080',
 };
 
-/* 给微信小程序用的条件编译。小程序接口需指定域名。 */
-// #ifndef MP-WEIXIN
-ApiServer.Host = 'http://8.133.240.77:8080';
-// #endif
+if (process.env.UNI_PLATFORM === 'h5') {
+    // H5 使用本机作为 host
+    ApiServer.Host = '';
+}
 
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {
     return error.statusCode === 401;
@@ -30,7 +32,7 @@ export async function request<T>(options: UniApp.RequestOptions, cfg: IRequestCo
     const token = await tokenManager.getToken();
 
     return new Promise<IResponse<T>>((resolve, reject) => {
-        const { url, data, ...rest } = options;
+        const { url, ...rest } = options;
         const requestUrl = cfg.useI18n === false ? url : (url.indexOf('?') >= 0 ? url + '&' : url + '?') + 'lang=' + getLocale() ;
 
         uni.request({

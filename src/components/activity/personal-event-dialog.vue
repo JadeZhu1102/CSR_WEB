@@ -16,8 +16,8 @@
           </view>
         </view>
         <view class="form-item">
-          <text class="label">{{ $t('event.dialog.desc') }}</text>
-          <textarea v-model="form.content" class="input ani-input" :placeholder="$t('event.dialog.desc_placeholder')" />
+          <text class="label">{{ $t('event.dialog.remark') }}</text>
+          <textarea v-model="form.content" class="input ani-input" :placeholder="$t('event.dialog.remark_placeholder')" />
         </view>
         <view class="form-item">
           <text class="label">{{ $t('event.dialog.money') }}</text>
