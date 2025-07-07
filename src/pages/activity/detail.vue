@@ -224,6 +224,8 @@ const previewImg = ref<string | null>(null);
 const activeTab = ref('progress');
 const popup = ref();
 const popupContent = ref('');
+const popupAction = ref<'join' | 'cancel' | null>(null);
+let pendingDeleteId: number | null = null;
 const currentJoinStage = ref<any>(null);
 
 function goBack() {
@@ -281,9 +283,10 @@ async function refreshUserStages() {
 }
 
 function handleJoinStage(stage: any) {
-  currentJoinStage.value = stage;
-  popupContent.value = '确认参加吗？';
+  popupContent.value = $t('activity.detail.confirm_join_content') || '确定要报名参加该阶段吗？';
+  popupAction.value = 'join';
   popup.value.open();
+  currentJoinStage.value = stage;
 }
 
 function editStage(stage: any) {
@@ -292,9 +295,10 @@ function editStage(stage: any) {
 }
 
 function deleteStage(id: number) {
-  stages.value = stages.value.filter(s => s.id !== id);
-  refreshUserStages();
-  uni.showToast({ title: '删除成功', icon: 'success', duration: 2000 });
+  popupContent.value = '确定取消报名吗';
+  popupAction.value = 'cancel';
+  pendingDeleteId = id;
+  popup.value.open();
 }
 
 function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
@@ -331,17 +335,27 @@ function handleEditEventConfirm(data: { type: string; content: string; money: nu
 }
 
 function handleConfirm() {
-  // 判断是否已报名，避免重复
-  if (currentJoinStage.value && !userStages.value.find((s: any) => s.id === currentJoinStage.value.id)) {
-    userStages.value.push({ ...currentJoinStage.value });
+  if (popupAction.value === 'join') {
+    // 判断是否已报名，避免重复
+    if (currentJoinStage.value && !userStages.value.find((s: any) => s.id === currentJoinStage.value.id)) {
+      userStages.value.push({ ...currentJoinStage.value });
+    }
+    uni.showToast({
+      title: '报名成功',
+      icon: 'success',
+      duration: 2000
+    });
+    popup.value.close();
+    currentJoinStage.value = null;
+  } else if (popupAction.value === 'cancel' && pendingDeleteId !== null) {
+    // 执行取消报名逻辑
+    // 这里调用原有的删除逻辑
+    // 例如：doDeleteStage(pendingDeleteId)
+    stages.value = stages.value.filter(s => s.id !== pendingDeleteId);
+    refreshUserStages();
+    pendingDeleteId = null;
   }
-  uni.showToast({
-    title: '报名成功',
-    icon: 'success',
-    duration: 2000
-  });
-  popup.value.close();
-  currentJoinStage.value = null;
+  popupAction.value = null;
 }
 
 function handleClose() {
