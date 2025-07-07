@@ -105,7 +105,7 @@
                     </view>
                     <view class="stage-meta">
                       <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.description || '-' }}</div>
-                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}：{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</div>
+                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</div>
                       <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.totalParticipants || 0 }}</div>
                     </view>
                     <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
@@ -139,7 +139,7 @@
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
                     <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ record.time || '-' }}</div>
-                    <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div>
+                    <!-- <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div> -->
                   </view>
                   <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
                     <image
