@@ -131,7 +131,7 @@
                 v-for="record in userStages"
                 :key="record.id"
               >
-                <view class="event-content">
+                <view class="item-main">
                   <view class="event-header">
                     <text class="event-title">{{ record.name }}</text>
                   </view>
@@ -152,7 +152,7 @@
                     />
                   </view>
                 </view>
-                <view class="action-icons">
+                <view class="item-actions">
                   <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="editStage(record)" />
                   <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="deleteStage(record.id)" />
                 </view>
@@ -783,9 +783,24 @@ page {
   gap: 30rpx;
 }
 .participation-item {
-  background-color: #f8f9fa;
-  border-radius: 16rpx;
-  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  .item-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .item-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    margin-left: 18px;
+  }
 }
 .record-header {
   display: flex;
