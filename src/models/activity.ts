@@ -15,4 +15,9 @@ export interface IActivity {
   createdAt: string | null;
   totalParticipants: number | null;
   totalTime: number | null;
+
+  // 以下为虚假的，原UI设计需要的字段
+  completed?: boolean;
+  isUserAdded?: boolean;
+  thumbs?: string[];
 }

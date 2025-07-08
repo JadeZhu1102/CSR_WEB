@@ -120,8 +120,6 @@
                     </view>
                   </view>
                   <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
-                  <view class="edit-btn" v-if="stage.isUserAdded" @click="editStage(stage)">{{ $t('activity.detail.edit_btn') }}</view>
-                  <view class="delete-btn" v-if="stage.isUserAdded" @click="deleteStage(stage.id)">{{ $t('activity.detail.delete_btn') }}</view>
                 </view>
               </view>
             </view>
@@ -135,10 +133,9 @@
                   <view class="event-header">
                     <text class="event-title">{{ record.name }}</text>
                   </view>
-                  <text class="event-time">{{ record.time }}</text>
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
-                    <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ $d(record.startTime) || '-' }}</div>
+                    <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}</div>
                     <!-- <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div> -->
                   </view>
                   <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
@@ -153,8 +150,8 @@
                   </view>
                 </view>
                 <view class="item-actions">
-                  <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="editStage(record)" />
-                  <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="deleteStage(record.id)" />
+                  <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
+                  <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
                 </view>
               </view>
             </view>
@@ -166,18 +163,6 @@
     </scroll-view>
 
     <!-- 参与确认弹窗 -->
-    <uni-popup ref="popup" type="dialog">
-      <uni-popup-dialog
-        class="centered-dialog"
-        type="info"
-        :cancelText="$t('activity.detail.cancel')"
-        :confirmText="$t('activity.detail.confirm_join')"
-        :title="$t('activity.detail.confirm_title')"
-        :content="$t(popupContent)"
-        @confirm="handleConfirm"
-        @close="handleClose"
-      ></uni-popup-dialog>
-    </uni-popup>
     <!-- 编辑弹窗、图片预览等其它弹窗保留 -->
     <EditStageDialog
       v-if="!!editingStage"
@@ -192,10 +177,9 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
-import UniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue';
-import UniPopupDialog from '@dcloudio/uni-ui/lib/uni-popup-dialog/uni-popup-dialog.vue';
 
 import EditStageDialog from '@/components/activity/personal-event-dialog.vue'; // 如有单独编辑弹窗组件请替换为实际路径
 import ImagePreview from '@/components/activity/image-preview.vue'; // 如有图片预览组件请替换为实际路径
@@ -222,23 +206,18 @@ interface IEventInformation {
   _location:  string;
 }
 
+const i18n = useI18n();
 const scrollHeight = ref(0);
 
 const eventId = ref<number|null>(null);
 const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
 const activity = ref<IEventInformation | null>(null);
 const stages = ref<IActivity[]>([]);
-const userStages = ref<any[]>([]);
-const showDialog = ref(false);
+const userStages = ref<IActivity[]>([]);
 const showEditDialog = ref(false);
 const editingStage = ref<IActivity | null>(null);
 const previewImg = ref<string | null>(null);
 const activeTab = ref('progress');
-const popup = ref();
-const popupContent = ref('');
-const popupAction = ref<'join' | 'cancel' | null>(null);
-let pendingDeleteId: number | null = null;
-const currentJoinStage = ref<IActivity|null>(null);
 
 function goBack() {
   uni.reLaunch({ url: '/pages/index/index' });
@@ -294,23 +273,43 @@ async function refreshUserStages() {
   userStages.value = res ?? [];
 }
 
-function handleJoinStage(stage: any) {
-  popupContent.value = 'activity.detail.confirm_join_content';
-  popupAction.value = 'join';
-  popup.value.open();
-  currentJoinStage.value = stage;
+function handleJoinStage(stage: IActivity) {
+  uni.showModal({
+    title: i18n.t('activity.detail.confirm_title'),
+    content: i18n.t('activity.detail.confirm_join_content'),
+    confirmText: i18n.t('activity.detail.confirm_join'),
+    cancelText: i18n.t('activity.detail.cancel'),
+    confirmColor: '#40bad5',
+    success: function (res) {
+      if (res.confirm) {
+        registerActivity(stage);
+      } else if (res.cancel) {
+        //
+      }
+    }
+  });
 }
 
-function editStage(stage: any) {
-  editingStage.value = { ...stage };
+function handleEditJoinActivity(activity: IActivity) {
+  editingStage.value = { ...activity };
   showEditDialog.value = true;
 }
 
-function deleteStage(id: number) {
-  popupContent.value = '确定取消报名吗';
-  popupAction.value = 'cancel';
-  pendingDeleteId = id;
-  popup.value.open();
+function handleDeleteStage(activity: IActivity) {
+  uni.showModal({
+    title: i18n.t('activity.detail.unregister_title'),
+    content: i18n.t('activity.detail.unregister_message'),
+    confirmText: i18n.t('activity.detail.confirm_unregister'),
+    cancelText: i18n.t('activity.detail.cancel'),
+    confirmColor: '#40bad5',
+    success: function (res) {
+      if (res.confirm) {
+        unregisterActivity(activity);
+      } else if (res.cancel) {
+        //
+      }
+    }
+  });
 }
 
 /**
@@ -334,39 +333,29 @@ async function handleEditEventConfirm(data: { type: string; content: string; mon
   refreshUserStages();
 }
 
-async function handleConfirm() {
-  if (popupAction.value === 'join') {
-    const selectedActivity = currentJoinStage.value;
-    // 判断是否已报名，避免重复
-    if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
-      await activitySignupApi(selectedActivity.id);
-      refreshUserStages();
-    }
-    uni.showToast({
-      title: '报名成功',
-      icon: 'success',
-      duration: 2000
-    });
-    popup.value.close();
-    currentJoinStage.value = null;
-  } else if (popupAction.value === 'cancel' && pendingDeleteId !== null) {
-    // 执行取消报名逻辑
-    // 这里调用原有的删除逻辑
-    await activityWithdrawApi(pendingDeleteId);
-    uni.showToast({
-      title: '取消报名',
-      icon: 'success',
-      duration: 2000
-    });
+async function registerActivity(selectedActivity: IActivity) {
+  // 判断是否已报名，避免重复
+  if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
+    await activitySignupApi(selectedActivity.id);
     refreshUserStages();
-    pendingDeleteId = null;
   }
-  popupAction.value = null;
+  uni.showToast({
+    title: '报名成功',
+    icon: 'success',
+    duration: 2000
+  });
 }
 
-function handleClose() {
-  popup.value.close();
-  currentJoinStage.value = null;
+async function unregisterActivity(selectedActivity: IActivity) {
+  // 执行取消报名逻辑
+  // 这里调用原有的删除逻辑
+  await activityWithdrawApi(selectedActivity.id);
+  uni.showToast({
+    title: '取消报名',
+    icon: 'success',
+    duration: 2000
+  });
+  refreshUserStages();
 }
 
 function getStatusText(status: string) {
@@ -509,6 +498,7 @@ page {
   box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
 }
 .activity-title {
+  display: block;
   font-size: 24px;
   font-weight: bold;
   color: #333333;
