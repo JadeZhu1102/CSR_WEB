@@ -179,7 +179,13 @@
       ></uni-popup-dialog>
     </uni-popup>
     <!-- 编辑弹窗、图片预览等其它弹窗保留 -->
-    <EditStageDialog v-model:visible="showEditDialog" :editData="editingStage" @confirm="handleEditEventConfirm" />
+    <EditStageDialog
+      v-if="!!editingStage"
+      v-model:visible="showEditDialog"
+      :editData="editingStage"
+      :templateType="editingStage.templateId"
+      @confirm="handleEditEventConfirm"
+    />
     <ImagePreview v-if="previewImg" :src="previewImg" @close="closePreview" />
   </view>
 </template>
@@ -225,7 +231,7 @@ const stages = ref<IActivity[]>([]);
 const userStages = ref<any[]>([]);
 const showDialog = ref(false);
 const showEditDialog = ref(false);
-const editingStage = ref<any>(null);
+const editingStage = ref<IActivity | null>(null);
 const previewImg = ref<string | null>(null);
 const activeTab = ref('progress');
 const popup = ref();
@@ -311,32 +317,16 @@ function deleteStage(id: number) {
  * 修改参与活动的详情。
  * 备注、时间、金额等。
  */
-function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
+async function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
   const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
   if (index !== -1 && editingStage.value) {
-    activityJoinApi({
-    activityId: stages.value[index].id,
-    detail: {
-      comment: data.content,
-      amount: data.money,
-    }
-  });
-
-    stages.value[index] = {
-      ...editingStage.value,
-      name: data.type,
-      time: data.date,
-      description: data.content,
-      intro: editingStage.value.intro || editingStage.value.description || '',
-      thumbnail: editingStage.value.thumbnail,
-      progress: editingStage.value.progress,
-      records: data.images || editingStage.value.records,
-      isUserAdded: true,
-      participants: editingStage.value.participants,
-      completed: editingStage.value.completed,
-      thumbs: editingStage.value.thumbs || [defaultCover, defaultCover],
-    };
-    stages.value.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    await activityJoinApi({
+      activityId: stages.value[index].id,
+      detail: {
+        comment: data.content,
+        amount: data.money,
+      }
+    });
     uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
   }
   showEditDialog.value = false;

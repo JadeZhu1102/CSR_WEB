@@ -139,6 +139,7 @@
     "event.dialog.name_required": "事件名称不能为空",
     "event.dialog.desc_required": "描述不能为空",
     "event.dialog.date_required": "日期不能为空",
+    "event.dialog.money_required": "金额不能为空",
     "login.welcome": "欢迎回来，请登录您的账户",
     "register.welcome": "欢迎加入并创建您的账户",
     "register.email": "工作邮箱",

@@ -19,7 +19,7 @@
           <text class="label">{{ $t('event.dialog.remark') }}</text>
           <textarea v-model="form.content" class="input ani-input" :placeholder="$t('event.dialog.remark_placeholder')" />
         </view>
-        <view class="form-item">
+        <view class="form-item" v-if="templateType === 2">
           <text class="label">{{ $t('event.dialog.money') }}</text>
           <view class="input-select ani-input" @click="showCalendar">
             <input inputmode="decimal" v-model="form.money" />
@@ -86,6 +86,10 @@ export default defineComponent({
   components: { uniCalendar, uniFilePicker },
   props: {
     visible: Boolean,
+    templateType: {
+      type: Number,
+      required: true,
+    },
     typeOptions: {
       type: Array,
       default: () => ['重要', '普通', '提醒']
@@ -103,7 +107,7 @@ export default defineComponent({
     const form = ref({
       typeIndex: 0,
       content: '',
-      money: 1,
+      money: 0,
       date: '',
       images: [] as any[]
     });
@@ -164,6 +168,12 @@ export default defineComponent({
         showError($t('event.dialog.desc_required'));
         return;
       }
+      if (props.templateType === 2) {
+        if (!form.value.money) {
+          showError($t('event.dialog.money_required'));
+          return;
+        }
+      }
       /*
       if (!form.value.date) {
         showError($t('event.dialog.date_required'));
@@ -173,7 +183,7 @@ export default defineComponent({
       emit('confirm', {
         type: typeOptionsComputed.value[form.value.typeIndex],
         content: form.value.content,
-        money: form.value.money,
+        money: props.templateType === 2 ? form.value.money : undefined,
         // date: form.value.date,
         // images: form.value.images
       });
