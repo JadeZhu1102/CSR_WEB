@@ -319,43 +319,64 @@ function handleDeleteStage(activity: IActivity) {
 async function handleEditEventConfirm(data: { type: string; content: string; money: number; date: string; images?: any[] }) {
   const index = stages.value.findIndex(s => s.id === editingStage.value?.id);
   if (index !== -1 && editingStage.value) {
-    await activityJoinApi({
-      activityId: stages.value[index].id,
-      detail: {
-        comment: data.content,
-        amount: data.money,
-      }
-    });
-    uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
+    try {
+      uni.showLoading();
+      await activityJoinApi({
+        activityId: stages.value[index].id,
+        detail: {
+          comment: data.content,
+          amount: data.money,
+        }
+      });
+      uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
+      await refreshUserStages();
+    } catch (error) {
+      //
+    } finally {
+      uni.hideLoading();
+    }
   }
   showEditDialog.value = false;
   editingStage.value = null;
-  refreshUserStages();
 }
 
 async function registerActivity(selectedActivity: IActivity) {
-  // 判断是否已报名，避免重复
-  if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
-    await activitySignupApi(selectedActivity.id);
-    refreshUserStages();
+  try {
+    uni.showLoading();
+    // 判断是否已报名，避免重复
+    if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
+      await activitySignupApi(selectedActivity.id);
+      refreshUserStages();
+    }
+    uni.showToast({
+      title: '报名成功',
+      icon: 'success',
+      duration: 2000
+    });
+  } catch (error) {
+    //
+  } finally {
+    uni.hideLoading();
   }
-  uni.showToast({
-    title: '报名成功',
-    icon: 'success',
-    duration: 2000
-  });
 }
 
 async function unregisterActivity(selectedActivity: IActivity) {
-  // 执行取消报名逻辑
-  // 这里调用原有的删除逻辑
-  await activityWithdrawApi(selectedActivity.id);
-  uni.showToast({
-    title: '取消报名',
-    icon: 'success',
-    duration: 2000
-  });
-  refreshUserStages();
+  try {
+    uni.showLoading();
+    // 执行取消报名逻辑
+    // 这里调用原有的删除逻辑
+    await activityWithdrawApi(selectedActivity.id);
+    uni.showToast({
+      title: '取消报名',
+      icon: 'success',
+      duration: 2000
+    });
+    refreshUserStages();
+  } catch (error) {
+    //
+  } finally {
+    uni.hideLoading();
+  }
 }
 
 function getStatusText(status: string) {

@@ -61,6 +61,7 @@
 import { ref, watch, defineComponent, computed, getCurrentInstance, type PropType } from 'vue';
 import uniCalendar from '@dcloudio/uni-ui/lib/uni-calendar/uni-calendar.vue';
 import uniFilePicker from '@dcloudio/uni-ui/lib/uni-file-picker/uni-file-picker.vue';
+import type { IActivity } from '@/models/activity';
 
 const errorMsg = ref('');
 
@@ -95,7 +96,7 @@ export default defineComponent({
       default: () => ['重要', '普通', '提醒']
     },
     editData: {
-      type: Object as PropType<Record<string, any> | null>,
+      type: Object as PropType<IActivity | null>,
       default: null
     }
   },
@@ -137,13 +138,20 @@ export default defineComponent({
           const typeIndex = typeOptionsComputed.value.findIndex(type => type === props.editData?.name);
           form.value = {
             typeIndex: typeIndex >= 0 ? typeIndex : 0,
-            content: props.editData?.description || '',
-            date: props.editData?.time || '',
-            images: props.editData?.records || []
+            content: props.editData?.details?.comment || '',
+            money: props.editData?.details?.amount ?? 0,
+            date: props.editData?.startTime || '',
+            images: props.editData?.thumbs || [],
           };
         } else {
           // 新增模式：清空表单
-          form.value = { typeIndex: 0, content: '', date: '', images: [] };
+          form.value = {
+            typeIndex: 0,
+            content: '',
+            money: 0,
+            date: '',
+            images: [],
+          };
         }
         showTypeSelect.value = false;
         errorMsg.value = '';

@@ -14,6 +14,8 @@ export interface IEventListApiRequest {
 
     /** 每页条数（默认10） */
     pageSize: number
+
+    needsTotal?: boolean
 }
 
 /**
@@ -40,5 +42,6 @@ export async function eventJoinedActivitiesApi(eventId: number): Promise<IActivi
         userId: userId,
         page: 1,
         pageSize: 100,
+        needsTotal: true
     })
 }

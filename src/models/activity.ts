@@ -15,6 +15,10 @@ export interface IActivity {
   createdAt: string | null;
   totalParticipants: number | null;
   totalTime: number | null;
+  details?: {
+    comment: string
+    amount: number
+  }
 
   // 以下为虚假的，原UI设计需要的字段
   completed?: boolean;
