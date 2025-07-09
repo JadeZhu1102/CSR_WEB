@@ -43,10 +43,10 @@
     <!-- 全部活动区域 -->
     <view class="all-activities">
       <view class="section-header">
-        <view class="section-title">{{$t('section.title')}}</view>
+        <view class="section-title">{{$t('all.title')}}</view>
         <view class="view-more cursor-pointer">
-          <text>{{$t('common.view_more')}}</text>
-          <uni-icons type="right" size="14" color="#666"></uni-icons>
+          <!-- <text>{{$t('common.view_more')}}</text>
+          <uni-icons type="right" size="14" color="#666"></uni-icons> -->
         </view>
       </view>
       <view class="activity-grid">
@@ -55,12 +55,19 @@
           :key="index"
           class="activity-card cursor-pointer"
           @click="goToActivityDetail(item.id)"
+          style="position: relative;"
         >
           <image
             :src="item.coverImage"
             mode="aspectFill"
             class="activity-image"
           ></image>
+          <view
+            v-if="item.status === 2"
+            class="coming-soon-overlay"
+          >
+            <text class="coming-soon-text">{{$t('all.coming_soon')}}</text>
+          </view>
           <view class="activity-info">
             <text class="activity-title">{{ item.name }}</text>
             <text class="activity-desc">{{ item.slogan }}</text>
@@ -481,6 +488,28 @@ page {
 
 .activity-participants text {
   margin-left: 6rpx;
+}
+
+.coming-soon-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border-radius: 16rpx;
+  pointer-events: none;
+}
+.coming-soon-text {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 /* 移动端优化 */

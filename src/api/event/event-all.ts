@@ -42,7 +42,8 @@ export async function allEventsListApi(): Promise<IEventItemMock[]> {
             progress: 100,
             location: "城市中心公园",
             numberOfParticipants: 1024,
-            enrollStatus: null
+            enrollStatus: null,
+            status: 2
         },
         {
             id: 5,
