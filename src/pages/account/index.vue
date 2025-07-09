@@ -1078,6 +1078,8 @@ watchEffect(() => {
     line-height: 1.5;
     resize: none;
     margin-bottom: 20px;
+    min-width: 0;
+    box-sizing: border-box;
     
     &:focus {
         outline: none;
@@ -1089,6 +1091,9 @@ watchEffect(() => {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .feedback-cancel-btn,

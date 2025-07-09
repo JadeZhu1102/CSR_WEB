@@ -448,11 +448,9 @@ page {
 .helper-links {
   display: flex;
   justify-content: center;
-  margin-top: 30rpx;
-  
-  @media screen and (min-width: 768px) {
-    margin-top: 40px;
-  }
+  align-items: center;
+  margin-top: 18px;
+  gap: 18px;
 }
 
 .helper-link {
@@ -464,6 +462,7 @@ page {
 }
 
 .divider {
+  margin: 0 8px;
   color: #e0e0e0;
   
   @media screen and (min-width: 768px) {
@@ -473,17 +472,19 @@ page {
 
 /* 底部协议 */
 .agreement {
-  margin-top: auto;
-  padding: 40rpx 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  
-  @media screen and (min-width: 768px) {
-    padding: 60px 0;
-  }
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  z-index: 10;
 }
-
 .agreement-text {
   font-size: 12px;
   color: #999999;
@@ -495,6 +496,7 @@ page {
 
 .agreement-link {
   color: #40bad5;
+  margin: 0 2px;
   
   @media screen and (min-width: 768px) {
     font-size: 14px;
@@ -514,6 +516,14 @@ page {
   
   .submit-button {
     -webkit-tap-highlight-color: transparent;
+  }
+  .agreement {
+    bottom: 18px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .agreement-link {
+    margin: 0 1px;
   }
 }
 
@@ -544,7 +554,7 @@ page {
 }
 
 .select-field {
-  background: #fafbfc;
+  /* background: #fafbfc; */
   border: none !important;
   outline: none !important;
   font-size: 14px;

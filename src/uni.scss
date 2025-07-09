@@ -907,3 +907,14 @@ image {
         padding: 0.5em 1.2em;
     }
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-internal-autofill-selected {
+    box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
