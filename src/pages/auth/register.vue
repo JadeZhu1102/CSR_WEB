@@ -130,11 +130,11 @@ const onRegister = async () => {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: linear-gradient(90deg, #30a908 0%, #4caf50 100%);
+  background: linear-gradient(90deg, #40bad5 0%, #3bd1b5 100%);
   color: #fff;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(48,169,8,0.10);
+  box-shadow: 0 2px 8px rgba(64,186,213,0.10);
   border: none;
   margin-top: 8px;
 }
@@ -142,5 +142,10 @@ const onRegister = async () => {
   display: flex;
   align-items: end;
   margin-top: 28px;
+  color: #40bad5;
+}
+.auth-navigation .navigator,
+.auth-navigation text {
+  color: #40bad5;
 }
 </style>

@@ -655,13 +655,19 @@ watchEffect(() => {
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(64,186,213,0.10);
-    padding: 4px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     transition: background 0.2s;
     
     @media screen and (min-width: 768px) {
         top: 40px;
         left: 40px;
-        padding: 8px;
+        width: 56px;
+        height: 56px;
     }
     
     &:hover {
@@ -1154,6 +1160,14 @@ watchEffect(() => {
     justify-content: center;
     box-shadow: 0 4px 24px rgba(0,0,0,0.10);
     animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    // 移除以下样式，避免全屏拉伸
+    // border-bottom-left-radius: 16px !important;
+    // border-bottom-right-radius: 16px !important;
+    // width: 100vw !important;
+    // max-width: 100vw !important;
+    // min-width: 0 !important;
+    // margin: 0 !important;
+    // padding-bottom: env(safe-area-inset-bottom, 24px) !important;
 }
 
 .lang-title {
@@ -1323,19 +1337,37 @@ watchEffect(() => {
 }
 
 .lang-bottom-sheet {
-    align-items: flex-end !important;
-    justify-content: center;
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
     z-index: 3000;
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .lang-dialog {
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding-bottom: env(safe-area-inset-bottom, 24px) !important;
+    background: #fff;
+    border-radius: 16px;
+    min-width: 280px;
+    max-width: 90vw;
+    width: 320px;
+    margin: 0 auto;
+    padding: 24px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    // 移除以下样式，避免全屏拉伸
+    // border-bottom-left-radius: 16px !important;
+    // border-bottom-right-radius: 16px !important;
+    // width: 100vw !important;
+    // max-width: 100vw !important;
+    // min-width: 0 !important;
+    // margin: 0 !important;
+    // padding-bottom: env(safe-area-inset-bottom, 24px) !important;
 }
 
 .contribution-header {

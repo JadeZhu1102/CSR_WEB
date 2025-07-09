@@ -429,27 +429,17 @@ page {
 }
 
 .submit-button {
-  height: 100rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #4a66f0;
-  color: #ffffff;
+  width: 100%;
+  padding: 13px 0;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #40bad5 0%, #3bd1b5 100%);
+  color: #fff;
   font-size: 16px;
-  font-weight: bold;
-  border-radius: 16rpx;
-  margin-top: 60rpx;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(64,186,213,0.10);
   border: none;
-  
-  @media screen and (min-width: 768px) {
-    height: 56px;
-    font-size: 18px;
-    border-radius: 12px;
-    margin-top: 80px;
-  }
+  margin-top: 8px;
 }
-
 .submit-button:active {
   transform: scale(0.98);
   opacity: 0.9;
@@ -466,8 +456,7 @@ page {
 }
 
 .helper-link {
-  font-size: 14px;
-  color: #4a66f0;
+  color: #40bad5;
   
   @media screen and (min-width: 768px) {
     font-size: 16px;
@@ -475,8 +464,7 @@ page {
 }
 
 .divider {
-  margin: 0 20rpx;
-  color: #dddddd;
+  color: #e0e0e0;
   
   @media screen and (min-width: 768px) {
     margin: 0 24px;
@@ -506,8 +494,7 @@ page {
 }
 
 .agreement-link {
-  font-size: 12px;
-  color: #4a66f0;
+  color: #40bad5;
   
   @media screen and (min-width: 768px) {
     font-size: 14px;
