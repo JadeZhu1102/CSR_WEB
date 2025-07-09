@@ -226,9 +226,9 @@ function normalizeLang(lang: string) {
 
 const avatarUrl = computed(() => {
     if (userDetail.value && userDetail.value.gender === 'female') {
-        return '/static/avator/female.svg';
+        return '/static/avatar/female.png';
     }
-    return '/static/avator/male.png';
+    return '/static/avatar/male.png';
 });
 const userName = ref('-');
 const userRole = ref<string | null>(null);
@@ -472,10 +472,6 @@ onLoad(() => {
     initUserInfo();
 });
 
-onShow(() => {
-    initUserInfo();
-});
-
 const showContribution = async () => {
     try {
         const userId = await tokenManager.getUserId();
@@ -664,7 +660,7 @@ watchEffect(() => {
     
     @media screen and (min-width: 768px) {
         top: 40px;
-        right: 40px;
+        left: 40px;
         padding: 8px;
     }
     
