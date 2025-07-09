@@ -15,10 +15,12 @@ export interface IActivity {
   createdAt: string | null;
   totalParticipants: number | null;
   totalTime: number | null;
-  details?: {
+  userActivityDetail?: {
     comment: string
     amount: number
   }
+  userActivityState: 'SIGN_UP';
+  userActivityCreatedAt: string;
 
   // 以下为虚假的，原UI设计需要的字段
   completed?: boolean;

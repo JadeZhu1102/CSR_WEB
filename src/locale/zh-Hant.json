@@ -113,6 +113,8 @@
     "activity.detail.completed": "已完成",
     "activity.detail.stage_intro": "簡介：",
     "activity.detail.stage_start": "開始時間：",
+    "activity.detail.remark": "備注：",
+    "activity.detail.amount": "金額：",
     "activity.detail.stage_participants": "參與人數：",
     "activity.detail.join_btn": "報名",
     "activity.detail.edit_btn": "編輯",

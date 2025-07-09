@@ -114,6 +114,8 @@
     "activity.detail.completed": "已完成",
     "activity.detail.stage_intro": "简介：",
     "activity.detail.stage_start": "开始时间：",
+    "activity.detail.remark": "备注：",
+    "activity.detail.amount": "金额：",
     "activity.detail.stage_participants": "参与人数：",
     "activity.detail.join_btn": "报名",
     "activity.detail.edit_btn": "编辑",

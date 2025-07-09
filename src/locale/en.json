@@ -141,6 +141,8 @@
     "activity.detail.stage_intro": "Intro: ",
     "activity.detail.stage_start": "Start: ",
     "activity.detail.stage_participants": "Participants: ",
+    "activity.detail.remark": "Remark: ",
+    "activity.detail.amount": "Amount: ",
     "activity.detail.join_btn": "Join",
     "activity.detail.edit_btn": "Edit",
     "activity.detail.delete_btn": "Delete",

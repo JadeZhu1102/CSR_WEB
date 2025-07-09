@@ -135,8 +135,15 @@
                   </view>
                   <text class="event-desc">{{ record.description }}</text>
                   <view class="stage-meta">
-                    <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}</div>
-                    <!-- <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ record.participants || 0 }}</div> -->
+                    <view class="meta-col">
+                      {{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}
+                    </view>
+                    <view class="meta-col" v-if="record.userActivityDetail?.comment">
+                      {{ $t('activity.detail.remark') }}{{ record.userActivityDetail?.comment }}
+                    </view>
+                    <view class="meta-col" v-if="typeof record.userActivityDetail?.amount === 'number'">
+                      {{ $t('activity.detail.amount') }}{{ record.userActivityDetail?.amount }}
+                    </view>
                   </view>
                   <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
                     <image

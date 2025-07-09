@@ -138,8 +138,8 @@ export default defineComponent({
           const typeIndex = typeOptionsComputed.value.findIndex(type => type === props.editData?.name);
           form.value = {
             typeIndex: typeIndex >= 0 ? typeIndex : 0,
-            content: props.editData?.details?.comment || '',
-            money: props.editData?.details?.amount ?? 0,
+            content: props.editData?.userActivityDetail?.comment || '',
+            money: props.editData?.userActivityDetail?.amount ?? 0,
             date: props.editData?.startTime || '',
             images: props.editData?.thumbs || [],
           };
