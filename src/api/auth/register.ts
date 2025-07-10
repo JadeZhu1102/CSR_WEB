@@ -1,4 +1,5 @@
 import type { IResponse } from "@/api/types";
+import { ApiServer } from "@/api/request";
 
 export interface IRegisterParams {
     username: string;
@@ -15,7 +16,7 @@ export interface IRegisterResponse extends IResponse {
 export const registerApi = (params: IRegisterParams) => {
     return new Promise<boolean>((resolve, reject) => {
         uni.request({
-            url: '/api/auth/register',
+            url: ApiServer.Host + '/api/auth/register',
             method: 'POST',
             data: params,
             header: {
