@@ -357,6 +357,7 @@ async function registerActivity(selectedActivity: IActivity) {
     // 判断是否已报名，避免重复
     if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
       await activitySignupApi(selectedActivity.id);
+      refreshStages();
       refreshUserStages();
     }
     uni.showToast({
