@@ -173,5 +173,7 @@
     "section.title": "當前活動",
     "common.view_more": "查看更多",
     "all.title": "全部活動",
-    "all.coming_soon": "敬請期待"
+    "all.coming_soon": "敬請期待",
+    "activity.detail.waiting": "敬請期待",
+    "activity.detail.ended": "活動已結束"
 }

@@ -175,5 +175,7 @@
     "section.title": "当前活动",
     "common.view_more": "查看更多",
     "all.title": "全部活动",
-    "all.coming_soon": "敬请期待"
+    "all.coming_soon": "敬请期待",
+    "activity.detail.waiting": "敬请期待",
+    "activity.detail.ended": "活动已结束"
 }

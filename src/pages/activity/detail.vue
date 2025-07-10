@@ -119,7 +119,9 @@
                       />
                     </view>
                   </view>
-                  <view class="join-btn" v-if="!stage.completed" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
+                  <view v-if="stage.status === 'IN_PROGRESS'" class="join-btn" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
+                  <view v-else-if="stage.status === 'NOT_STARTED'" class="stamp-btn stamp-wait">{{ $t('activity.detail.waiting') || '敬请期待' }}</view>
+                  <view v-else-if="stage.status === 'FINISHED'" class="stamp-btn stamp-finished">{{ $t('activity.detail.ended') || '活动已结束' }}</view>
                 </view>
               </view>
             </view>
@@ -269,7 +271,8 @@ async function refreshStages() {
       page: 1,
       pageSize: 100,
     });
-    stages.value = res;
+    // 按开始时间升序排序
+    stages.value = (res || []).slice().sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 }
 
 /**
@@ -277,7 +280,8 @@ async function refreshStages() {
  */
 async function refreshUserStages() {
   const res = await eventJoinedActivitiesApi(eventId.value!);
-  userStages.value = res ?? [];
+  // 按开始时间升序排序
+  userStages.value = (res || []).slice().sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 }
 
 function handleJoinStage(stage: IActivity) {
@@ -401,13 +405,8 @@ function getDateText(start: string | null, end: string | null) {
   return `${start} - ${end}`;
 }
 
-onLoad((query) => {
+onLoad(async (query) => {
   eventId.value = Number((query as { id: string }).id);
-})
-
-onShow(async () => {
-  // 获取活动详情
-  // @ts-ignore
   try {
     uni.showLoading();
     await Promise.all([
@@ -415,12 +414,12 @@ onShow(async () => {
       refreshStages(),
       refreshUserStages(),
     ]);
-  } catch (error) {
-    //
   } finally {
     uni.hideLoading();
   }
 })
+
+onShow(() => {});
 
 onMounted(async () => {
   uni.getSystemInfo({
@@ -828,17 +827,17 @@ page {
   background: #f8f9fa;
   border-radius: 12px;
   margin-bottom: 18px;
-  .item-main {
-    flex: 1;
-    min-width: 0;
-  }
-  .item-actions {
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    align-items: center;
-    margin-left: 18px;
-  }
+}
+.participation-item .item-main {
+  flex: 1;
+  min-width: 0;
+}
+.participation-item .item-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  margin-left: 18px;
 }
 .record-header {
   display: flex;
@@ -951,5 +950,36 @@ page {
   letter-spacing: 2rpx;
   white-space: nowrap;
   user-select: none;
+}
+.stamp-btn {
+  display: inline-block;
+  min-width: 90px;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background: #e74c3c;
+  border-radius: 32px;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(231,76,60,0.12);
+  text-align: center;
+  letter-spacing: 2px;
+  user-select: none;
+  transform: rotate(-8deg) scale(1.04);
+  opacity: 0.92;
+  border: 3px solid #e74c3c;
+  margin-top: 6px;
+}
+.stamp-wait {
+  background: #f39c12;
+  border-color: #f39c12;
+  box-shadow: 0 2px 12px rgba(243,156,18,0.12);
+  transform: rotate(-10deg) scale(1.04);
+}
+.stamp-finished {
+  background: #95a5a6;
+  border-color: #95a5a6;
+  box-shadow: 0 2px 12px rgba(149,165,166,0.12);
+  transform: rotate(-6deg) scale(1.04);
 }
 </style>

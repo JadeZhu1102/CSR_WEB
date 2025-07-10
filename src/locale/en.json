@@ -174,5 +174,7 @@
     "section.title": "Current Activities",
     "common.view_more": "View More",
     "all.title": "All Activities",
-    "all.coming_soon": "Coming Soon"
+    "all.coming_soon": "Coming Soon",
+    "activity.detail.waiting": "Coming Soon",
+    "activity.detail.ended": "Event Ended"
 }
