@@ -66,37 +66,17 @@
                 <view class="dialog-header contribution-header">
                     <text class="dialog-title">{{ $t('account.title.my_contributions') }}</text>
                 </view>
-                
-                <view class="contribution-stats">
-                    <text class="records-title">{{ $t('account.contribution.events') }}</text>
-                    <view v-for="event in userEvents" :key="event.id" class="record-item ani-list-item">
-                        <view class="record-info">
-                            <text class="record-name">{{ event.name }}</text>
-                            <text class="record-date">{{ event.duration }}</text>
-                        </view>
-                        <view class="record-status">{{ event.status }}</view>
-                    </view>
+                <view class="contribution-row">
+                  <text class="records-title">{{ $t('account.contribution.events') }}</text>
+                  <text class="record-value">{{ contributionStats.completedActivities }}</text>
                 </view>
-
-                <view class="activity-records">
-                    <text class="records-title">{{ $t('account.contribution.duration') }}</text>
-                    <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
-                        <view class="record-info">
-                            <text class="record-name">{{ activity.name }}</text>
-                            <text class="record-date">{{ activity.duration }}</text>
-                        </view>
-                        <view class="record-status">{{ activity.eventName }}</view>
-                    </view>
+                <view class="contribution-row">
+                  <text class="records-title">{{ $t('account.contribution.duration') }}</text>
+                  <text class="record-value">{{ contributionStats.totalHours }}</text>
                 </view>
-                <view class="money-records">
-                    <text class="records-title">{{ $t('account.contribution.donation') }}</text>
-                    <view v-for="activity in userActivities" :key="activity.id" class="record-item ani-list-item">
-                        <view class="record-info">
-                            <text class="record-name">{{ activity.name }}</text>
-                            <text class="record-date">{{ activity.duration }}</text>
-                        </view>
-                        <view class="record-status">{{ activity.eventName }}</view>
-                    </view>
+                <view class="contribution-row">
+                  <text class="records-title">{{ $t('account.contribution.donation') }}</text>
+                  <text class="record-value">{{ contributionStats.money }}</text>
                 </view>
                 <button class="dialog-close-btn ani-btn" @click="showContributionDialog = false">
                     {{ $t('account.contribution.close') }}
@@ -169,7 +149,8 @@
                 <view class="form-content" style="margin-top: 10px;">
                     <view class="form-item">
                         <text class="form-label">{{ $t('account.profile.nickname') }}</text>
-                        <input v-model="profileForm.nickname" class="ani-input form-input" :placeholder="$t('account.profile.nickname_placeholder')" />
+                        <input disabled v-model="profileForm.nickname" class="ani-input form-input" :placeholder="$t('account.profile.nickname_placeholder')" />
+                        <!-- <span class="input-locked-icon">🔒</span> -->
                     </view>
                     
                     <view class="form-item">
@@ -266,10 +247,11 @@ const profileForm = ref({
 
 const contributionStats = ref({
     totalActivities: 0,
-    totalHours: 0,
+    totalHours: '', // 这里改为字符串
     completedActivities: 0,
     ongoingActivities: 0,
-    pendingActivities: 0
+    pendingActivities: 0,
+    money: '' // 这里改为字符串
 });
 const activityRecords = ref<any[]>([]);
 
@@ -319,26 +301,28 @@ const submitFeedback = async () => {
             content: feedbackContent.value.trim(),
             timestamp: new Date().toISOString()
         });
-        
-        if (result.success) {
+        // 新增：根据status判断
+        if (result.status === 'success') {
             uni.showToast({
-                title: result.message,
+                title: result.data?.message || '反馈提交成功',
                 icon: 'success'
             });
             feedbackContent.value = '';
             showFeedbackDialog.value = false;
         } else {
             uni.showToast({
-                title: result.message || instance?.proxy?.$t('toast.submit_failed'),
+                title: '提交失败，请联系管理员',
                 icon: 'none'
             });
+            // 不关闭弹窗
         }
     } catch (error) {
         console.error('提交反馈失败:', error);
         uni.showToast({
-            title: instance?.proxy?.$t('toast.submit_failed'),
+            title: '提交失败，请联系管理员',
             icon: 'none'
         });
+        // 不关闭弹窗
     } finally {
         isLoading.value = false;
     }
@@ -386,6 +370,10 @@ const handleUpdateProfile = async () => {
         });
         if (res && res.code === 200) {
             uni.showToast({ title: '个人信息更新成功', icon: 'success' });
+            // 新增：更新成功后自动刷新页面
+            setTimeout(() => {
+                location.reload();
+            }, 800);
         } else {
             uni.showToast({ title: '更新失败，请联系管理员', icon: 'none' });
         }
@@ -472,42 +460,41 @@ onLoad(() => {
     initUserInfo();
 });
 
+// 新增：分钟转小时+分钟格式化函数
+function formatMinutesToHourMinute(totalMinutes: number) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours > 0 && minutes > 0) return `${hours}小时${minutes}分钟`;
+    if (hours > 0) return `${hours}小时`;
+    return `${minutes}分钟`;
+}
+
 const showContribution = async () => {
     try {
         const userId = await tokenManager.getUserId();
         if (!userId) throw new Error('用户ID不存在');
-        // 并发获取事件和活动
         const [eventsRes, activitiesRes] = await Promise.all([
             getUserEventsApi(Number(userId)),
             getUserActivitiesApi(Number(userId))
         ]);
-        // 统计区数据（根据新API返回格式化）
+        // 活动总数
         contributionStats.value.totalActivities = activitiesRes.data.length;
-        contributionStats.value.completedActivities = activitiesRes.data.filter(a => {
-            const { status = '' } = a;
-            return status === 'completed';
-        }).length;
-        contributionStats.value.ongoingActivities = activitiesRes.data.filter(a => {
-            const { status = '' } = a;
-            return status === 'ongoing';
-        }).length;
-        contributionStats.value.pendingActivities = activitiesRes.data.filter(a => {
-            const { status = '' } = a;
-            return status === 'pending';
-        }).length;
-        contributionStats.value.totalHours = 0; // 新API如无hours字段可置0或补充
-        // 活动记录区数据
-        activityRecords.value = activitiesRes.data.map(a => {
-            const { id, name, eventName = '', status = '' } = a;
-            return {
-                id,
-                name,
-                date: '',
-                status,
-                hours: '',
-                description: eventName
-            };
+
+        // 总时长和捐款金额
+        let totalMinutes = 0;
+        let totalMoney = 0;
+        (activitiesRes.data as any[]).forEach((a: any) => {
+            totalMinutes += Number(a.duration) || 0;
+            if (a.templateId === 2 && a.userActivityDetail && a.userActivityDetail.amount) {
+                totalMoney += Number(a.userActivityDetail.amount) || 0;
+            }
         });
+        contributionStats.value.totalHours = formatMinutesToHourMinute(totalMinutes);
+        contributionStats.value.money = totalMoney.toString();
+
+        // 参与事件数（如需显示已完成活动数可调整此处）
+        contributionStats.value.completedActivities = activitiesRes.data.length;
+
         showContributionDialog.value = true;
     } catch (e) {
         uni.showToast({ title: '获取贡献数据失败', icon: 'none' });
@@ -1400,6 +1387,7 @@ watchEffect(() => {
     max-width: 90vw;
     width: 400px;
     padding: 24px;
+    animation: popInScaleFade 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .activity-records,
@@ -1483,6 +1471,24 @@ watchEffect(() => {
         border-color: #30a908;
         box-shadow: 0 0 0 2px rgba(48,169,8,0.08);
     }
+}
+
+.form-input[disabled] {
+  background: #f3f3f3 !important;
+  color: #b0b0b0 !important;
+  border: 1px dashed #d0d0d0 !important;
+  cursor: not-allowed;
+  position: relative;
+  padding-right: 36px;
+}
+.input-locked-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b0b0b0;
+  font-size: 18px;
+  pointer-events: none;
 }
 
 .form-select {
@@ -1572,5 +1578,69 @@ watchEffect(() => {
         transform: scale(1.1);
         box-shadow: 0 4px 16px rgba(64,186,213,0.2);
     }
+}
+
+.contribution-dialog {
+  animation: popInScaleFade 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  .contribution-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    animation: fadeInUpRow 0.5s ease forwards;
+    transition: box-shadow 0.2s, transform 0.2s;
+    &:hover {
+      background: #f8f9fa;
+      box-shadow: 0 2px 8px rgba(48,169,8,0.08);
+      transform: translateY(0) scale(1.03);
+    }
+    &:nth-child(2) { animation-delay: 0.08s; }
+    &:nth-child(3) { animation-delay: 0.16s; }
+    &:nth-child(4) { animation-delay: 0.24s; }
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  .records-title {
+    color: #222;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .record-value {
+    color: #30a908;
+    font-size: 22px;
+    font-weight: 600;
+    min-width: 48px;
+    text-align: right;
+    letter-spacing: 1px;
+    transition: font-size 0.2s, color 0.2s;
+  }
+}
+
+@keyframes fadeInUpRow {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popInScaleFade {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>

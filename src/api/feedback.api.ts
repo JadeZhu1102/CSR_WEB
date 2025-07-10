@@ -2,6 +2,8 @@
  * 用户反馈相关API
  */
 
+import { request } from '@/api/request';
+
 export interface IFeedbackData {
     content: string;
     userId?: string;
@@ -12,16 +14,15 @@ export interface IFeedbackData {
  * 提交用户反馈
  * @param feedbackData - 反馈数据
  */
-export default async function submitFeedbackApi(feedbackData: IFeedbackData): Promise<{ success: boolean; message: string }> {
-    // TODO: 调用真实的API
-    console.log('提交反馈数据:', feedbackData);
-    
-    // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 模拟成功响应
-    return {
-        success: true,
-        message: '反馈提交成功'
-    };
+export default async function submitFeedbackApi(feedbackData: IFeedbackData): Promise<any> {
+    // 调用真实的API
+    const res = await request<any>({
+        url: '/api/feedback',
+        method: 'POST',
+        data: {
+            feedbackDetail: feedbackData.content
+        }
+    });
+    // 直接返回后端原始结构
+    return res;
 } 

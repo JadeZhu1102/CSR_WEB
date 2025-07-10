@@ -75,7 +75,7 @@ export const getUserActivitiesApi = (userId: number) => {
         duration: string;
         status?: string;
     }>>({
-        url: `/api/users/${userId}/activities`,
+        url: `/api/activities?userId=${userId}`,
         method: 'GET',
         header: {
             'content-type': 'application/json',
