@@ -472,34 +472,28 @@ page {
 
 /* 底部协议 */
 .agreement {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: 14px;
   color: #999;
   text-align: center;
   z-index: 10;
-}
-.agreement-text {
-  font-size: 12px;
-  color: #999999;
-  
-  @media screen and (min-width: 768px) {
-    font-size: 14px;
-  }
-}
+  padding: 8px;
 
-.agreement-link {
-  color: #40bad5;
-  margin: 0 2px;
-  
-  @media screen and (min-width: 768px) {
-    font-size: 14px;
+  .agreement-text {
+    font-size: 12px;
+    color: #999999;
+    
+    @media screen and (min-width: 768px) {
+      font-size: 14px;
+    }
+  }
+
+  .agreement-link {
+    color: #40bad5;
+    margin: 0 2px;
+    
+    @media screen and (min-width: 768px) {
+      font-size: 14px;
+    }
   }
 }
 
