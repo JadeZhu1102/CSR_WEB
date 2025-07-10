@@ -1,10 +1,10 @@
 <template>
   <view class="container">
     <!-- 顶部搜索栏 -->
-    <view class="search-bar">
+    <!-- <view class="search-bar">
       <uni-icons type="search" size="18" color="#666"></uni-icons>
       <input type="text" placeholder="搜索活动" class="search-input" />
-    </view>
+    </view> -->
     <!-- 轮播图区域 -->
     <view class="swiper-container">
       <view class="section-title">{{$t('section.title')}}</view>
