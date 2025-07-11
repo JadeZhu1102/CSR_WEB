@@ -11,10 +11,12 @@ export const ApiServer = {
     Host: 'http://8.133.240.77:8080',
 };
 
+/*
 if (process.env.UNI_PLATFORM === 'h5') {
     // H5 使用本机作为 host
     ApiServer.Host = '';
 }
+*/
 
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {
     return error.statusCode === 401;

@@ -357,6 +357,7 @@ async function registerActivity(selectedActivity: IActivity) {
     // 判断是否已报名，避免重复
     if (selectedActivity && !userStages.value.find((s: any) => s.id === selectedActivity.id)) {
       await activitySignupApi(selectedActivity.id);
+      refreshStages();
       refreshUserStages();
     }
     uni.showToast({
@@ -773,6 +774,8 @@ page {
 
 .event-content {
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
 .event-header {
   display: flex;
@@ -893,7 +896,7 @@ page {
 .meta-col {
   flex: none;
   text-align: left;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -953,9 +956,9 @@ page {
 }
 .stamp-btn {
   display: inline-block;
-  min-width: 90px;
-  padding: 12px 28px;
-  font-size: 16px;
+  min-width: 80px;
+  padding: 6px 4px;
+  font-size: 12px;
   font-weight: bold;
   color: #fff;
   background: #e74c3c;
@@ -966,9 +969,13 @@ page {
   letter-spacing: 2px;
   user-select: none;
   transform: rotate(-8deg) scale(1.04);
-  opacity: 0.92;
+  opacity: 0.3;
   border: 3px solid #e74c3c;
   margin-top: 6px;
+  position: absolute;
+  right: -8px;
+  top: -12px;
+  z-index: 0;
 }
 .stamp-wait {
   background: #f39c12;
