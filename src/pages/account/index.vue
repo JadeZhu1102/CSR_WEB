@@ -209,7 +209,10 @@ const avatarUrl = computed(() => {
     if (userDetail.value && userDetail.value.gender === 'female') {
         return '/static/avatar/female.png';
     }
-    return '/static/avatar/male.png';
+    if (userDetail.value && userDetail.value.gender === 'male') {
+        return '/static/avatar/male.png';
+    }
+    return '';
 });
 const userName = ref('-');
 const userRole = ref<string | null>(null);
