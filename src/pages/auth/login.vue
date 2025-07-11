@@ -93,20 +93,6 @@
           ></uni-icons>
         </view>
       </view>
-      <!-- 新增：注册时填写工作邮箱、性别、城市 -->
-      <view v-if="!isLogin" class="input-group">
-        <view class="input-prefix">
-          <uni-icons type="email-filled" size="20" color="#999"></uni-icons>
-        </view>
-        <input
-          class="input-field"
-          type="email"
-          :placeholder="$t('register.email')"
-          v-model="email"
-          @focus="focusedInput = 'email'"
-          @blur="focusedInput = ''"
-        />
-      </view>
       <view v-if="!isLogin" class="input-group">
         <view class="input-prefix">
           <uni-icons type="man" size="20" color="#999"></uni-icons>
@@ -190,7 +176,6 @@ const showPassword = ref(false);
 const focusedInput = ref("");
 const isLoading = ref(false);
 // 新增ref变量
-const email = ref("");
 const gender = ref("");
 const city = ref("");
 const showAgreementDialog = ref(false);
@@ -234,7 +219,6 @@ const handleSubmit = async () => {
     const success = await registerApi({
       username: username.value,
       password: password.value,
-      email: email.value,
       gender: gender.value,
       city: city.value
     });

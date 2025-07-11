@@ -153,10 +153,10 @@
                         <!-- <span class="input-locked-icon">🔒</span> -->
                     </view>
                     
-                    <view class="form-item">
+                    <!-- <view class="form-item">
                         <text class="form-label">{{ $t('account.profile.email') }}</text>
                         <input v-model="profileForm.email" class="ani-input form-input" :placeholder="$t('account.profile.email_placeholder')" />
-                    </view>
+                    </view> -->
                     
                     <view class="form-item">
                         <text class="form-label">{{ $t('account.profile.gender') }}</text>
