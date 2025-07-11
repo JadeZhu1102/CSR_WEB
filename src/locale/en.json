@@ -24,7 +24,7 @@
     "acivity.introduction": "Introduction",
     "acivity.progress": "Progress",
     "acivity.participation": "Participation",
-    "login.user_name": "Username",
+    "login.user_name": "Name e.g. Zhang San",
     "login.password": "Password",
     "login.login": "Login",
     "register.user_name": "User Name",
@@ -176,5 +176,7 @@
     "all.title": "All Activities",
     "all.coming_soon": "Coming Soon",
     "activity.detail.waiting": "Coming Soon",
-    "activity.detail.ended": "Event Ended"
+    "activity.detail.ended": "Event Ended",
+    "login.pwd_length_tip": "Password must be 8-20 characters",
+    "login.pwd_complexity_tip": "Password must contain both letters and numbers"
 }

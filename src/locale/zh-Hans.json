@@ -24,7 +24,7 @@
     "acivity.introduction": "活动内容",
     "acivity.progress": "活动进度",
     "acivity.participation": "我的参与",
-    "login.user_name": "用户名",
+    "login.user_name": "姓名 例如：Zhang San",
     "login.password": "密码",
     "login.login": "登录",
     "register.user_name": "用户名",
@@ -177,5 +177,7 @@
     "all.title": "全部活动",
     "all.coming_soon": "敬请期待",
     "activity.detail.waiting": "敬请期待",
-    "activity.detail.ended": "活动已结束"
+    "activity.detail.ended": "活动已结束",
+    "login.pwd_length_tip": "密码长度需为8-20位",
+    "login.pwd_complexity_tip": "密码需包含字母和数字"
 }

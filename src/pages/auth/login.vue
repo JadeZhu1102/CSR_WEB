@@ -36,6 +36,11 @@
           v-model="username"
           @focus="focusedInput = 'username'"
           @blur="focusedInput = ''"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          style="background: transparent;"
         />
       </view>
       <!-- 密码输入框 -->
@@ -53,6 +58,11 @@
           v-model="password"
           @focus="focusedInput = 'password'"
           @blur="focusedInput = ''"
+          autocomplete="new-password"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          style="background: transparent;"
         />
         <view
           class="password-toggle cursor-pointer"
@@ -81,6 +91,11 @@
           v-model="passwordConfirm"
           @focus="focusedInput = 'passwordConfirm'"
           @blur="focusedInput = ''"
+          autocomplete="new-password"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          style="background: transparent;"
         />
         <view
           class="password-toggle cursor-pointer"
@@ -97,22 +112,17 @@
         <view class="input-prefix">
           <uni-icons type="man" size="20" color="#999"></uni-icons>
         </view>
-        <select v-model="gender" class="input-field select-field">
-          <option value="" disabled hidden>{{ $t('register.gender') }}</option>
-          <option value="male">{{ $t('register.male') }}</option>
-          <option value="female">{{ $t('register.female') }}</option>
-          <option value="other">{{ $t('register.other') }}</option>
-        </select>
+        <picker :range="genderOptions" range-key="label" v-model="gender" class="input-field select-field">
+          <view class="picker-text">{{ genderOptions.find(opt => opt.value === gender)?.label || $t('register.gender') }}</view>
+        </picker>
       </view>
       <view v-if="!isLogin" class="input-group">
         <view class="input-prefix">
           <uni-icons type="location-filled" size="20" color="#999"></uni-icons>
         </view>
-        <select v-model="city" class="input-field select-field">
-          <option value="" disabled hidden>{{ $t('register.city') }}</option>
-          <option value="SH">{{ $t('register.shanghai') }}</option>
-          <option value="SZ">{{ $t('register.shenzhen') }}</option>
-        </select>
+        <picker :range="cityOptions" range-key="label" v-model="city" class="input-field select-field">
+          <view class="picker-text">{{ cityOptions.find(opt => opt.value === city)?.label || $t('register.city') }}</view>
+        </picker>
       </view>
       <!-- 操作按钮 -->
       <button class="submit-button cursor-pointer" @click="handleSubmit">
@@ -180,6 +190,16 @@ const gender = ref("");
 const city = ref("");
 const showAgreementDialog = ref(false);
 const agreementType = ref<'user'|'privacy'>('user');
+// 1. 引入ref和picker选项
+const genderOptions = [
+  { label: t('register.male'), value: 'male' },
+  { label: t('register.female'), value: 'female' },
+  { label: t('register.other'), value: 'other' }
+];
+const cityOptions = [
+  { label: t('register.shanghai'), value: 'SH' },
+  { label: t('register.shenzhen'), value: 'SZ' }
+];
 // 切换登录/注册模式
 const toggleLoginRegister = () => {
   isLogin.value = !isLogin.value;
@@ -193,10 +213,26 @@ const goBack = () => {
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
+// 校验密码复杂度
+function validatePassword(pwd: string): string | null {
+  if (!pwd || pwd.length < 8 || pwd.length > 20) {
+    return t('login.pwd_length_tip');
+  }
+  if (!/[A-Za-z]/.test(pwd) || !/\d/.test(pwd)) {
+    return t('login.pwd_complexity_tip');
+  }
+  return null;
+}
 // 提交表单
 const handleSubmit = async () => {
   if (!username.value || !password.value) {
     uni.showToast({ title: t('login.please_input_username_password'), icon: 'none' });
+    return;
+  }
+  // 密码复杂度校验
+  const pwdErr = validatePassword(password.value);
+  if (pwdErr) {
+    uni.showToast({ title: pwdErr, icon: 'none' });
     return;
   }
   if (!isLogin.value && password.value !== passwordConfirm.value) {
@@ -663,5 +699,11 @@ page {
   color: #333;
   line-height: 1.7;
   white-space: pre-line;
+}
+.picker-text {
+  width: 100%;
+  color: #333;
+  font-size: 14px;
+  padding: 18px 0;
 }
 </style>
