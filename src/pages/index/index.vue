@@ -33,7 +33,7 @@
               <!-- <text class="swiper-desc">{{ item.name }}</text> -->
               <view class="swiper-participants">
                 <uni-icons type="person" size="14" color="#fff"></uni-icons>
-                <text>{{ item.numberOfParticipants ?? 0 }}人参与</text>
+                <text>{{ item.totalParticipants ?? item.numberOfParticipants ?? 0 }}人参与</text>
               </view>
             </view>
           </view>
@@ -54,7 +54,7 @@
           v-for="(item, index) in allActivities"
           :key="index"
           class="activity-card cursor-pointer"
-          @click="goToActivityDetail(item.id)"
+          @click="item.status !== 2 && goToActivityDetail(item.id)"
           style="position: relative;"
         >
           <image
@@ -73,7 +73,7 @@
             <text class="activity-desc">{{ item.slogan }}</text>
             <view class="activity-participants">
               <uni-icons type="person" size="14" color="#666"></uni-icons>
-              <text>10人参与</text>
+              <text>{{ item.totalParticipants ?? item.numberOfParticipants ?? 0 }}人参与</text>
             </view>
           </view>
         </view>
@@ -87,6 +87,8 @@ import { ref, onMounted } from "vue";
 import PageUrl from '@/config/page-url';
 import type { IEventItem } from '@/models/event';
 import { eventListApi, allEventsListApi, type IEventItemMock } from "@/api/event";
+// 新增：导入请求方法
+import { request } from '@/api/request';
 
 // 当前选中的标签页
 const activeTab = ref("activities");
@@ -94,7 +96,7 @@ const activeTab = ref("activities");
 const currentActivities = ref<IEventItem[]>([]);
 
 // 全部活动数据
-const allActivities = ref<IEventItemMock[]>();
+const allActivities = ref<IEventItemMock[] & { status?: number }[]>();
 
 // 切换标签页
 const switchTab = (tab: string) => {
@@ -107,9 +109,23 @@ onMounted(async () => {
     const eventList = await eventListApi();
     currentActivities.value = eventList.data.data;
 
+    // 新增：为每个活动获取轮播图图片
+    await Promise.all(currentActivities.value.map(async (item) => {
+      try {
+        const res = await request({ url: `/api/photo/${item.id}`, method: 'GET' });
+        // 假设返回 { url: '图片地址' }
+        const photoData = res && res.data as { url?: string };
+        if (photoData && photoData.url) {
+          item.bgImage = photoData.url;
+        }
+      } catch (e) {
+        // 保持原有图片
+      }
+    }));
+
     const list = await allEventsListApi();
-    // 假设最新活动为前3条，全部活动为全部
-    allActivities.value = list;
+    // 类型断言，确保 status 字段可用
+    allActivities.value = list as (IEventItemMock & { status?: number })[];
   } catch (e) {
     // 保留mock
   }

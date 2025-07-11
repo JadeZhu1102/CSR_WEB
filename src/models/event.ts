@@ -8,11 +8,13 @@ interface IEventProps {
     startTime: string | null;
     // TODO:
     numberOfParticipants?: number;
+    totalParticipants?: number;
 }
 
 export interface IEventItem extends IEventProps {
     /** 当前用户是否已参加 */
     enrollStatus: 'Approved' | 'Pending' | null;
+    totalParticipants?: number;
 }
 
 export interface IActivityDetail extends IEventItem {

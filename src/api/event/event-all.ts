@@ -19,6 +19,7 @@ export interface IEventItemMock {
     location: string;
     /** 参加人数 */
     numberOfParticipants: number;
+    totalParticipants?: number;
 }
 
 interface IActivityListApiResponse {
