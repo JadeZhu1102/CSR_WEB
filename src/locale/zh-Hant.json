@@ -177,5 +177,8 @@
     "activity.detail.waiting": "敬請期待",
     "activity.detail.ended": "活動已結束",
     "login.pwd_length_tip": "密碼長度需為8-20位",
-    "login.pwd_complexity_tip": "密碼需包含字母和數字"
+    "login.pwd_complexity_tip": "密碼需包含字母和數字",
+    "login.name_required": "請輸入姓名",
+    "login.gender_required": "請選擇性別",
+    "login.city_required": "請選擇城市"
 }

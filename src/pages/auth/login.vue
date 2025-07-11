@@ -112,16 +112,16 @@
         <view class="input-prefix">
           <uni-icons type="man" size="20" color="#999"></uni-icons>
         </view>
-        <picker :range="genderOptions" range-key="label" v-model="gender" class="input-field select-field">
-          <view class="picker-text">{{ genderOptions.find(opt => opt.value === gender)?.label || $t('register.gender') }}</view>
+        <picker :range="genderOptions" range-key="label" :value="genderIndex" @change="onGenderChange" class="input-field select-field">
+          <view class="picker-text">{{ genderOptions[genderIndex]?.label || $t('register.gender') }}</view>
         </picker>
       </view>
       <view v-if="!isLogin" class="input-group">
         <view class="input-prefix">
           <uni-icons type="location-filled" size="20" color="#999"></uni-icons>
         </view>
-        <picker :range="cityOptions" range-key="label" v-model="city" class="input-field select-field">
-          <view class="picker-text">{{ cityOptions.find(opt => opt.value === city)?.label || $t('register.city') }}</view>
+        <picker :range="cityOptions" range-key="label" :value="cityIndex" @change="onCityChange" class="input-field select-field">
+          <view class="picker-text">{{ cityOptions[cityIndex]?.label || $t('register.city') }}</view>
         </picker>
       </view>
       <!-- 操作按钮 -->
@@ -191,6 +191,8 @@ const city = ref("");
 const showAgreementDialog = ref(false);
 const agreementType = ref<'user'|'privacy'>('user');
 // 1. 引入ref和picker选项
+const genderIndex = ref(-1);
+const cityIndex = ref(-1);
 const genderOptions = [
   { label: t('register.male'), value: 'male' },
   { label: t('register.female'), value: 'female' },
@@ -200,6 +202,13 @@ const cityOptions = [
   { label: t('register.shanghai'), value: 'SH' },
   { label: t('register.shenzhen'), value: 'SZ' }
 ];
+// 1. picker事件处理
+function onGenderChange(e: any) {
+  genderIndex.value = e.detail.value;
+}
+function onCityChange(e: any) {
+  cityIndex.value = e.detail.value;
+}
 // 切换登录/注册模式
 const toggleLoginRegister = () => {
   isLogin.value = !isLogin.value;
@@ -229,6 +238,20 @@ const handleSubmit = async () => {
     uni.showToast({ title: t('login.please_input_username_password'), icon: 'none' });
     return;
   }
+  if (!isLogin.value) {
+    if (!username.value) {
+      uni.showToast({ title: t('login.name_required'), icon: 'none' });
+      return;
+    }
+    if (genderIndex.value < 0) {
+      uni.showToast({ title: t('login.gender_required'), icon: 'none' });
+      return;
+    }
+    if (cityIndex.value < 0) {
+      uni.showToast({ title: t('login.city_required'), icon: 'none' });
+      return;
+    }
+  }
   // 密码复杂度校验
   const pwdErr = validatePassword(password.value);
   if (pwdErr) {
@@ -252,11 +275,13 @@ const handleSubmit = async () => {
       uni.showToast({ title: t('login.username_password_error'), icon: 'none' });
     }
   } else {
+    const gender = genderIndex.value >= 0 ? genderOptions[genderIndex.value].value : '';
+    const city = cityIndex.value >= 0 ? cityOptions[cityIndex.value].value : '';
     const success = await registerApi({
       username: username.value,
       password: password.value,
-      gender: gender.value,
-      city: city.value
+      gender,
+      city
     });
     isLoading.value = false;
     if (success) {
