@@ -178,7 +178,8 @@ import { ref, computed } from "vue";
 import { useI18n } from 'vue-i18n';
 import { loginAccount } from '@/util/auth';
 import { registerApi } from '@/api/auth';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
+import tokenManager from '@/api/token';
 const { t } = useI18n();
 // 状态管理
 const isLogin = ref(true);
@@ -267,8 +268,22 @@ const openAgreement = (type: 'user'|'privacy') => {
   agreementType.value = type;
   showAgreementDialog.value = true;
 };
-onLoad(() => {
+
+// 判断是否已登录，未登录则强制留在登录页
+async function checkLoginGuard() {
+  const token = await tokenManager.getToken();
+  if (!token) {
+    uni.reLaunch({ url: '/pages/auth/login' });
+  }
+}
+
+onLoad(async () => {
   isLogin.value = true;
+  await checkLoginGuard();
+});
+
+onShow(async () => {
+  await checkLoginGuard();
 });
 </script>
 
