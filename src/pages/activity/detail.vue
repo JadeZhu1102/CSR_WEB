@@ -101,12 +101,14 @@
                   <view class="event-content">
                     <view class="event-header">
                       <text class="event-title">{{ stage.name }}</text>
-                      <span v-if="stage.completed" class="stamp-completed-float"><span class="stamp-text-float">{{ $t('activity.detail.completed') }}</span></span>
+                      <view v-if="stage.completed" class="stamp-completed-float">
+                        <view class="stamp-text-float">{{ $t('activity.detail.completed') }}</view>
+                      </view>
                     </view>
-                    <view class="stage-meta">
-                      <div class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.description || '-' }}</div>
-                      <div class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</div>
-                      <div class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.totalParticipants || 0 }}</div>
+                    <view class="stage-meta"> 
+                      <view class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.description || '-' }}</view>
+                      <view class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</view>
+                      <view class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.totalParticipants || 0 }}</view>
                     </view>
                     <view class="stage-thumbs" v-if="stage.thumbs && stage.thumbs.length">
                       <image
