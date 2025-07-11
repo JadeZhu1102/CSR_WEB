@@ -26,7 +26,9 @@
       </view>
       <!-- 活动基本信息区 -->
       <view class="activity-basic-info">
-        <view class="activity-status">{{ activity?._statusText || $t('activity.detail.status_enrolling') }}</view>
+        <view class="activity-status-wrap">
+          <view v-if="stages.some(s => s.status === 'IN_PROGRESS')" class="activity-status-btn">{{$t('activity.detail.status_enrolling')}}</view>
+        </view>
         <text class="activity-title">{{ activity?._title || $t('activity.detail.title_placeholder') }}</text>
         <view class="info-row">
           <view class="info-item">
@@ -121,7 +123,14 @@
                       />
                     </view>
                   </view>
-                  <view v-if="stage.status === 'IN_PROGRESS'" class="join-btn" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
+                  <view v-if="stage.status === 'IN_PROGRESS'">
+                    <template v-if="userStages.find(s => s.id === stage.id)">
+                      <view class="join-btn joined" style="background: #ccc; color: #fff;">{{$t('activity.joined')}}</view>
+                    </template>
+                    <template v-else>
+                      <view class="join-btn" @click="handleJoinStage(stage)">{{ $t('activity.detail.join_btn') }}</view>
+                    </template>
+                  </view>
                   <view v-else-if="stage.status === 'NOT_STARTED'" class="stamp-btn stamp-wait">{{ $t('activity.detail.waiting') || '敬请期待' }}</view>
                   <view v-else-if="stage.status === 'FINISHED'" class="stamp-btn stamp-finished">{{ $t('activity.detail.ended') || '活动已结束' }}</view>
                 </view>
@@ -275,6 +284,10 @@ async function refreshStages() {
     });
     // 按开始时间升序排序
     stages.value = (res || []).slice().sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    // 计算总参与人数
+    if (activity.value) {
+      activity.value._enrollCount = stages.value.reduce((sum, item) => sum + (item.totalParticipants || 0), 0);
+    }
 }
 
 /**
@@ -511,21 +524,22 @@ page {
   border-radius: 30rpx 30rpx 0 0;
   margin-top: -30rpx;
 }
-.activity-status {
+.activity-status-wrap {
   position: absolute;
   top: -20rpx;
   right: 30rpx;
-  background: linear-gradient(
-    to right,
-    rgba(64, 186, 213, 0.9),
-    rgba(59, 209, 181, 0.9)
-  );
-  color: #ffffff;
-  padding: 10rpx 30rpx;
+  z-index: 10;
+}
+.activity-status-btn {
+  background: linear-gradient(90deg, #40bad5 0%, #3dd1b5 100%);
+  color: #fff;
+  padding: 10rpx 36rpx;
   border-radius: 30rpx;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
+  box-shadow: 0 4px 16px rgba(64,186,213,0.18);
+  letter-spacing: 2px;
+  display: inline-block;
 }
 .activity-title {
   display: block;
@@ -990,5 +1004,34 @@ page {
   border-color: #95a5a6;
   box-shadow: 0 2px 12px rgba(149,165,166,0.12);
   transform: rotate(-6deg) scale(1.04);
+}
+.join-btn.joined {
+  background: #ccc !important;
+  color: #fff !important;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.bottom-join-btn {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: #fff;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  padding: 16px 24px 32px 24px;
+  display: flex;
+  justify-content: center;
+}
+.main-join-btn {
+  width: 100%;
+  font-size: 18px;
+  background: linear-gradient(to right, #40bad5, #3dd1b5);
+  color: #fff;
+  border: none;
+  border-radius: 32px;
+  padding: 16px 0;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(64,186,213,0.12);
 }
 </style>
