@@ -472,10 +472,11 @@ page {
 
 /* 底部协议 */
 .agreement {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 32px;
+  margin-top: 24px;
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -518,9 +519,11 @@ page {
     -webkit-tap-highlight-color: transparent;
   }
   .agreement {
-    bottom: 18px;
+    margin-top: 18px;
+    margin-bottom: 32px;
     font-size: 13px;
     line-height: 1.7;
+    position: static;
   }
   .agreement-link {
     margin: 0 1px;
