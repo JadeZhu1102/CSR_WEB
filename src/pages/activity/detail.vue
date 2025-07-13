@@ -261,7 +261,7 @@ async function refreshEventDetail() {
     if (detail) {
       // 兼容UI字段
       activity.value = {
-        _cover: detail.icon || defaultCover,
+        _cover: detail.detailImage || defaultCover,
         _title: detail.name,
         _statusText: getStatusText(detail.status || 'in_progress'),
         _dateText: getDateText(detail.startTime, detail.endTime),

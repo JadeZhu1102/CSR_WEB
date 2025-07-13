@@ -1,13 +1,12 @@
 
 interface IEventProps {
     bgImage: string;
+    detailImage: string;
     endTime: string | null;
     id: number;
     isDisplay: boolean;
     name: string;
     startTime: string | null;
-    // TODO:
-    numberOfParticipants?: number;
     totalParticipants?: number;
 }
 
