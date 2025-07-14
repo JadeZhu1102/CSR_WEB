@@ -24,7 +24,7 @@
         >
           <view class="swiper-item">
             <image
-              :src="item.bgImage"
+              :src="item.detailImage"
               mode="aspectFill"
               class="swiper-image"
             ></image>
@@ -33,7 +33,7 @@
               <!-- <text class="swiper-desc">{{ item.name }}</text> -->
               <view class="swiper-participants">
                 <uni-icons type="person" size="14" color="#fff"></uni-icons>
-                <text>{{ item.totalParticipants ?? item.numberOfParticipants ?? 0 }}人参与</text>
+                <text>{{ item.totalParticipants ?? 0 }}人参与</text>
               </view>
             </view>
           </view>
@@ -108,21 +108,6 @@ onMounted(async () => {
   try {
     const eventList = await eventListApi();
     currentActivities.value = eventList.data.data;
-
-    // 新增：为每个活动获取轮播图图片
-    await Promise.all(currentActivities.value.map(async (item) => {
-      try {
-        const res = await request({ url: `/api/photo/${item.id}`, method: 'GET' });
-        // 假设返回 { url: '图片地址' }
-        const photoData = res && res.data as { url?: string };
-        if (photoData && photoData.url) {
-          item.bgImage = photoData.url;
-        }
-      } catch (e) {
-        // 保持原有图片
-      }
-    }));
-
     const list = await allEventsListApi();
     // 类型断言，确保 status 字段可用
     allActivities.value = list as (IEventItemMock & { status?: number })[];

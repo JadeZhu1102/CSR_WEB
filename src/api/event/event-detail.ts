@@ -13,6 +13,7 @@ interface IActivityDetail {
 export interface IEventDetailResponse {
     id: number;
     name: string;
+    detailImage: string;
     totalTime: number;
     icon: string;
     isDisplay: boolean;
