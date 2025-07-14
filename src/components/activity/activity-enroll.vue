@@ -23,6 +23,7 @@
 import { ref } from "vue";
 import type { IActivity } from "@/models/activity";
 import { activityEnrollApi } from "@/api/activity";
+import { showErrorToast } from '@/util/showErrorToast';
 
 export default {
     props: {
@@ -52,9 +53,7 @@ export default {
                     });
                 }
             } catch (error) {
-                uni.showToast({
-                    icon: 'error',
-                });
+                showErrorToast(error);
             } finally {
                 uni.hideLoading();
             }

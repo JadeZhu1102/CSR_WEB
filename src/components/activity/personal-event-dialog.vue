@@ -62,24 +62,13 @@ import { ref, watch, defineComponent, computed, getCurrentInstance, type PropTyp
 import uniCalendar from '@dcloudio/uni-ui/lib/uni-calendar/uni-calendar.vue';
 import uniFilePicker from '@dcloudio/uni-ui/lib/uni-file-picker/uni-file-picker.vue';
 import type { IActivity } from '@/models/activity';
+import { showErrorToast } from '@/util/showErrorToast';
 
 const errorMsg = ref('');
 
 function showError(msg: string) {
   errorMsg.value = msg;
-  const instance = getCurrentInstance();
-  const proxy = instance && (instance.proxy as any);
-  if (proxy && proxy.$u && typeof proxy.$u.toast === 'function') {
-    proxy.$u.toast(msg);
-  } else if (typeof uni !== 'undefined' && typeof uni.showToast === 'function') {
-    uni.showToast({
-      title: msg,
-      icon: 'none',
-      duration: 2000,
-      position: 'center',
-      mask: true
-    });
-  }
+  showErrorToast(msg);
   console.error('表单校验失败:', msg);
 }
 

@@ -197,6 +197,7 @@ import { useLanguage } from '@/composables/useLanguage';
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
 import { userProfileApi, resetPasswordApi, getUserDetailApi, getUserEventsApi, getUserActivitiesApi, updateUserDetailApi } from '@/api/user';
 import tokenManager from '@/api/token';
+import { showErrorToast } from '@/util/showErrorToast';
 
 function normalizeLang(lang: string) {
     if (lang === 'zh-Hans' || lang === 'zh-CN') return 'zh-Hans';
@@ -290,10 +291,7 @@ const switchLang = async (lang: string) => {
 
 const submitFeedback = async () => {
     if (!feedbackContent.value.trim()) {
-        uni.showToast({
-            title: instance?.proxy?.$t('toast.input_empty'),
-            icon: 'none'
-        });
+        showErrorToast(instance?.proxy?.$t('toast.input_empty'));
         return;
     }
     
@@ -320,11 +318,7 @@ const submitFeedback = async () => {
             // 不关闭弹窗
         }
     } catch (error) {
-        console.error('提交反馈失败:', error);
-        uni.showToast({
-            title: '提交失败，请联系管理员',
-            icon: 'none'
-        });
+        showErrorToast(error, '提交失败，请联系管理员');
         // 不关闭弹窗
     } finally {
         isLoading.value = false;
@@ -333,11 +327,11 @@ const submitFeedback = async () => {
 
 const handleChangePwd = async () => {
     if (!oldPwd.value || !newPwd.value || !confirmPwd.value) {
-        uni.showToast({ title: instance?.proxy?.$t('toast.fill_all'), icon: 'none' });
+        showErrorToast(instance?.proxy?.$t('toast.fill_all'));
         return;
     }
     if (newPwd.value !== confirmPwd.value) {
-        uni.showToast({ title: instance?.proxy?.$t('toast.pwd_mismatch'), icon: 'none' });
+        showErrorToast(instance?.proxy?.$t('toast.pwd_mismatch'));
         return;
     }
     try {
@@ -353,13 +347,13 @@ const handleChangePwd = async () => {
         newPwd.value = '';
         confirmPwd.value = '';
     } catch (e) {
-        uni.showToast({ title: '重置失败', icon: 'error' });
+        showErrorToast(e, '重置失败');
     }
 }
 
 const handleUpdateProfile = async () => {
     if (!profileForm.value.nickname.trim()) {
-        uni.showToast({ title: '请输入昵称', icon: 'none' });
+        showErrorToast('请输入昵称');
         return;
     }
     try {
@@ -381,7 +375,7 @@ const handleUpdateProfile = async () => {
             uni.showToast({ title: '更新失败，请联系管理员', icon: 'none' });
         }
     } catch (e) {
-        uni.showToast({ title: '更新失败，请联系管理员', icon: 'none' });
+        showErrorToast(e, '更新失败，请联系管理员');
     } finally {
         showProfileEdit.value = false;
     }
@@ -422,7 +416,7 @@ const handleEditProfile = async (uid?: number,) => {
         }
         showProfileEdit.value = true;
     } catch (e) {
-        uni.showToast({ title: '获取用户信息失败', icon: 'none' });
+        showErrorToast(e, '获取用户信息失败');
     }
 };
 
@@ -444,7 +438,7 @@ const initUserInfo = async () => {
             userName.value = data.username;
         }
     } catch (e) {
-        uni.showToast({ title: '获取用户信息失败', icon: 'none' });
+        showErrorToast(e, '获取用户信息失败');
     }
 };
 
@@ -500,7 +494,7 @@ const showContribution = async () => {
 
         showContributionDialog.value = true;
     } catch (e) {
-        uni.showToast({ title: '获取贡献数据失败', icon: 'none' });
+        showErrorToast(e, '获取贡献数据失败');
     }
 };
 

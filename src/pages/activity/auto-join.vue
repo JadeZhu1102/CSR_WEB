@@ -25,6 +25,7 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { activityJoinCheckApi, type IActivityJoinResult } from "@/api/activity";
+import { showErrorToast } from '@/util/showErrorToast';
 
 const currentActivityId = ref<string | null>(null);
 const activity = ref<IActivityJoinResult | null>(null);
@@ -57,7 +58,7 @@ onLoad(async (query) => {
     const detail: IActivityJoinResult = await activityJoinCheckApi(activitySessionId);
     activity.value = detail;
   } catch (error) {
-    //
+    showErrorToast(error);
   } finally {
     uni.hideLoading();
   }

@@ -2,42 +2,42 @@
     "pages": [{
             "path": "pages/index/index",
             "style": {
-                "navigationBarTitleText": "%title.newest_activities%",
+                "navigationBarTitleText": "Latest Activities",
                 "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/activity/detail",
             "style": {
-                "navigationBarTitleText": "%title.activity_detail%",
+                "navigationBarTitleText": "Activity Detail",
                 "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/activity/auto-join",
             "style": {
-                "navigationBarTitleText": "%title.join_activity%",
+                "navigationBarTitleText": "Join Activty",
                 "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/account/index",
             "style": {
-                "navigationBarTitleText": "%title.my_account%",
+                "navigationBarTitleText": "My Account",
                 "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/auth/login",
             "style": {
-                "navigationBarTitleText": "%title.login%",
+                "navigationBarTitleText": "Login",
                 "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/auth/register",
             "style": {
-                "navigationBarTitleText": "%title.register%",
+                "navigationBarTitleText": "Register",
                 "navigationStyle": "custom"
             }
         }

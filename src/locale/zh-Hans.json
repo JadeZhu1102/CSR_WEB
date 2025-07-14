@@ -178,8 +178,12 @@
     "all.coming_soon": "敬请期待",
     "activity.detail.waiting": "敬请期待",
     "activity.detail.ended": "活动已结束",
-    "login.pwd_length_tip": "密码长度需为8-20位",
-    "login.pwd_complexity_tip": "密码需包含字母和数字",
+    "login": {
+        "pwd_length_tip": "密码长度需为8-20位",
+        "pwd_complexity_tip": "密码必须包含字母和数字",
+        "pwd_complexity_tip_letter": "密码需包含字母",
+        "pwd_complexity_tip_number": "密码需包含数字"
+    },
     "login.name_required": "请输入姓名",
     "login.gender_required": "请选择性别",
     "login.city_required": "请选择城市"

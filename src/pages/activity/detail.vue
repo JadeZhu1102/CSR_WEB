@@ -213,6 +213,7 @@ import {
   eventActivitiesApi,
   eventJoinedActivitiesApi,
 } from '@/api/activity';
+import { showErrorToast } from '@/util/showErrorToast';
 
 //---- Page -----
 interface IEventInformation {
@@ -357,7 +358,7 @@ async function handleEditEventConfirm(data: { type: string; content: string; mon
       uni.showToast({ title: '编辑成功', icon: 'success', duration: 2000 });
       await refreshUserStages();
     } catch (error) {
-      //
+      showErrorToast(error);
     } finally {
       uni.hideLoading();
     }
@@ -381,7 +382,7 @@ async function registerActivity(selectedActivity: IActivity) {
       duration: 2000
     });
   } catch (error) {
-    //
+    showErrorToast(error);
   } finally {
     uni.hideLoading();
   }
@@ -398,9 +399,10 @@ async function unregisterActivity(selectedActivity: IActivity) {
       icon: 'success',
       duration: 2000
     });
+    refreshStages();
     refreshUserStages();
   } catch (error) {
-    //
+    showErrorToast(error);
   } finally {
     uni.hideLoading();
   }

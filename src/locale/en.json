@@ -177,8 +177,12 @@
     "all.coming_soon": "Coming Soon",
     "activity.detail.waiting": "Coming Soon",
     "activity.detail.ended": "Event Ended",
-    "login.pwd_length_tip": "Password must be 8-20 characters",
-    "login.pwd_complexity_tip": "Password must contain both letters and numbers",
+    "login": {
+        "pwd_length_tip": "Password must be 8-20 characters long",
+        "pwd_complexity_tip": "Password must contain both letters and numbers",
+        "pwd_complexity_tip_letter": "Password must contain at least one letter",
+        "pwd_complexity_tip_number": "Password must contain at least one number"
+    },
     "login.name_required": "Please enter your name",
     "login.gender_required": "Please select gender",
     "login.city_required": "Please select city"

@@ -1,5 +1,6 @@
 import { loginApi, logoutApi, type ILoginParams } from "@/api/auth";
 import tokenManager from "@/api/token";
+import { showErrorToast } from './showErrorToast';
 
 /**
  * 检查是否已登录
@@ -34,7 +35,7 @@ export const loginAccount = async (params: ILoginParams): Promise<boolean> => {
             }, true);
             return true;
         }
-        uni.showToast({ title: res.message });
+        showErrorToast(res);
     } catch (error) {
         console.log(error);
     }

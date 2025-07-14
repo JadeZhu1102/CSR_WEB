@@ -28,7 +28,7 @@ export const registerApi = (params: IRegisterParams) => {
                 if (resData.code === 200) {
                     resolve(true);
                 } else {
-                    reject(new Error('Failed to register'));
+                    reject(Object.assign(new Error(resData.message || 'Failed to register'), { response: resData }));
                 }
             },
             fail: (error) => {

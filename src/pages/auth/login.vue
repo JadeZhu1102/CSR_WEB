@@ -176,6 +176,7 @@ import { loginAccount } from '@/util/auth';
 import { registerApi } from '@/api/auth';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import tokenManager from '@/api/token';
+import { showErrorToast } from '@/util/showErrorToast';
 const { t } = useI18n();
 // 状态管理
 const isLogin = ref(true);
@@ -227,6 +228,12 @@ function validatePassword(pwd: string): string | null {
   if (!pwd || pwd.length < 8 || pwd.length > 20) {
     return t('login.pwd_length_tip');
   }
+  if (/^[0-9]+$/.test(pwd)) {
+    return t('login.pwd_complexity_tip_letter'); // 需要字母
+  }
+  if (/^[A-Za-z]+$/.test(pwd)) {
+    return t('login.pwd_complexity_tip_number'); // 需要数字
+  }
   if (!/[A-Za-z]/.test(pwd) || !/\d/.test(pwd)) {
     return t('login.pwd_complexity_tip');
   }
@@ -235,31 +242,31 @@ function validatePassword(pwd: string): string | null {
 // 提交表单
 const handleSubmit = async () => {
   if (!username.value || !password.value) {
-    uni.showToast({ title: t('login.please_input_username_password'), icon: 'none' });
+    showErrorToast(t('login.please_input_username_password'));
     return;
   }
   if (!isLogin.value) {
     if (!username.value) {
-      uni.showToast({ title: t('login.name_required'), icon: 'none' });
+      showErrorToast(t('login.name_required'));
       return;
     }
     if (genderIndex.value < 0) {
-      uni.showToast({ title: t('login.gender_required'), icon: 'none' });
+      showErrorToast(t('login.gender_required'));
       return;
     }
     if (cityIndex.value < 0) {
-      uni.showToast({ title: t('login.city_required'), icon: 'none' });
+      showErrorToast(t('login.city_required'));
       return;
     }
   }
   // 密码复杂度校验
   const pwdErr = validatePassword(password.value);
   if (pwdErr) {
-    uni.showToast({ title: pwdErr, icon: 'none' });
+    showErrorToast(pwdErr);
     return;
   }
   if (!isLogin.value && password.value !== passwordConfirm.value) {
-    uni.showToast({ title: t('login.two_input_password_not_consistent'), icon: 'none' });
+    showErrorToast(t('login.two_input_password_not_consistent'));
     return;
   }
   isLoading.value = true;
@@ -272,25 +279,24 @@ const handleSubmit = async () => {
         uni.reLaunch({ url: '/pages/index/index' });
       }, 500);
     } else {
-      uni.showToast({ title: t('login.username_password_error'), icon: 'none' });
+      showErrorToast(t('login.username_password_error'));
     }
   } else {
-    const gender = genderIndex.value >= 0 ? genderOptions[genderIndex.value].value : '';
-    const city = cityIndex.value >= 0 ? cityOptions[cityIndex.value].value : '';
-    const success = await registerApi({
-      username: username.value,
-      password: password.value,
-      gender,
-      city
-    });
-    isLoading.value = false;
-    if (success) {
+    try {
+      const gender = genderIndex.value >= 0 ? genderOptions[genderIndex.value].value : '';
+      const city = cityIndex.value >= 0 ? cityOptions[cityIndex.value].value : '';
+      await registerApi({
+        username: username.value,
+        password: password.value,
+        gender,
+        city
+      });
       uni.showToast({ title: t('login.register_success'), icon: 'success' });
       isLogin.value = true;
       password.value = '';
       passwordConfirm.value = '';
-    } else {
-      uni.showToast({ title: t('login.register_failed'), icon: 'none' });
+    } catch (error) {
+      showErrorToast(error);
     }
   }
 };
