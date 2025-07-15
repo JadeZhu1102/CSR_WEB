@@ -185,5 +185,12 @@
     },
     "login.name_required": "Please enter your name",
     "login.gender_required": "Please select gender",
-    "login.city_required": "Please select city"
+    "login.city_required": "Please select city",
+    "activity": {
+        "participation": {
+            "empty_title": "No Participation Yet",
+            "empty_desc": "You haven't joined any activities yet. Go sign up for one you like!",
+            "go_join": "Go Join Activity"
+        }
+    }
 }

@@ -186,5 +186,12 @@
     },
     "login.name_required": "请输入姓名",
     "login.gender_required": "请选择性别",
-    "login.city_required": "请选择城市"
+    "login.city_required": "请选择城市",
+    "activity": {
+        "participation": {
+            "empty_title": "暂无参与记录",
+            "empty_desc": "您还没有参与任何活动，快去报名一个喜欢的活动吧！",
+            "go_join": "去报名活动"
+        }
+    }
 }

@@ -184,5 +184,12 @@
     },
     "login.name_required": "請輸入姓名",
     "login.gender_required": "請選擇性別",
-    "login.city_required": "請選擇城市"
+    "login.city_required": "請選擇城市",
+    "activity": {
+        "participation": {
+            "empty_title": "暫無參與記錄",
+            "empty_desc": "您還沒有參與任何活動，快去報名一個喜歡的活動吧！",
+            "go_join": "去報名活動"
+        }
+    }
 }

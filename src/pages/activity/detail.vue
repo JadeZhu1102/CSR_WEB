@@ -137,43 +137,53 @@
               </view>
             </view>
             <view v-if="activeTab === 'participation'" class="participation-list">
-              <view
-                class="participation-item"
-                v-for="record in userStages"
-                :key="record.id"
-              >
-                <view class="item-main">
-                  <view class="event-header">
-                    <text class="event-title">{{ record.name }}</text>
+              <template v-if="userStages.length > 0">
+                <view
+                  class="participation-item"
+                  v-for="record in userStages"
+                  :key="record.id"
+                >
+                  <view class="item-main">
+                    <view class="event-header">
+                      <text class="event-title">{{ record.name }}</text>
+                    </view>
+                    <text class="event-desc">{{ record.description }}</text>
+                    <view class="stage-meta">
+                      <view class="meta-col">
+                        {{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}
+                      </view>
+                      <view class="meta-col" v-if="record.userActivityDetail?.comment">
+                        {{ $t('activity.detail.remark') }}{{ record.userActivityDetail?.comment }}
+                      </view>
+                      <view class="meta-col" v-if="typeof record.userActivityDetail?.amount === 'number'">
+                        {{ $t('activity.detail.amount') }}{{ record.userActivityDetail?.amount }}
+                      </view>
+                    </view>
+                    <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
+                      <image
+                        v-for="(img, idx) in record.thumbs"
+                        :key="idx"
+                        :src="img"
+                        class="stage-thumb-img"
+                        mode="aspectFill"
+                        @click="showPreview(img)"
+                      />
+                    </view>
                   </view>
-                  <text class="event-desc">{{ record.description }}</text>
-                  <view class="stage-meta">
-                    <view class="meta-col">
-                      {{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}
-                    </view>
-                    <view class="meta-col" v-if="record.userActivityDetail?.comment">
-                      {{ $t('activity.detail.remark') }}{{ record.userActivityDetail?.comment }}
-                    </view>
-                    <view class="meta-col" v-if="typeof record.userActivityDetail?.amount === 'number'">
-                      {{ $t('activity.detail.amount') }}{{ record.userActivityDetail?.amount }}
-                    </view>
-                  </view>
-                  <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
-                    <image
-                      v-for="(img, idx) in record.thumbs"
-                      :key="idx"
-                      :src="img"
-                      class="stage-thumb-img"
-                      mode="aspectFill"
-                      @click="showPreview(img)"
-                    />
+                  <view class="item-actions">
+                    <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
+                    <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
                   </view>
                 </view>
-                <view class="item-actions">
-                  <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
-                  <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
+              </template>
+              <template v-else>
+                <view class="empty-participation">
+                  <image src="/src/static/icons/empty.svg" class="empty-illustration" mode="widthFix" style="width:120px;margin:0 auto 18px;display:block;" />
+                  <view class="empty-title">{{ $t('activity.participation.empty_title') }}</view>
+                  <view class="empty-desc">{{ $t('activity.participation.empty_desc') }}</view>
+                  <button class="main-join-btn" @click="activeTab = 'progress'">{{ $t('activity.participation.go_join') }}</button>
                 </view>
-              </view>
+              </template>
             </view>
           </view>
         </view>
@@ -1035,5 +1045,31 @@ page {
   padding: 16px 0;
   font-weight: bold;
   box-shadow: 0 2px 8px rgba(64,186,213,0.12);
+}
+.empty-participation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0 32px 0;
+  color: #888;
+}
+.empty-illustration {
+  width: 120px;
+  height: auto;
+  margin-bottom: 18px;
+}
+.empty-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+.empty-desc {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 18px;
+  text-align: center;
+  max-width: 260px;
 }
 </style>
