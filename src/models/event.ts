@@ -8,12 +8,14 @@ interface IEventProps {
     name: string;
     startTime: string | null;
     totalParticipants?: number;
+    status: 'InProgress' | 'Finished' | 'ToStart';
+
+    slogan?: string;
 }
 
 export interface IEventItem extends IEventProps {
     /** 当前用户是否已参加 */
     enrollStatus: 'Approved' | 'Pending' | null;
-    totalParticipants?: number;
 }
 
 export interface IActivityDetail extends IEventItem {

@@ -54,26 +54,26 @@
           v-for="(item, index) in allActivities"
           :key="index"
           class="activity-card cursor-pointer"
-          @click="item.status !== 2 && goToActivityDetail(item.id)"
+          @click="item.status !== 'ToStart' && goToActivityDetail(item.id)"
           style="position: relative;"
         >
           <image
-            :src="item.coverImage"
+            :src="item.bgImage"
             mode="aspectFill"
             class="activity-image"
           ></image>
           <view
-            v-if="item.status === 2"
+            v-if="item.status === 'ToStart'"
             class="coming-soon-overlay"
           >
             <text class="coming-soon-text">{{$t('all.coming_soon')}}</text>
           </view>
           <view class="activity-info">
             <text class="activity-title">{{ item.name }}</text>
-            <text class="activity-desc">{{ item.slogan }}</text>
+            <text v-if="item.slogan" class="activity-desc">{{ item.slogan }}</text>
             <view class="activity-participants">
               <uni-icons type="person" size="14" color="#666"></uni-icons>
-              <text>{{ item.totalParticipants ?? item.numberOfParticipants ?? 0 }}人参与</text>
+              <text>{{ item.totalParticipants ?? 0 }}人参与</text>
             </view>
           </view>
         </view>
@@ -86,7 +86,7 @@
 import { ref, onMounted } from "vue";
 import PageUrl from '@/config/page-url';
 import type { IEventItem } from '@/models/event';
-import { eventListApi, allEventsListApi, type IEventItemMock } from "@/api/event";
+import { eventListApi } from "@/api/event";
 // 新增：导入请求方法
 import { request } from '@/api/request';
 
@@ -96,7 +96,7 @@ const activeTab = ref("activities");
 const currentActivities = ref<IEventItem[]>([]);
 
 // 全部活动数据
-const allActivities = ref<IEventItemMock[] & { status?: number }[]>();
+const allActivities = ref<IEventItem[]>();
 
 // 切换标签页
 const switchTab = (tab: string) => {
@@ -107,10 +107,34 @@ const switchTab = (tab: string) => {
 onMounted(async () => {
   try {
     const eventList = await eventListApi();
-    currentActivities.value = eventList.data.data;
-    const list = await allEventsListApi();
-    // 类型断言，确保 status 字段可用
-    allActivities.value = list as (IEventItemMock & { status?: number })[];
+    const activeEvents: IEventItem[] = [];
+    const finishedEvents: IEventItem[] = [];
+    const toStartEvents: IEventItem[] = [];
+
+    const allEvents = eventList.data.data;
+    const now = new Date();
+    for (const event of allEvents) {
+      if (event.startTime && new Date(event.startTime) > now) {
+        toStartEvents.push({
+          ...event,
+          status: 'ToStart',
+        });
+      } else if (event.endTime && new Date(event.endTime) < now) {
+        finishedEvents.push({
+          ...event,
+          status: 'Finished',
+        });
+      } else {
+        activeEvents.push(event);
+      }
+    }
+
+    const otherEvents: IEventItem[] = [
+      ...toStartEvents,
+      ...finishedEvents,
+    ];
+    currentActivities.value = activeEvents;
+    allActivities.value = otherEvents;
   } catch (e) {
     // 保留mock
   }

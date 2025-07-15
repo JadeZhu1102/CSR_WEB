@@ -91,15 +91,19 @@ export default defineComponent({
   },
   emits: ['update:visible', 'confirm', 'cancel'],
   setup(props, { emit }) {
+    const fillFormData = (editingStage: IActivity | null) => ({
+      content: editingStage?.userActivityDetail?.comment || '',
+      money: editingStage?.userActivityDetail?.amount ?? 0,
+    });
     const instance = getCurrentInstance();
     const $t = instance?.proxy?.$t || ((k:string)=>k);
     const typeOptionsComputed = computed(() => (props.typeOptions && props.typeOptions.length > 0 ? props.typeOptions as string[] : ['重要', '普通', '提醒']));
+  
     const form = ref({
       typeIndex: 0,
-      content: '',
-      money: 0,
       date: '',
-      images: [] as any[]
+      images: [] as any[],
+      ...fillFormData(props.editData),
     });
     const showTypeSelect = ref(false);
     const uniCalendarRef = ref();
@@ -127,10 +131,9 @@ export default defineComponent({
           const typeIndex = typeOptionsComputed.value.findIndex(type => type === props.editData?.name);
           form.value = {
             typeIndex: typeIndex >= 0 ? typeIndex : 0,
-            content: props.editData?.userActivityDetail?.comment || '',
-            money: props.editData?.userActivityDetail?.amount ?? 0,
             date: props.editData?.startTime || '',
             images: props.editData?.thumbs || [],
+            ...fillFormData(props.editData),
           };
         } else {
           // 新增模式：清空表单

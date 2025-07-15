@@ -24,7 +24,7 @@ export async function activitySignupApi(activityId: number) {
 export async function activityWithdrawApi(activityId: number) {
     const userId = await tokenManager.getUserId();
     if (userId === null || userId === undefined) {
-        throw new Error('Failed to sign up activity.');
+        throw new Error('Failed to withdraw activity.');
     }
     return request<boolean>({
         url: `/api/activities/${activityId}/withdraw`,
