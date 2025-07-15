@@ -7,16 +7,13 @@ import tokenManager from "@/api/token";
 declare var process: any;
 
 export const ApiServer = {
-    // TODO: 在域名配置修改
-    Host: 'http://8.133.240.77:8080',
+    Host: 'https://joy4giving.cn',
 };
 
-/*
 if (process.env.UNI_PLATFORM === 'h5') {
     // H5 使用本机作为 host
     ApiServer.Host = '';
 }
-*/
 
 const isTokenExpired = (error: UniApp.RequestSuccessCallbackResult): boolean => {
     return error.statusCode === 401;

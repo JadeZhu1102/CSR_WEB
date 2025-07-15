@@ -170,7 +170,7 @@
                       />
                     </view>
                   </view>
-                  <view class="item-actions">
+                  <view class="item-actions" v-if="record.status === 'IN_PROGRESS'">
                     <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
                     <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
                   </view>

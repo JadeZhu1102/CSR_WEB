@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 1. 打包前端项目
-npm install
+#npm install
 npm run build:h5
 
 # 2. 上传打包产物到服务器
@@ -9,7 +9,7 @@ npm run build:h5
 SRC_DIR="dist/build/h5/"
 DEST_USER="root"
 DEST_HOST="8.133.240.77"
-DEST_DIR="/dist/build/h5/"
+DEST_DIR="/opt/csr-app/"
 
 # 上传（覆盖目标目录）
 echo "Uploading files to $DEST_USER@$DEST_HOST:$DEST_DIR ..."
