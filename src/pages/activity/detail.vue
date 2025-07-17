@@ -41,7 +41,7 @@
           </view>
           <view class="info-item">
             <uni-icons type="person" size="16" color="#6a11cb"></uni-icons>
-            <text>{{ activity?._enrollCount ? activity._enrollCount + $t('activity.detail.enrolled_suffix') : '-' }}</text>
+            <text>{{ activity?._enrollCount ? activity._enrollCount + $t('activity.detail.enrolled_suffix') : '朱瑜' }}</text>
           </view>
         </view>
       </view>
@@ -108,7 +108,7 @@
                       </view>
                     </view>
                     <view class="stage-meta"> 
-                      <view class="meta-col">{{ $t('activity.detail.stage_intro') }}{{ stage.description || '-' }}</view>
+                      <view class="meta-col" v-html="($t('activity.detail.stage_intro') + (stage.description ? stage.description.replace(/\n/g, '<br>') : '-'))"></view>
                       <view class="meta-col">{{ $t('activity.detail.stage_start') }}{{ stage.startTime ? $d(new Date(stage.startTime)) : '-' }}</view>
                       <view class="meta-col">{{ $t('activity.detail.stage_participants') }}{{ stage.totalParticipants || 0 }}</view>
                     </view>
