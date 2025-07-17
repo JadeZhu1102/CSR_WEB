@@ -24,7 +24,7 @@
     "acivity.introduction": "Introduction",
     "acivity.progress": "Progress",
     "acivity.participation": "Participation",
-    "login.user_name": "Name e.g. Zhang San",
+    "login.user_name": "Name e.g.:张三",
     "login.password": "Password",
     "login.login": "Login",
     "register.user_name": "User Name",
