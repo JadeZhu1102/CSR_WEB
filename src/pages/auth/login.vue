@@ -322,7 +322,7 @@ const openAgreement = (type: 'user'|'privacy') => {
 
 // 判断是否已登录，未登录则强制留在登录页
 async function checkLoginGuard() {
-  const token = await tokenManager.getToken();
+  const token = await tokenManager.getToken(true);
   if (!token) {
     uni.reLaunch({ url: '/pages/auth/login' });
   }
@@ -330,7 +330,6 @@ async function checkLoginGuard() {
 
 onLoad(async () => {
   isLogin.value = true;
-  await checkLoginGuard();
 });
 
 onShow(async () => {
