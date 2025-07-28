@@ -274,7 +274,7 @@ const i18n = useI18n();
 const scrollHeight = ref(0);
 
 const eventId = ref<number|null>(null);
-const defaultCover = 'https://readdy.ai/api/search-image?query=City%20marathon%20charity%20run%20event&width=750&height=560&seq=8&orientation=landscape';
+const defaultCover = '';
 const activity = ref<IEventInformation | null>(null);
 const stages = ref<IActivity[]>([]);
 const userStages = ref<IActivity[]>([]);

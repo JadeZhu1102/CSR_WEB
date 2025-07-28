@@ -102,7 +102,7 @@ class TokenManager {
         }
     }
 
-    public async getToken(): Promise<string> {
+    public async getToken(checkingOnly = false): Promise<string> {
         const tokenCache = await this.retrieve();
 
         if (tokenCache) {
@@ -111,8 +111,10 @@ class TokenManager {
             }
         }
 
-        this.clearRefresh();
-        this.goToLoginPage();
+        if (checkingOnly === false) {
+            this.clearRefresh();
+            this.goToLoginPage();
+        }
         throw new Error('Token does not exist or is expired');
     }
 
