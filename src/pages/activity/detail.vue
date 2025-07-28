@@ -142,7 +142,40 @@
                   class="participation-item"
                   v-for="record in userStages"
                   :key="record.id"
+                  style="position:relative;"
                 >
+                  <!-- 右上角的trxId -->
+                  <view
+                    v-if="record.templateId === 2 && isChainId(record) && txHashMap[record.id]"
+                    style="position:absolute;top:12px;right:18px;display:flex;align-items:center;gap:4px;color:#40bad5;padding:2px 10px;border-radius:8px;font-size:12px;z-index:2;"
+                  >
+                    <!-- 比特币+电路SVG，主题色#40bad5 -->
+                    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g stroke="#40bad5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <!-- 外部电路线和圆点 -->
+                        <circle cx="32" cy="32" r="18"/>
+                        <circle cx="32" cy="6" r="2"/>
+                        <circle cx="32" cy="58" r="2"/>
+                        <circle cx="6" cy="32" r="2"/>
+                        <circle cx="58" cy="32" r="2"/>
+                        <path d="M32 8v6"/>
+                        <path d="M32 50v6"/>
+                        <path d="M8 32h6"/>
+                        <path d="M50 32h6"/>
+                        <path d="M14.93 14.93l4.24 4.24"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <path d="M49.07 14.93l-4.24 4.24"/>
+                        <circle cx="52" cy="12" r="2"/>
+                        <path d="M14.93 49.07l4.24-4.24"/>
+                        <circle cx="12" cy="52" r="2"/>
+                        <path d="M49.07 49.07l-4.24-4.24"/>
+                        <circle cx="52" cy="52" r="2"/>
+                        <!-- B字母 -->
+                        <text x="32" y="42" text-anchor="middle" font-size="22" font-family="Arial, Helvetica, sans-serif" fill="#40bad5" font-weight="bold">B</text>
+                      </g>
+                    </svg>
+                    {{ txHashMap[record.id] && txHashMap[record.id].slice(0, 8) }}
+                  </view>
                   <view class="item-main">
                     <view class="event-header">
                       <text class="event-title">{{ record.name }}</text>
@@ -206,7 +239,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import UniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
@@ -249,6 +282,33 @@ const showEditDialog = ref(false);
 const editingStage = ref<IActivity | null>(null);
 const previewImg = ref<string | null>(null);
 const activeTab = ref('progress');
+
+// 新增：存储txHash前6位
+const txHashMap = reactive({} as Record<number, string>); // key: record.id, value: txHash前6位
+
+// 新增：辅助函数判断record是否有chainId
+function isChainId(record: any): boolean {
+  return record && record.userActivityDetail && typeof record.userActivityDetail.chainId === 'string' && record.userActivityDetail.chainId;
+}
+
+defineExpose({ isChainId });
+
+// 新增：获取交易信息
+async function fetchTxHash(chainId: string, recordId: number) {
+  try {
+    const res = await uni.request({
+      url: `/api/transactions/${chainId}`,
+      method: 'GET',
+    });
+    // 兼容res.data类型
+    const data = (res as any).data;
+    if (data && typeof data === 'object' && 'txHash' in data && typeof data.txHash === 'string') {
+      txHashMap[recordId] = data.txHash.slice(0, 8);
+    }
+  } catch (e) {
+    // 忽略错误
+  }
+}
 
 function goBack() {
   uni.reLaunch({ url: '/pages/index/index' });
@@ -308,6 +368,15 @@ async function refreshUserStages() {
   const res = await eventJoinedActivitiesApi(eventId.value!);
   // 按开始时间升序排序
   userStages.value = (res || []).slice().sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  // 新增：遍历查找templateId==2且有chainId的，获取txHash
+  for (const record of userStages.value) {
+    // 兼容 userActivityDetail 可能没有 chainId
+    const detail: any = record.userActivityDetail;
+    const chainId = detail && detail.chainId;
+    if (record.templateId === 2 && typeof chainId === 'string' && chainId) {
+      fetchTxHash(chainId, record.id);
+    }
+  }
 }
 
 function handleJoinStage(stage: IActivity) {
