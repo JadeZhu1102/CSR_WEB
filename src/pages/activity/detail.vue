@@ -144,10 +144,40 @@
                   :key="record.id"
                   style="position:relative;"
                 >
-                  <!-- 右上角的trxId -->
+                  <view class="item-main">
+                    <view class="event-header">
+                      <text class="event-title">{{ record.name }}</text>
+                    </view>
+                    <view class="stage-meta">
+                      <view class="meta-col">
+                        {{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}
+                      </view>
+                      <view class="meta-col" v-if="record.userActivityDetail?.comment">
+                        {{ $t('activity.detail.remark') }}{{ record.userActivityDetail?.comment }}
+                      </view>
+                      <view class="meta-col" v-if="typeof record.userActivityDetail?.amount === 'number'">
+                        {{ $t('activity.detail.amount') }}{{ record.userActivityDetail?.amount }}
+                      </view>
+                    </view>
+                    <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
+                      <image
+                        v-for="(img, idx) in record.thumbs"
+                        :key="idx"
+                        :src="img"
+                        class="stage-thumb-img"
+                        mode="aspectFill"
+                        @click="showPreview(img)"
+                      />
+                    </view>
+                  </view>
+                  <view class="item-actions" v-if="record.status === 'IN_PROGRESS'">
+                    <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
+                    <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
+                  </view>
+                  <!-- 右下角的trxId -->
                   <view
                     v-if="record.templateId === 2 && isChainId(record) && txHashMap[record.id]"
-                    style="position:absolute;top:12px;right:18px;display:flex;align-items:center;gap:4px;color:#40bad5;padding:2px 10px;border-radius:8px;font-size:12px;z-index:2;"
+                    class="trxid-info"
                   >
                     <!-- 比特币+电路SVG，主题色#40bad5 -->
                     <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,37 +205,6 @@
                       </g>
                     </svg>
                     {{ txHashMap[record.id] && txHashMap[record.id].slice(0, 8) }}
-                  </view>
-                  <view class="item-main">
-                    <view class="event-header">
-                      <text class="event-title">{{ record.name }}</text>
-                    </view>
-                    <text class="event-desc">{{ record.description }}</text>
-                    <view class="stage-meta">
-                      <view class="meta-col">
-                        {{ $t('activity.detail.stage_start') }}{{ $d(new Date(record.startTime)) || '-' }}
-                      </view>
-                      <view class="meta-col" v-if="record.userActivityDetail?.comment">
-                        {{ $t('activity.detail.remark') }}{{ record.userActivityDetail?.comment }}
-                      </view>
-                      <view class="meta-col" v-if="typeof record.userActivityDetail?.amount === 'number'">
-                        {{ $t('activity.detail.amount') }}{{ record.userActivityDetail?.amount }}
-                      </view>
-                    </view>
-                    <view class="stage-thumbs" v-if="record.thumbs && record.thumbs.length">
-                      <image
-                        v-for="(img, idx) in record.thumbs"
-                        :key="idx"
-                        :src="img"
-                        class="stage-thumb-img"
-                        mode="aspectFill"
-                        @click="showPreview(img)"
-                      />
-                    </view>
-                  </view>
-                  <view class="item-actions" v-if="record.status === 'IN_PROGRESS'">
-                    <uni-icons type="compose" size="22" color="#30a908" class="icon-btn" @click="handleEditJoinActivity(record)" />
-                    <uni-icons type="trash" size="22" color="#dd524d" class="icon-btn" @click="handleDeleteStage(record)" />
                   </view>
                 </view>
               </template>
@@ -921,12 +920,13 @@ page {
 }
 .participation-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 18px 20px;
   background: #f8f9fa;
   border-radius: 12px;
   margin-bottom: 18px;
+  position: relative;
 }
 .participation-item .item-main {
   flex: 1;
@@ -938,6 +938,8 @@ page {
   gap: 16px;
   align-items: center;
   margin-left: 18px;
+  align-self: flex-start;
+  margin-top: 0;
 }
 .record-header {
   display: flex;
@@ -1140,5 +1142,21 @@ page {
   margin-bottom: 18px;
   text-align: center;
   max-width: 260px;
+}
+
+.trxid-info {
+  position: absolute;
+  right: 5px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #40bad5;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
 }
 </style>
