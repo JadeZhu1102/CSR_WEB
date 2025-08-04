@@ -41,7 +41,7 @@
           </view>
           <view class="info-item">
             <uni-icons type="person" size="16" color="#6a11cb"></uni-icons>
-            <text>{{ activity?._enrollCount ? activity._enrollCount + $t('activity.detail.enrolled_suffix') : '朱瑜' }}</text>
+            <text>{{ activity?._enrollCount ? activity._enrollCount + $t('activity.detail.enrolled_suffix') : '' }}</text>
           </view>
         </view>
       </view>
