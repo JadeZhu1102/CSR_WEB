@@ -119,20 +119,20 @@
                 </view>
                 <view class="drawer-content">
                     <button class="ani-btn drawer-btn" @click="openLangDialogFromDrawer">{{$t('account.button.language')}}</button>
-                    <button class="ani-btn drawer-btn" @click="showPwdDialog = true">{{$t('account.button.change_pwd')}}</button>
+                    <button class="ani-btn drawer-btn" @click="openPwdDialog">{{$t('account.button.change_pwd')}}</button>
                     <button class="ani-btn logout-drawer-btn" @click="onLogout">{{$t('account.button.logout')}}</button>
                 </view>
             </view>
         </view>
 
-        <view v-if="showPwdDialog" class="pwd-dialog-mask" @click.self="showPwdDialog = false">
+        <view v-if="showPwdDialog" class="pwd-dialog-mask" @click.self="handleCancelPwd">
             <view class="pwd-dialog ani-dialog">
                 <view class="dialog-title">{{$t('account.pwd.title')}}</view>
                 <input v-model="oldPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.old')" />
                 <input v-model="newPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.new')" />
                 <input v-model="confirmPwd" class="ani-input pwd-input" type="password" :placeholder="$t('account.pwd.confirm')" />
                 <view class="dialog-actions">
-                    <button class="ani-btn drawer-btn" @click="showPwdDialog = false">{{$t('account.feedback.cancel')}}</button>
+                    <button class="ani-btn drawer-btn" @click="handleCancelPwd">{{$t('account.feedback.cancel')}}</button>
                     <button class="ani-btn drawer-btn" @click="handleChangePwd">{{$t('account.pwd.confirm_btn')}}</button>
                 </view>
             </view>
@@ -325,6 +325,14 @@ const submitFeedback = async () => {
     }
 }
 
+const handleCancelPwd = () => {
+    showPwdDialog.value = false;
+    showSettings.value = false; // 关闭左边菜单栏
+    oldPwd.value = '';
+    newPwd.value = '';
+    confirmPwd.value = '';
+}
+
 const handleChangePwd = async () => {
     if (!oldPwd.value || !newPwd.value || !confirmPwd.value) {
         showErrorToast(instance?.proxy?.$t('toast.fill_all'));
@@ -343,9 +351,18 @@ const handleChangePwd = async () => {
         }
         uni.showToast({ title: instance?.proxy?.$t('toast.pwd_changed'), icon: 'success' });
         showPwdDialog.value = false;
+        showSettings.value = false; // 关闭左边菜单栏
         oldPwd.value = '';
         newPwd.value = '';
         confirmPwd.value = '';
+        
+        // 修改密码成功后自动登出
+        setTimeout(() => {
+            logoutAccount();
+            uni.navigateTo({
+                url: PageUrl.auth.login,
+            });
+        }, 1500); // 延迟1.5秒后登出，让用户看到成功提示
     } catch (e) {
         showErrorToast(e, '重置失败');
     }
@@ -386,6 +403,14 @@ const openLangDialogFromDrawer = () => {
     // 延迟弹出，避免动画冲突
     setTimeout(() => {
         showLangDialog.value = true;
+    }, 250);
+};
+
+const openPwdDialog = () => {
+    showSettings.value = false;
+    // 延迟弹出，避免动画冲突
+    setTimeout(() => {
+        showPwdDialog.value = true;
     }, 250);
 };
 
@@ -1296,10 +1321,13 @@ watchEffect(() => {
     position: fixed;
     left: 0; top: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.18);
-    z-index: 2100;
+    z-index: 2500;
     display: flex;
     align-items: center;
     justify-content: center;
+    /* 确保完全覆盖设置侧边栏 */
+    width: 100vw;
+    height: 100vh;
 }
 
 .pwd-dialog {
