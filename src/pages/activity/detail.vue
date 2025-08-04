@@ -335,7 +335,7 @@ async function refreshEventDetail() {
         _title: detail.name,
         _statusText: getStatusText(detail.status || 'in_progress'),
         _dateText: getDateText(detail.startTime, detail.endTime),
-        _enrollCount: detail.numberOfParticipants,
+        _enrollCount: detail?.totalParticipants ?? 0,
         _description: detail.description,
         _detailImage: detail.bgImage || '',
         _location: detail.visibleLocations.join(' | ') || '-',
@@ -355,9 +355,9 @@ async function refreshStages() {
     // 按开始时间升序排序
     stages.value = (res || []).slice().sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     // 计算总参与人数
-    if (activity.value) {
-      activity.value._enrollCount = stages.value.reduce((sum, item) => sum + (item.totalParticipants || 0), 0);
-    }
+    //if (activity.value) {
+      // activity.value._enrollCount = stages.value.reduce((sum, item) => sum + (item.totalParticipants || 0), 0);
+    //}
 }
 
 /**

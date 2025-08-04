@@ -20,7 +20,7 @@ export interface IEventDetailResponse {
     visibleLocations: string[];
     visibleRoles: ('admin' | 'user')[];
     description: string;
-
+    totalParticipants: number;
     // TODO:
     activities: IActivityDetail[];
     bgImage: string;
