@@ -11,10 +11,14 @@ export default defineConfig({
   server: {
     // port: 8016,
     proxy: {
+      '/api/transactions':{
+        target: 'http://8.133.240.77:8194',
+        changeOrigin: true,
+      },
       '/api': {
         target: hostName,
         changeOrigin: true,
-      },
+      },  
       '/media': {
         target: 'http://localhost:8999',
         changeOrigin: true,
