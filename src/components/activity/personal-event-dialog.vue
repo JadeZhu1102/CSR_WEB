@@ -51,7 +51,13 @@
       </view>
       <view class="dialog-actions">
         <button class="btn cancel ani-btn" @click="onCancel">{{ $t('event.dialog.cancel') }}</button>
-        <button class="btn confirm ani-btn" @click="onConfirm" :style="isEditMode ? 'background:#30a908;color:#fff;' : ''">{{ $t('event.dialog.confirm') }}</button>
+        <button 
+          class="btn confirm ani-btn" 
+          :class="{ 'btn-disabled': !hasFormChanged }"
+          @click="hasFormChanged ? onConfirm() : null"
+        >
+          {{ $t('event.dialog.confirm') }}
+        </button>
       </view>
     </view>
   </view>
@@ -93,7 +99,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const fillFormData = (editingStage: IActivity | null) => ({
       content: editingStage?.userActivityDetail?.comment || '',
-      money: editingStage?.userActivityDetail?.amount ?? 0,
+      money: Number(editingStage?.userActivityDetail?.amount) || 0,
     });
     const instance = getCurrentInstance();
     const $t = instance?.proxy?.$t || ((k:string)=>k);
@@ -108,8 +114,29 @@ export default defineComponent({
     const showTypeSelect = ref(false);
     const uniCalendarRef = ref();
     
+    // 存储初始表单状态
+    const initialFormState = ref({
+      typeIndex: 0,
+      content: '',
+      money: 0,
+      date: '',
+      images: [] as any[],
+    });
+    
     // 判断是否为编辑模式
     const isEditMode = computed(() => !!props.editData);
+    
+    // 计算属性：判断表单是否已更改
+    const hasFormChanged = computed(() => {
+      // 比较当前表单状态与初始状态
+      const currentContent = form.value.content || '';
+      const currentMoney = Number(form.value.money) || 0;
+      const initialContent = initialFormState.value.content || '';
+      const initialMoney = Number(initialFormState.value.money) || 0;
+     
+      // 只有当当前值与初始值不同时，按钮才启用
+      return currentContent !== initialContent || currentMoney !== initialMoney;
+    });
     
     const showCalendar = () => {
       const instance = uniCalendarRef.value;
@@ -129,26 +156,30 @@ export default defineComponent({
         if (props.editData) {
           // 编辑模式：填充现有数据
           const typeIndex = typeOptionsComputed.value.findIndex(type => type === props.editData?.name);
-          form.value = {
+          const newFormData = {
             typeIndex: typeIndex >= 0 ? typeIndex : 0,
             date: props.editData?.startTime || '',
             images: props.editData?.thumbs || [],
             ...fillFormData(props.editData),
           };
-        } else {
+          form.value = { ...newFormData };
+          initialFormState.value = JSON.parse(JSON.stringify(newFormData));
+          } else {
           // 新增模式：清空表单
-          form.value = {
+          const newFormData = {
             typeIndex: 0,
             content: '',
             money: 0,
             date: '',
             images: [],
           };
-        }
+          form.value = { ...newFormData };
+          initialFormState.value = JSON.parse(JSON.stringify(newFormData));
+          }
         showTypeSelect.value = false;
         errorMsg.value = '';
       }
-    });
+    }, { immediate: true });
     
     const selectType = (idx: number) => {
       form.value.typeIndex = idx;
@@ -201,7 +232,8 @@ export default defineComponent({
       onCancel,
       onConfirm,
       errorMsg,
-      isEditMode
+      isEditMode,
+      hasFormChanged
     };
   }
 });
@@ -307,6 +339,13 @@ export default defineComponent({
     ) !important;
     color: #fff !important;
     border: none !important;
+    
+    &.btn-disabled {
+      background: #ccc !important;
+      color: #999 !important;
+      cursor: not-allowed !important;
+      opacity: 0.6 !important;
+    }
   }
 }
 .form-error {
