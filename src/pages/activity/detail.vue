@@ -176,7 +176,7 @@
                   </view>
                   <!-- 右下角的trxId -->
                   <view
-                    v-if="record.templateId === 2 && isChainId(record) && txHashMap[record.id]"
+                    v-if="isChainId(record) && txHashMap[record.id]"
                     class="trxid-info"
                   >
                     <!-- 比特币+电路SVG，主题色#40bad5 -->
@@ -372,7 +372,7 @@ async function refreshUserStages() {
     // 兼容 userActivityDetail 可能没有 chainId
     const detail: any = record.userActivityDetail;
     const chainId = detail && detail.chainId;
-    if (record.templateId === 2 && typeof chainId === 'string' && chainId) {
+    if (typeof chainId === 'string' && chainId) {
       fetchTxHash(chainId, record.id);
     }
   }
